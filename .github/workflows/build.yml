@@ -40,6 +40,9 @@ jobs:
       - name: Run Astro Check
         run: pnpm astro check
 
+      - name: Run TypeScript Check
+        run: pnpm type-check
+
   build:
     strategy:
       matrix:
