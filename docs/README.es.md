@@ -11,8 +11,8 @@ plantilla [Fuwari](https://github.com/saicaca/fuwari) y actualizado a un conjunt
 herramientas más reciente.
 
 🌏 Otros idiomas:
-[**English**](../README.md) /
-[**中文**](README.zh-CN.md) /
+[**English**](README.en.md) /
+[**中文**](../README.md) /
 [**日本語**](README.ja.md) /
 [**한국어**](README.ko.md) /
 [**ไทย**](README.th.md) /

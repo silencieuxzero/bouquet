@@ -10,8 +10,8 @@ Blog tĩnh cá nhân được xây dựng bằng [Astro](https://astro.build), f
 [Fuwari](https://github.com/saicaca/fuwari) và đã được cập nhật lên bộ công cụ mới hơn.
 
 🌏 Ngôn ngữ khác:
-[**English**](../README.md) /
-[**中文**](README.zh-CN.md) /
+[**English**](README.en.md) /
+[**中文**](../README.md) /
 [**日本語**](README.ja.md) /
 [**한국어**](README.ko.md) /
 [**Español**](README.es.md) /

@@ -11,8 +11,8 @@
 ツールチェーンに追随させています。
 
 🌏 他の言語:
-[**English**](../README.md) /
-[**中文**](README.zh-CN.md) /
+[**English**](README.en.md) /
+[**中文**](../README.md) /
 [**한국어**](README.ko.md) /
 [**Español**](README.es.md) /
 [**ไทย**](README.th.md) /

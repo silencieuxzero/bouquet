@@ -11,8 +11,8 @@
 체인을 따르도록 업데이트했습니다.
 
 🌏 다른 언어:
-[**English**](../README.md) /
-[**中文**](README.zh-CN.md) /
+[**English**](README.en.md) /
+[**中文**](../README.md) /
 [**日本語**](README.ja.md) /
 [**Español**](README.es.md) /
 [**ไทย**](README.th.md) /
