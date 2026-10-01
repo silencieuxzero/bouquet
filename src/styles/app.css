@@ -1,0 +1,24 @@
+﻿/**
+ * Tailwind CSS v4 entry point.
+ *
+ * These partials are inlined into one compilation context: Tailwind v4 only resolves
+ * `@apply` for stylesheets sharing the entry's context. Previously the whole
+ * src/styles folder was bundled only as an accidental side effect of ImageWrapper's
+ * broad `import.meta.glob("../../**")`, which scanned all of src/.
+ *
+ * `variables.styl` and `markdown-extend.styl` are Stylus (not plain CSS) and contain
+ * no `@apply`, so Layout.astro imports them directly and Vite compiles them.
+ */
+@import "tailwindcss";
+
+@import "./main.css";
+@import "./markdown.css";
+@import "./scrollbar.css";
+@import "./transition.css";
+@import "./photoswipe.css";
+@import "./expressive-code.css";
+
+@plugin "@tailwindcss/typography";
+
+/* Dark mode stays class-driven (<html class="dark">), matching the previous v3 config. */
+@custom-variant dark (&:where(.dark, .dark *));

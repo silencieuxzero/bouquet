@@ -49,7 +49,8 @@ export function getDir(path: string): string {
 export function getPostAssetBasePath(filePath: string | undefined): string {
 	if (!filePath) return "content/posts/";
 	const lastSlashIndex = filePath.lastIndexOf("/");
-	const dir = lastSlashIndex < 0 ? "" : filePath.substring(0, lastSlashIndex + 1);
+	const dir =
+		lastSlashIndex < 0 ? "" : filePath.substring(0, lastSlashIndex + 1);
 	return dir.replace(/^src\//, "");
 }
 
