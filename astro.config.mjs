@@ -159,6 +159,15 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		server: {
+			watch: {
+				// On Windows, Vite's watcher can walk up to the drive root, where the
+				// protected "System Volume Information" folder makes the readdir stream
+				// fail with EINVAL and takes the whole dev server down. Ignoring the bare
+				// drive roots (plus that folder) keeps the watcher inside the project.
+				ignored: [/^[A-Za-z]:[\\/]?$/, "**/System Volume Information/**"],
+			},
+		},
 		build: {
 			rollupOptions: {
 				onwarn(warning, warn) {
