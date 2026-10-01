@@ -39,6 +39,20 @@ export function getDir(path: string): string {
 	return path.substring(0, lastSlashIndex + 1);
 }
 
+/**
+ * Resolve the `basePath` used to load a post's local assets (e.g. its cover).
+ *
+ * Content Layer ids drop the trailing `/index`, so an entry's id is no longer a
+ * usable directory. `filePath` (root-relative, POSIX) still carries the real
+ * location, e.g. `src/content/posts/guide/index.md` -> `content/posts/guide/`.
+ */
+export function getPostAssetBasePath(filePath: string | undefined): string {
+	if (!filePath) return "content/posts/";
+	const lastSlashIndex = filePath.lastIndexOf("/");
+	const dir = lastSlashIndex < 0 ? "" : filePath.substring(0, lastSlashIndex + 1);
+	return dir.replace(/^src\//, "");
+}
+
 export function url(path: string) {
 	return joinUrl("", import.meta.env.BASE_URL, path);
 }
