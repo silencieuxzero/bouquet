@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -56,7 +56,7 @@ Konten blog dan pengaturan situs masih memakai nilai bawaan template — sunting
 ## Kebutuhan
 
 - **Node.js 22.12.0 atau lebih baru**
-- **pnpm 9 atau lebih baru**
+- **pnpm 10 atau lebih baru**
 
 Versi pnpm yang tepat dipatok melalui kolom `packageManager`, sehingga versi yang
 kompatibel dipilih secara otomatis. Skrip `preinstall` menolak npm dan Yarn.

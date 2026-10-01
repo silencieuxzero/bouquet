@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -56,7 +56,7 @@
 ## 요구 사항
 
 - **Node.js 22.12.0 이상**
-- **pnpm 9 이상**
+- **pnpm 10 이상**
 
 pnpm의 정확한 버전은 `packageManager` 필드로 고정되어 있어 호환 버전이 자동으로
 선택됩니다. `preinstall` 스크립트는 npm과 Yarn을 거부합니다.

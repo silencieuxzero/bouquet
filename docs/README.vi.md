@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -55,7 +55,7 @@ Nội dung blog và cấu hình site vẫn là giá trị mặc định của m�
 ## Yêu cầu
 
 - **Node.js 22.12.0 trở lên**
-- **pnpm 9 trở lên**
+- **pnpm 10 trở lên**
 
 Phiên bản pnpm chính xác được ghim qua trường `packageManager`, nên bản tương thích
 sẽ được chọn tự động. Script `preinstall` sẽ từ chối npm và Yarn.

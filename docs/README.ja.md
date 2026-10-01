@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -56,7 +56,7 @@
 ## 動作環境
 
 - **Node.js 22.12.0 以上**
-- **pnpm 9 以上**
+- **pnpm 10 以上**
 
 pnpm の正確なバージョンは `packageManager` フィールドで固定されているため、互換版が
 自動的に選択されます。`preinstall` スクリプトは npm と Yarn を拒否します。

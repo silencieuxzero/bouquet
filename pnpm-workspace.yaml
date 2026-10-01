@@ -1,0 +1,18 @@
+# pnpm 10 stopped running dependency lifecycle scripts automatically, so every
+# package that needs one must be listed explicitly. Before pnpm 10 this allow-list
+# lived in the "pnpm" field of package.json; pnpm 10 reads it from here instead.
+onlyBuiltDependencies:
+  # Verifies/installs the prebuilt native binary that sharp loads at runtime.
+  - sharp
+  # Verifies the platform-specific esbuild binary; without it Vite's bundling fails.
+  - esbuild
+
+# Reviewed and deliberately skipped:
+#   @parcel/watcher - its install() compiles from source, but it only arrives here as
+#                     an optional dependency of sass, and this project styles with
+#                     Stylus. The prebuilt @parcel/watcher-win32-x64 package still
+#                     installs, so nothing depends on that build step.
+#   swup            - its postinstall() only prints an OpenCollective donation prompt.
+ignoredBuiltDependencies:
+  - "@parcel/watcher"
+  - swup

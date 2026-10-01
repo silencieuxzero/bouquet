@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -57,7 +57,7 @@ defecto de la plantilla: edita [src/config.ts](../src/config.ts) para personaliz
 ## Requisitos
 
 - **Node.js 22.12.0 o superior**
-- **pnpm 9 o superior**
+- **pnpm 10 o superior**
 
 La versión exacta de pnpm está fijada en el campo `packageManager`, por lo que se
 selecciona automáticamente una versión compatible. El script `preinstall` rechaza npm

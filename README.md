@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -54,7 +54,7 @@
 ## 环境要求
 
 - **Node.js ≥ 22.12.0**
-- **pnpm ≥ 9**
+- **pnpm ≥ 10**
 
 pnpm 的确切版本由 `packageManager` 字段锁定，会自动选用兼容版本。`preinstall`
 脚本会拒绝 npm 与 Yarn。

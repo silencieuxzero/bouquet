@@ -1,7 +1,7 @@
 # 🍥 Fuwari
 
 ![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![pnpm >= 10](https://img.shields.io/badge/pnpm-%3E%3D10-blue)
 ![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
 ![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -56,7 +56,7 @@ The blog content and site settings are still the template defaults — edit
 ## Requirements
 
 - **Node.js ≥ 22.12.0**
-- **pnpm ≥ 9**
+- **pnpm ≥ 10**
 
 The exact pnpm version is pinned through the `packageManager` field, so a compatible
 release is selected automatically. The `preinstall` script rejects npm and Yarn.
