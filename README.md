@@ -1,99 +1,184 @@
-# 🍥Fuwari  
-![Node.js >= 20](https://img.shields.io/badge/node.js-%3E%3D20-brightgreen) 
-![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue) 
-[![DeepWiki](https://img.shields.io/badge/DeepWiki-saicaca%2Ffuwari-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5ErkJggg==)](https://deepwiki.com/saicaca/fuwari)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari?ref=badge_shield&issueType=license)
+# 🍥 Fuwari
 
-A static blog template built with [Astro](https://astro.build).
+![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
+![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
+![License MIT](https://img.shields.io/badge/license-MIT-green)
 
-[**🖥️ Live Demo (Vercel)**](https://fuwari.vercel.app)
-
-![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
+A personal static blog built with [Astro](https://astro.build), forked from the
+[Fuwari](https://github.com/saicaca/fuwari) template and kept up to date with the
+current toolchain.
 
 🌏 README in
-[**中文**](https://github.com/saicaca/fuwari/blob/main/docs/README.zh-CN.md) /
-[**日本語**](https://github.com/saicaca/fuwari/blob/main/docs/README.ja.md) /
-[**한국어**](https://github.com/saicaca/fuwari/blob/main/docs/README.ko.md) /
-[**Español**](https://github.com/saicaca/fuwari/blob/main/docs/README.es.md) /
-[**ไทย**](https://github.com/saicaca/fuwari/blob/main/docs/README.th.md) /
-[**Tiếng Việt**](https://github.com/saicaca/fuwari/blob/main/docs/README.vi.md) /
-[**Bahasa Indonesia**](https://github.com/saicaca/fuwari/blob/main/docs/README.id.md) (Provided by the community and may not always be up-to-date)
+[**中文**](docs/README.zh-CN.md) /
+[**日本語**](docs/README.ja.md) /
+[**한국어**](docs/README.ko.md) /
+[**Español**](docs/README.es.md) /
+[**ไทย**](docs/README.th.md) /
+[**Tiếng Việt**](docs/README.vi.md) /
+[**Bahasa Indonesia**](docs/README.id.md)
 
-## ✨ Features
+## About
 
-- [x] Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)
-- [x] Smooth animations and page transitions
-- [x] Light / dark mode
-- [x] Customizable theme colors & banner
-- [x] Responsive design
-- [x] Search functionality with [Pagefind](https://pagefind.app/)
-- [x] [Markdown extended features](https://github.com/saicaca/fuwari?tab=readme-ov-file#-markdown-extended-syntax)
-- [x] Table of contents
-- [x] RSS feed
+This repository started as a copy of Fuwari and has since been upgraded to a newer
+stack than the upstream template:
 
-## 🚀 Getting Started
+| Area | Upstream template | This repository |
+|:--|:--|:--|
+| Astro | 5.x | **7.3** |
+| Tailwind CSS | 3.x via `@astrojs/tailwind` | **4.x via `@tailwindcss/vite`** |
+| Content collections | legacy `src/content/config.ts` | **Content Layer API** (`src/content.config.ts`) |
+| Svelte | 5.39 | **5.57** |
 
-1. Create your blog repository:
-    - [Generate a new repository](https://github.com/saicaca/fuwari/generate) from this template or fork this repository.
-    - Or run one of the following commands:
-       ```sh
-       npm create fuwari@latest
-       yarn create fuwari
-       pnpm create fuwari@latest
-       bun create fuwari@latest
-       deno run -A npm:create-fuwari@latest
-       ```
-2. To edit your blog locally, clone your repository, run `pnpm install` to install dependencies.
-    - Install [pnpm](https://pnpm.io) `npm install -g pnpm` if you haven't.
-3. Edit the config file `src/config.ts` to customize your blog.
-4. Run `pnpm new-post <filename>` to create a new post and edit it in `src/content/posts/`.
-5. Deploy your blog to Vercel, Netlify, GitHub Pages, etc. following [the guides](https://docs.astro.build/en/guides/deploy/). You need to edit the site configuration in `astro.config.mjs` before deployment.
+Because `@astrojs/tailwind` never supported Astro 6+, the Tailwind CSS 4 migration was
+required rather than optional. Styles are now configured CSS-first in
+[`src/styles/app.css`](src/styles/app.css) instead of `tailwind.config.js`.
 
-## 📝 Frontmatter of Posts
+The blog content and site settings are still the template defaults — edit
+[`src/config.ts`](src/config.ts) to make it your own.
+
+## Features
+
+- Built with Astro and Tailwind CSS, with Svelte for interactive components
+- Smooth page transitions via [Swup](https://swup.js.org/)
+- Client-side full-text search via [Pagefind](https://pagefind.app/)
+- Light / dark mode with a customizable accent hue, persisted in `localStorage`
+- Responsive layout with a table of contents on wide screens
+- Syntax-highlighted code blocks via [Expressive Code](https://expressive-code.com/),
+  with language badges, copy buttons and collapsible sections
+- Math typesetting via [KaTeX](https://katex.org/)
+- Extended Markdown: admonitions, GitHub repository cards
+- Image lightbox via [PhotoSwipe](https://photoswipe.com/), optimized with Sharp
+- RSS feed, sitemap and `robots.txt` generated at build time
+- UI strings translated into 10 languages
+
+## Requirements
+
+- **Node.js ≥ 22.12.0**
+- **pnpm ≥ 9**
+
+The exact pnpm version is pinned through the `packageManager` field, so a compatible
+release is selected automatically. The `preinstall` script rejects npm and Yarn.
+
+## Getting Started
+
+```sh
+pnpm install     # install dependencies
+pnpm dev         # start the dev server at http://localhost:4321
+```
+
+Then:
+
+1. Edit [`src/config.ts`](src/config.ts) — site title, subtitle, language, theme hue,
+   banner, table of contents and favicons.
+2. Run `pnpm new-post <filename>` to scaffold a post in `src/content/posts/`.
+3. Set the `site` and `base` values in [`astro.config.mjs`](astro.config.mjs) before
+   deploying.
+
+## Project Structure
+
+```
+src/
+├── assets/         images imported by components
+├── components/     Astro and Svelte components (control/, misc/, widget/)
+├── constants/      layout constants, icon defaults, nav link presets
+├── content/        blog posts and the standalone pages collection
+├── i18n/           UI strings, one module per language
+├── layouts/        Layout.astro and MainGridLayout.astro
+├── pages/          routes: index, archive, about, posts, RSS, robots.txt
+├── plugins/        remark / rehype and Expressive Code plugins
+├── styles/         app.css (Tailwind entry) and per-feature stylesheets
+├── types/          shared TypeScript types
+└── utils/          content queries, URL and theme helpers
+src/content.config.ts   collection definitions (Content Layer API)
+```
+
+## Post Frontmatter
+
+Posts live in `src/content/posts/` and are validated against the schema in
+`src/content.config.ts`.
 
 ```yaml
 ---
 title: My First Blog Post
 published: 2023-09-09
 description: This is the first post of my new Astro blog.
-image: ./cover.jpg
+image: ./cover.jpg        # relative to the post file, or an absolute / public URL
 tags: [Foo, Bar]
 category: Front-end
 draft: false
-lang: jp      # Set only if the post's language differs from the site's language in `config.ts`
+lang: jp                  # only when the post differs from the site language
 ---
 ```
 
-## 🧩 Markdown Extended Syntax
+Only `title` and `published` are required. Set `draft: true` to exclude a post from
+production builds while keeping it visible in development.
 
-In addition to Astro's default support for [GitHub Flavored Markdown](https://github.github.com/gfm/), several extra Markdown features are included:
+To keep a post's assets next to it, use a folder with an `index.md`:
 
-- Admonitions ([Preview and Usage](https://fuwari.vercel.app/posts/markdown-extended/#admonitions))
-- GitHub repository cards ([Preview and Usage](https://fuwari.vercel.app/posts/markdown-extended/#github-repository-cards))
-- Enhanced code blocks with Expressive Code ([Preview](https://fuwari.vercel.app/posts/expressive-code/) / [Docs](https://expressive-code.com/))
+```
+src/content/posts/my-post/
+├── index.md
+└── cover.jpg
+```
 
-## ⚡ Commands
+## Markdown Extensions
 
-All commands are run from the root of the project, from a terminal:
+On top of [GitHub Flavored Markdown](https://github.github.com/gfm/), the build
+pipeline adds:
 
-| Command                    | Action                                              |
-|:---------------------------|:----------------------------------------------------|
-| `pnpm install`             | Installs dependencies                               |
-| `pnpm dev`                 | Starts local dev server at `localhost:4321`         |
-| `pnpm build`               | Build your production site to `./dist/`             |
-| `pnpm preview`             | Preview your build locally, before deploying        |
-| `pnpm check`               | Run checks for errors in your code                  |
-| `pnpm format`              | Format your code using Biome                        |
-| `pnpm new-post <filename>` | Create a new post                                   |
-| `pnpm astro ...`           | Run CLI commands like `astro add`, `astro check`    |
-| `pnpm astro --help`        | Get help using the Astro CLI                        |
+- **Admonitions** — `note`, `tip`, `important`, `caution` and `warning` callouts.
+- **GitHub repository cards** — embed a repo summary with its stars and license.
+- **Enhanced code blocks** — Expressive Code features, including collapsible
+  sections, line numbers and language badges.
+- **Math** — inline and block formulas rendered with KaTeX.
 
-## ✏️ Contributing
+Runnable examples of each live in the demo posts under `src/content/posts/`.
 
-Check out the [Contributing Guide](https://github.com/saicaca/fuwari/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
+## Commands
 
-## 📄 License
+Run all commands from the repository root:
 
-This project is licensed under the MIT License.
+| Command | Action |
+|:--|:--|
+| `pnpm install` | Install dependencies |
+| `pnpm dev` | Start the dev server at `localhost:4321` |
+| `pnpm build` | Build the site to `./dist/`, then index it with Pagefind |
+| `pnpm preview` | Serve the production build locally |
+| `pnpm check` | Run `astro check` for type and template errors |
+| `pnpm format` | Format `src/` with Biome |
+| `pnpm lint` | Lint and auto-fix `src/` with Biome |
+| `pnpm new-post <filename>` | Scaffold a new post |
+| `pnpm astro ...` | Run Astro CLI commands such as `astro add` |
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari?ref=badge_large&issueType=license)
+`pnpm build` runs `astro build` followed by `pagefind --site dist`. Search only works
+against a production build, so use `pnpm build && pnpm preview` to test it.
+
+## Deployment
+
+The output in `dist/` is fully static and can be hosted anywhere. Vercel, Netlify and
+Cloudflare Pages all build it without extra configuration — set the build command to
+`pnpm build` and the output directory to `dist`, then follow the
+[Astro deployment guides](https://docs.astro.build/en/guides/deploy/) for your host.
+
+Remember to update `site` in `astro.config.mjs` first: it feeds the sitemap, RSS feed
+and canonical URLs.
+
+Continuous integration runs on every push and pull request through
+[`.github/workflows/build.yml`](.github/workflows/build.yml) and
+[`.github/workflows/biome.yml`](.github/workflows/biome.yml).
+
+## Credits
+
+Based on [Fuwari](https://github.com/saicaca/fuwari) by
+[saicaca](https://github.com/saicaca), which provided the original design and
+implementation. Upstream is tracked through the `upstream` git remote.
+
+Bundled fonts are [Roboto](https://fonts.google.com/specimen/Roboto) and
+[JetBrains Mono](https://www.jetbrains.com/lp/mono/); icons come from
+[Iconify](https://iconify.design/).
+
+## License
+
+[MIT](LICENSE) — the original copyright notice is retained.

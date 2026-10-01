@@ -1,106 +1,184 @@
 # 🍥 Fuwari
 
-Template blog statis yang dibangun dengan [Astro](https://astro.build).
+![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
+![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
+![License MIT](https://img.shields.io/badge/license-MIT-green)
 
-[**🖥️ Demo Langsung (Vercel)**](https://fuwari.vercel.app)
+Blog statis pribadi yang dibangun dengan [Astro](https://astro.build), di-fork dari
+template [Fuwari](https://github.com/saicaca/fuwari) dan diperbarui ke perangkat
+tooling yang lebih baru.
 
-![Gambar Pratinjau](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
+🌏 Bahasa lain:
+[**English**](../README.md) /
+[**中文**](README.zh-CN.md) /
+[**日本語**](README.ja.md) /
+[**한국어**](README.ko.md) /
+[**Español**](README.es.md) /
+[**ไทย**](README.th.md) /
+[**Tiếng Việt**](README.vi.md)
 
-🌏 README dalam
-[**中文**](https://github.com/saicaca/fuwari/blob/main/docs/README.zh-CN.md) /
-[**日本語**](https://github.com/saicaca/fuwari/blob/main/docs/README.ja.md) /
-[**한국어**](https://github.com/saicaca/fuwari/blob/main/docs/README.ko.md) /
-[**Español**](https://github.com/saicaca/fuwari/blob/main/docs/README.es.md) /
-[**ไทย**](https://github.com/saicaca/fuwari/blob/main/docs/README.th.md) /
-[**Tiếng Việt**](https://github.com/saicaca/fuwari/blob/main/docs/README.vi.md) /
-**Bahasa Indonesia (ini)** (Disediakan oleh komunitas, mungkin tidak selalu paling mutakhir)
+## Tentang
 
-## ✨ Fitur
+Repositori ini awalnya adalah salinan Fuwari dan kini berjalan di atas stack yang lebih
+baru daripada template aslinya:
 
-- [x] Dibangun dengan [Astro](https://astro.build) dan [Tailwind CSS](https://tailwindcss.com)
-- [x] Animasi dan transisi halaman yang halus
-- [x] Mode terang / gelap
-- [x] Warna tema & banner yang bisa dikustomisasi
-- [x] Desain responsif
-- [x] Fitur pencarian dengan [Pagefind](https://pagefind.app/)
-- [x] [Fitur markdown tambahan](#-markdown-sintaks-ekstensi)
-- [x] Daftar isi (Table of Contents)
-- [x] RSS feed
+| Aspek | Template asli | Repositori ini |
+|:--|:--|:--|
+| Astro | 5.x | **7.3** |
+| Tailwind CSS | 3.x melalui `@astrojs/tailwind` | **4.x melalui `@tailwindcss/vite`** |
+| Koleksi konten | `src/content/config.ts` lama | **Content Layer API** (`src/content.config.ts`) |
+| Svelte | 5.39 | **5.57** |
 
-## 🚀 Memulai
+Karena `@astrojs/tailwind` tidak pernah mendukung Astro 6 ke atas, migrasi ke Tailwind
+CSS 4 menjadi wajib, bukan pilihan. Konfigurasi gaya kini ditulis dengan pendekatan CSS
+terlebih dahulu di [src/styles/app.css](../src/styles/app.css), bukan `tailwind.config.js`.
 
-1. Buat repositori blog kamu:
-    - [Generate repositori baru](https://github.com/saicaca/fuwari/generate) dari template ini atau fork repositori ini.
-    - Atau jalankan salah satu perintah berikut:
-       ```sh
-        # npm
-        npm create fuwari@latest.
+Konten blog dan pengaturan situs masih memakai nilai bawaan template — sunting
+[src/config.ts](../src/config.ts) untuk menjadikannya situs Anda.
 
-        # yarn
-        yarn create fuwari.
+## Fitur
 
-        # pnpm
-        pnpm create fuwari@latest
+- Dibangun dengan Astro dan Tailwind CSS, memakai Svelte untuk komponen interaktif
+- Transisi halaman yang mulus melalui [Swup](https://swup.js.org/)
+- Pencarian teks lengkap di sisi klien melalui [Pagefind](https://pagefind.app/)
+- Mode terang / gelap dengan warna aksen yang dapat diubah, disimpan di `localStorage`
+- Tata letak responsif, menampilkan daftar isi pada layar lebar
+- Penyorotan sintaks kode melalui [Expressive Code](https://expressive-code.com/),
+  lengkap dengan label bahasa, tombol salin, dan blok yang dapat dilipat
+- Penulisan rumus matematika dengan [KaTeX](https://katex.org/)
+- Markdown tambahan: admonition dan kartu repositori GitHub
+- Lightbox gambar melalui [PhotoSwipe](https://photoswipe.com/), dioptimalkan dengan Sharp
+- Feed RSS, sitemap, dan `robots.txt` dibuat saat build
+- Teks antarmuka diterjemahkan ke 10 bahasa
 
-        # bun
-        bun create fuwari@latest
+## Kebutuhan
 
-        # deno
-        deno run -A npm:create-fuwari@latest
-        ```
-2. Untuk mengedit blog secara lokal, klon repositori kamu, jalankan `pnpm install` untuk instalasi dependensi.
-    - Install [pnpm](https://pnpm.io) `npm install -g pnpm` jika belum punya.
-3. Edit file konfigurasi `src/config.ts` untuk menyesuaikan blog.
-4. Jalankan `pnpm new-post <nama-file>` untuk membuat postingan baru dan edit di `src/content/posts/`.
-5. Deploy blog ke Vercel, Netlify, GitHub Pages, dll. sesuai [panduan](https://docs.astro.build/en/guides/deploy/). Jangan lupa edit konfigurasi situs di `astro.config.mjs` sebelum deploy.
+- **Node.js 22.12.0 atau lebih baru**
+- **pnpm 9 atau lebih baru**
 
-## 📝 Frontmatter Postingan
+Versi pnpm yang tepat dipatok melalui kolom `packageManager`, sehingga versi yang
+kompatibel dipilih secara otomatis. Skrip `preinstall` menolak npm dan Yarn.
+
+## Memulai
+
+```sh
+pnpm install     # pasang dependensi
+pnpm dev         # jalankan server pengembangan di http://localhost:4321
+```
+
+Selanjutnya:
+
+1. Sunting [src/config.ts](../src/config.ts) —— judul situs, subjudul, bahasa, hue tema,
+   banner, daftar isi, dan favicon.
+2. Jalankan `pnpm new-post <filename>` untuk membuat draf di `src/content/posts/`.
+3. Tetapkan `site` dan `base` di [astro.config.mjs](../astro.config.mjs) sebelum deploy.
+
+## Struktur Proyek
+
+```
+src/
+├── assets/         gambar yang diimpor komponen
+├── components/     komponen Astro dan Svelte (control/, misc/, widget/)
+├── constants/      konstanta tata letak, ikon bawaan, preset tautan navigasi
+├── content/        artikel blog dan koleksi halaman mandiri
+├── i18n/           teks antarmuka, satu modul per bahasa
+├── layouts/        Layout.astro dan MainGridLayout.astro
+├── pages/          rute: beranda, arsip, about, artikel, RSS, robots.txt
+├── plugins/        plugin remark / rehype dan Expressive Code
+├── styles/         app.css (entri Tailwind) dan stylesheet per fitur
+├── types/          tipe TypeScript bersama
+└── utils/          kueri konten, utilitas URL dan tema
+src/content.config.ts   definisi koleksi (Content Layer API)
+```
+
+## Frontmatter Artikel
+
+Artikel berada di `src/content/posts/` dan divalidasi dengan skema di
+`src/content.config.ts`.
 
 ```yaml
 ---
-title: Judul Postingan Pertama Saya
+title: My First Blog Post
 published: 2023-09-09
-description: Ini adalah postingan pertama blog Astro saya.
-image: ./cover.jpg
+description: This is the first post of my new Astro blog.
+image: ./cover.jpg        # relatif terhadap berkas artikel, atau path absolut di public
 tags: [Foo, Bar]
 category: Front-end
 draft: false
-lang: id   # Isi hanya jika bahasa postingan berbeda dari bahasa default di `config.ts`
+lang: jp                  # hanya bila bahasa artikel berbeda dari bahasa situs
 ---
 ```
 
-## 🧩 Markdown Sintaks Ekstensi
+Hanya `title` dan `published` yang wajib. Setel `draft: true` untuk mengecualikan
+artikel dari build produksi namun tetap menampilkannya saat pengembangan.
 
-Selain dukungan default Astro untuk [GitHub Flavored Markdown](https://github.github.com/gfm/), terdapat beberapa fitur tambahan:
+Untuk menyimpan aset di samping artikel, gunakan bentuk folder dengan `index.md`:
 
-- Admonisi ([Pratinjau & Cara Pakai](https://fuwari.vercel.app/posts/markdown-extended/#admonitions))
-- Kartu repositori GitHub ([Pratinjau & Cara Pakai](https://fuwari.vercel.app/posts/markdown-extended/#github-repository-cards))
-- Kode blok ekspresif lewat Expressive Code ([Pratinjau](https://fuwari.vercel.app/posts/expressive-code/) / [Dokumentasi](https://expressive-code.com/))
+```
+src/content/posts/my-post/
+├── index.md
+└── cover.jpg
+```
 
-## ⚡ Perintah
+## Sintaks Markdown Tambahan
 
-Semua perintah dijalankan dari root proyek, via terminal:
+Selain [GitHub Flavored Markdown](https://github.github.com/gfm/), pipeline build
+menambahkan:
 
-| Perintah                     | Aksi                                                      |
-|:-----------------------------|:----------------------------------------------------------|
-| `pnpm install`               | Instalasi dependensi                                      |
-| `pnpm dev`                   | Menjalankan server dev lokal di `localhost:4321`          |
-| `pnpm build`                 | Build untuk produksi ke folder `./dist/`                  |
-| `pnpm preview`               | Pratinjau hasil build sebelum deploy                      |
-| `pnpm check`                 | Cek error atau masalah di kode                            |
-| `pnpm format`                | Format kode dengan Biome                                  |
-| `pnpm new-post <nama-file>`  | Membuat postingan baru                                    |
-| `pnpm astro ...`             | Jalankan perintah CLI seperti `astro add`, `astro check`  |
-| `pnpm astro --help`          | Bantuan menggunakan Astro CLI                             |
+- **Admonition** —— blok `note`, `tip`, `important`, `caution`, dan `warning`.
+- **Kartu repositori GitHub** —— menyematkan ringkasan repo beserta bintang dan lisensi.
+- **Blok kode lanjutan** —— fitur Expressive Code, termasuk blok yang dapat dilipat,
+  nomor baris, dan label bahasa.
+- **Matematika** —— rumus sebaris dan blok yang dirender dengan KaTeX.
 
-## ✏️ Kontribusi
+Contoh yang dapat dijalankan untuk masing-masing ada di artikel demo dalam
+`src/content/posts/`.
 
-Lihat [Panduan Kontribusi](https://github.com/saicaca/fuwari/blob/main/CONTRIBUTING.md) untuk detail tentang cara berkontribusi ke proyek ini.
+## Perintah
 
-## 📄 Lisensi
+Jalankan semua perintah dari akar repositori:
 
-Proyek ini dilisensikan di bawah MIT License.
+| Perintah | Aksi |
+|:--|:--|
+| `pnpm install` | Memasang dependensi |
+| `pnpm dev` | Menjalankan server pengembangan di `localhost:4321` |
+| `pnpm build` | Build situs ke `./dist/`, lalu mengindeksnya dengan Pagefind |
+| `pnpm preview` | Melayani hasil build produksi secara lokal |
+| `pnpm check` | Menjalankan `astro check` untuk galat tipe dan template |
+| `pnpm format` | Memformat `src/` dengan Biome |
+| `pnpm lint` | Memeriksa dan memperbaiki `src/` dengan Biome |
+| `pnpm new-post <filename>` | Membuat artikel baru |
+| `pnpm astro ...` | Menjalankan perintah Astro CLI seperti `astro add` |
 
----
+`pnpm build` menjalankan `astro build` lalu `pagefind --site dist`. Pencarian hanya
+bekerja pada build produksi, jadi gunakan `pnpm build && pnpm preview` untuk mengujinya.
 
-> Dokumentasi ini tersedia dalam Bahasa Indonesia. Untuk bahasa lain, lihat README di direktori docs.
+## Deploy
+
+Keluaran di `dist/` sepenuhnya statis dan dapat dihosting di mana saja. Vercel,
+Netlify, dan Cloudflare Pages semuanya dapat mem-build tanpa konfigurasi tambahan ——
+setel perintah build ke `pnpm build` dan direktori keluaran ke `dist`, lalu ikuti
+[panduan deploy Astro](https://docs.astro.build/en/guides/deploy/) untuk penyedia Anda.
+
+Ingat untuk memperbarui `site` di `astro.config.mjs` terlebih dahulu: sitemap, feed
+RSS, dan URL kanonis bergantung padanya.
+
+CI berjalan pada setiap push dan pull request melalui
+[.github/workflows/build.yml](../.github/workflows/build.yml) dan
+[.github/workflows/biome.yml](../.github/workflows/biome.yml).
+
+## Kredit
+
+Berdasarkan [Fuwari](https://github.com/saicaca/fuwari) karya
+[saicaca](https://github.com/saicaca), yang menyediakan desain dan implementasi asli.
+Proyek asal dilacak melalui remote git `upstream`.
+
+Font yang disertakan adalah [Roboto](https://fonts.google.com/specimen/Roboto) dan
+[JetBrains Mono](https://www.jetbrains.com/lp/mono/); ikon berasal dari
+[Iconify](https://iconify.design/).
+
+## Lisensi
+
+[MIT](../LICENSE) —— pemberitahuan hak cipta asli dipertahankan.

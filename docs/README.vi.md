@@ -1,84 +1,183 @@
-# 🍥Fuwari  
+# 🍥 Fuwari
 
-Một mẫu blog tĩnh được xây bằng [Astro](https://astro.build).
+![Node.js >= 22.12](https://img.shields.io/badge/node.js-%3E%3D22.12-brightgreen)
+![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue)
+![Astro 7](https://img.shields.io/badge/Astro-7-ff5d01?logo=astro)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
+![License MIT](https://img.shields.io/badge/license-MIT-green)
 
-[**🖥️ Xem bản dùng thử (Vercel)**](https://fuwari.vercel.app)
+Blog tĩnh cá nhân được xây dựng bằng [Astro](https://astro.build), fork từ mẫu
+[Fuwari](https://github.com/saicaca/fuwari) và đã được cập nhật lên bộ công cụ mới hơn.
 
-![Hình ảnh xem trước](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
+🌏 Ngôn ngữ khác:
+[**English**](../README.md) /
+[**中文**](README.zh-CN.md) /
+[**日本語**](README.ja.md) /
+[**한국어**](README.ko.md) /
+[**Español**](README.es.md) /
+[**ไทย**](README.th.md) /
+[**Bahasa Indonesia**](README.id.md)
 
-## ✨ Tính năng
+## Giới thiệu
 
-- [x] Được xây dựng bằng [Astro](https://astro.build) và [Tailwind CSS](https://tailwindcss.com)
-- [x] Có hoạt ảnh đổi chuyển trang mượt mà
-- [x] Chế độ sáng / tối
-- [x] Màu sắc và biểu ngữ có thể tùy chỉnh được
-- [x] Thiết kế nhanh nhạy
-- [x] Có chức năng tìm kiếm với [Pagefind](https://pagefind.app/)
-- [x] [Có các tính năng mở rộng của Markdown](https://github.com/saicaca/fuwari?tab=readme-ov-file#-markdown-extended-syntax)
-- [x] Có mục lục
-- [x] Nguồn cấp dữ liệu RSS
+Kho lưu trữ này khởi đầu là một bản sao của Fuwari và hiện chạy trên nền tảng mới hơn
+mẫu gốc:
 
-## 🚀 Bắt đầu
+| Hạng mục | Mẫu gốc | Kho lưu trữ này |
+|:--|:--|:--|
+| Astro | 5.x | **7.3** |
+| Tailwind CSS | 3.x qua `@astrojs/tailwind` | **4.x qua `@tailwindcss/vite`** |
+| Bộ sưu tập nội dung | `src/content/config.ts` cũ | **Content Layer API** (`src/content.config.ts`) |
+| Svelte | 5.39 | **5.57** |
 
-1. Tạo kho lưu trữ blog của bạn:
-    - [Tạo một kho lưu trữ mới](https://github.com/saicaca/fuwari/generate) từ mẫu này hoặc fork kho lưu trữ này.
-    - Hoặc chạy một trong các lệnh sau:
-       ```sh
-       npm create fuwari@latest
-       yarn create fuwari
-       pnpm create fuwari@latest
-       bun create fuwari@latest
-       deno run -A npm:create-fuwari@latest
-       ```
-2. Để chỉnh sửa blog của bạn trên máy cục bộ, hãy clone kho lưu trữ của bạn, chạy lệnh `pnpm install` để cài đặt các phụ thuộc..
-    - Cài đặt [pnpm](https://pnpm.io) `npm install -g pnpm` nếu chưa có.
-3. Chỉnh sửa tệp cấu hình `src/config.ts` để tùy chỉnh blog của bạn.
-4. Chạy `pnpm new-post <filename>` để tạo một bài viết mới và chỉnh sửa nó trong `src/content/posts/`.
-5. Triển khai blog của bạn lên Vercel, Netlify, GitHub Pages, etc. theo [chỉ dẫn](https://docs.astro.build/en/guides/deploy/). Bạn cần chỉnh sửa cấu hình trang web trong `astro.config.mjs` trước khi triển khai.
+Vì `@astrojs/tailwind` chưa từng hỗ trợ Astro 6 trở lên, việc chuyển sang Tailwind
+CSS 4 là bắt buộc chứ không phải tùy chọn. Cấu hình style nay được viết theo hướng CSS
+trước trong [src/styles/app.css](../src/styles/app.css) thay vì `tailwind.config.js`.
 
-## 📝 Tiêu đề đầy đủ của bài viết
+Nội dung blog và cấu hình site vẫn là giá trị mặc định của mẫu — hãy sửa
+[src/config.ts](../src/config.ts) để biến nó thành site của bạn.
+
+## Tính năng
+
+- Xây dựng bằng Astro và Tailwind CSS, dùng Svelte cho các thành phần tương tác
+- Chuyển trang mượt mà nhờ [Swup](https://swup.js.org/)
+- Tìm kiếm toàn văn phía client bằng [Pagefind](https://pagefind.app/)
+- Chế độ sáng / tối với màu nhấn tùy chỉnh, lưu trong `localStorage`
+- Bố cục đáp ứng, hiển thị mục lục trên màn hình rộng
+- Tô sáng mã nguồn bằng [Expressive Code](https://expressive-code.com/), kèm nhãn
+  ngôn ngữ, nút sao chép và khối thu gọn
+- Hiển thị công thức toán bằng [KaTeX](https://katex.org/)
+- Markdown mở rộng: admonition và thẻ kho GitHub
+- Lightbox ảnh bằng [PhotoSwipe](https://photoswipe.com/), ảnh tối ưu bằng Sharp
+- Tạo feed RSS, sitemap và `robots.txt` khi build
+- Chuỗi giao diện đã dịch sang 10 ngôn ngữ
+
+## Yêu cầu
+
+- **Node.js 22.12.0 trở lên**
+- **pnpm 9 trở lên**
+
+Phiên bản pnpm chính xác được ghim qua trường `packageManager`, nên bản tương thích
+sẽ được chọn tự động. Script `preinstall` sẽ từ chối npm và Yarn.
+
+## Bắt đầu
+
+```sh
+pnpm install     # cài đặt phụ thuộc
+pnpm dev         # chạy dev server tại http://localhost:4321
+```
+
+Sau đó:
+
+1. Sửa [src/config.ts](../src/config.ts) —— tiêu đề, phụ đề, ngôn ngữ, màu chủ đề,
+   banner, mục lục và favicon.
+2. Chạy `pnpm new-post <filename>` để tạo bản nháp trong `src/content/posts/`.
+3. Đặt `site` và `base` trong [astro.config.mjs](../astro.config.mjs) trước khi triển khai.
+
+## Cấu trúc dự án
+
+```
+src/
+├── assets/         ảnh được các component import
+├── components/     component Astro và Svelte (control/, misc/, widget/)
+├── constants/      hằng số bố cục, icon mặc định, liên kết điều hướng
+├── content/        bài viết blog và bộ sưu tập trang riêng
+├── i18n/           chuỗi giao diện, mỗi ngôn ngữ một module
+├── layouts/        Layout.astro và MainGridLayout.astro
+├── pages/          route: trang chủ, lưu trữ, about, bài viết, RSS, robots.txt
+├── plugins/        plugin remark / rehype và Expressive Code
+├── styles/         app.css (điểm vào Tailwind) và stylesheet theo tính năng
+├── types/          kiểu TypeScript dùng chung
+└── utils/          truy vấn nội dung, tiện ích URL và chủ đề
+src/content.config.ts   định nghĩa bộ sưu tập (Content Layer API)
+```
+
+## Frontmatter của bài viết
+
+Bài viết nằm trong `src/content/posts/` và được kiểm tra theo schema trong
+`src/content.config.ts`.
 
 ```yaml
 ---
-title: Blog đầu tiên của mình
+title: My First Blog Post
 published: 2023-09-09
-description: Đây là bài viết đầu tiên vủa mình trên trang blog tạo bằng Astro này.
-image: ./cover.jpg
+description: This is the first post of my new Astro blog.
+image: ./cover.jpg        # tương đối với tệp bài viết, hoặc đường dẫn tuyệt đối trong public
 tags: [Foo, Bar]
 category: Front-end
 draft: false
-lang: jp      # Chỉ đặt nếu ngôn ngữ của bài viết khác với ngôn ngữ của trang web trong `config.ts`
+lang: jp                  # chỉ khi ngôn ngữ bài viết khác ngôn ngữ site
 ---
 ```
 
-## 🧩 Cú pháp Markdown mở rộng
+Chỉ `title` và `published` là bắt buộc. Đặt `draft: true` để loại bài viết khỏi bản
+build production nhưng vẫn hiển thị khi phát triển.
 
-Ngoài việc Astro đã có hỗ trợ mặc định cho [Markdown vị Github](https://github.github.com/gfm/), một số tính năng Markdown khác cũng đã được bổ sung:
+Muốn để tài nguyên cạnh bài viết, hãy dùng dạng thư mục với `index.md`:
 
-- Chêm xen ([Xem trước và Cách sử dụng](https://fuwari.vercel.app/posts/markdown-extended/#admonitions))
-- Thẻ hiển thị kho lưu trữ GitHub ([Xem trước và Cách sử dụng](https://fuwari.vercel.app/posts/markdown-extended/#github-repository-cards))
-- Các khối mã nâng cao với Expressive Code ([Xem trước](https://fuwari.vercel.app/posts/expressive-code/) / [Tài liệu](https://expressive-code.com/))
+```
+src/content/posts/my-post/
+├── index.md
+└── cover.jpg
+```
 
-## ⚡ Lệnh
+## Cú pháp Markdown mở rộng
 
-Tất cả các lệnh được chạy từ thư mục gốc của dự án, từ một bảng điều khiển:
+Ngoài [GitHub Flavored Markdown](https://github.github.com/gfm/), pipeline build còn
+bổ sung:
 
-| Lệnh                    | Mục đích                                              |
-|:---------------------------|:----------------------------------------------------|
-| `pnpm install`             | Cài đặt các phụ thuộc                               |
-| `pnpm dev`                 | Khởi động máy chủ cục bộ tại `localhost:4321`         |
-| `pnpm build`               | Xây dựng trang web của bạn vào `./dist/`             |
-| `pnpm preview`             | Xem trước bản web cục bộ của bạn, trước khi triển khai        |
-| `pnpm check`               | Chạy kiểm tra lỗi trong mã của bạn                 |
-| `pnpm format`              | Định dạng mã của bạn bằng Biome                       |
-| `pnpm new-post <filename>` | Tạo một bài viết mới                               |
-| `pnpm astro ...`           | Chạy các lệnh CLI như `astro add`, `astro check`    |
-| `pnpm astro --help`        | Nhận trợ giúp sử dụng Astro CLI                       |
+- **Admonition** —— các khối `note`, `tip`, `important`, `caution`, `warning`.
+- **Thẻ kho GitHub** —— nhúng tóm tắt kho kèm số sao và giấy phép.
+- **Khối mã nâng cao** —— các tính năng của Expressive Code như khối thu gọn, số dòng
+  và nhãn ngôn ngữ.
+- **Toán học** —— công thức trong dòng và dạng khối do KaTeX kết xuất.
 
-## ✏️ Đóng góp
+Ví dụ chạy được của từng tính năng nằm trong các bài viết mẫu ở `src/content/posts/`.
 
-Xem [Hướng dẫn đóng góp](https://github.com/saicaca/fuwari/blob/main/CONTRIBUTING.md) để biết thêm chi tiết về cách đóng góp cho dự án này.
+## Lệnh
 
-## 📄 Giấy phép
+Chạy mọi lệnh từ thư mục gốc của kho lưu trữ:
 
-Dự án này đã được cấp Giấy phép MIT.
+| Lệnh | Tác dụng |
+|:--|:--|
+| `pnpm install` | Cài đặt phụ thuộc |
+| `pnpm dev` | Chạy dev server tại `localhost:4321` |
+| `pnpm build` | Build site vào `./dist/` rồi lập chỉ mục bằng Pagefind |
+| `pnpm preview` | Xem trước bản build production tại máy |
+| `pnpm check` | Chạy `astro check` để tìm lỗi kiểu và template |
+| `pnpm format` | Định dạng `src/` bằng Biome |
+| `pnpm lint` | Kiểm tra và tự sửa `src/` bằng Biome |
+| `pnpm new-post <filename>` | Tạo bài viết mới |
+| `pnpm astro ...` | Chạy lệnh Astro CLI như `astro add` |
+
+`pnpm build` chạy `astro build` rồi `pagefind --site dist`. Tìm kiếm chỉ hoạt động
+với bản build production, nên hãy dùng `pnpm build && pnpm preview` để thử.
+
+## Triển khai
+
+Kết quả trong `dist/` hoàn toàn tĩnh và có thể host ở bất kỳ đâu. Vercel, Netlify và
+Cloudflare Pages đều build được mà không cần cấu hình thêm —— đặt lệnh build là
+`pnpm build` và thư mục đầu ra là `dist`, rồi xem
+[hướng dẫn triển khai của Astro](https://docs.astro.build/en/guides/deploy/) cho nhà
+cung cấp của bạn.
+
+Hãy cập nhật `site` trong `astro.config.mjs` trước: sitemap, feed RSS và URL chính
+tắc đều phụ thuộc vào nó.
+
+CI chạy mỗi khi push và pull request qua
+[.github/workflows/build.yml](../.github/workflows/build.yml) và
+[.github/workflows/biome.yml](../.github/workflows/biome.yml).
+
+## Ghi công
+
+Dựa trên [Fuwari](https://github.com/saicaca/fuwari) của
+[saicaca](https://github.com/saicaca), nơi cung cấp thiết kế và phần triển khai gốc.
+Bản gốc được theo dõi qua remote `upstream` của git.
+
+Phông chữ đi kèm là [Roboto](https://fonts.google.com/specimen/Roboto) và
+[JetBrains Mono](https://www.jetbrains.com/lp/mono/); icon đến từ
+[Iconify](https://iconify.design/).
+
+## Giấy phép
+
+[MIT](../LICENSE) —— giữ nguyên thông báo bản quyền gốc.
