@@ -60,17 +60,15 @@ Instead, real routes were added — `src/pages/categories/[category].astro` and
 `src/pages/tags/[tag].astro`, enumerating `getCategoryList()` / `getTagList()` via
 `getStaticPaths()`. All 18 URLs now render. Two follow-ups:
 
-**2a-i. The new detail pages are orphaned (nothing links to them).**
-The site's own taxonomy links still go through `getCategoryUrl()` /
-`getTagUrl()` — which point at `/archive/?category=…` — and those two helpers are
-consumed by `src/components/PostMeta.astro:56,73`, `src/components/widget/Tags.astro:26`
-and both index pages (`src/pages/categories.astro:43`, `src/pages/tags.astro:44`).
-So `/categories/教程/` is reachable **only** by typing the legacy URL.
+**2a-i. ~~The new detail pages are orphaned (nothing links to them).~~ — RESOLVED**
 
-*Decision needed:* point the helpers at the new routes (one consistent taxonomy
-system, at the cost of changing the theme's existing behaviour), **or** leave it —
-the new pages then exist purely to keep the 18 legacy URLs alive, and the same
-content is reachable two ways (`/categories/教程/` and `/archive/?category=教程`).
+*Decision (2026-10): point the helpers at the new routes.* `getCategoryUrl()` /
+`getTagUrl()` in `src/utils/url-utils.ts` now emit `/categories/<name>/` and
+`/tags/<name>/`, so PostMeta, the sidebar Tags widget and both index pages link
+straight to the detail pages. Verified in the built output: zero
+`/archive/?tag=` / `?category=` query links remain in `dist/`; the
+uncategorized fallback still routes to the archive filter.
+(Commit `bde7bca`.)
 
 **2a-ii. Latin tag casing flips, and needs a check after the first real deploy.**
 Tag routes are emitted with the **stored** casing (`/tags/CSS/`, `/tags/Astro/`,
@@ -101,7 +99,7 @@ Handled: `public/_redirects` + a matching `redirects` map in `astro.config.mjs`
 
 | # | Item | Original | Here | Note |
 |---|---|---|---|---|
-| D1 | **Licence** | `CC-BY-SA 3.0` (`/licenses/by-sa/3.0/`) in the footer | `CC BY-NC-SA 4.0` (`config.ts:98`) as a per-post block | **Legal meaning differs** — the original has *no* non-commercial restriction. Please confirm which you want. |
+| D1 | **Licence** | `CC-BY-SA 3.0` (`/licenses/by-sa/3.0/`) in the footer | `CC BY-NC-SA 4.0` (`config.ts:98`) as a per-post block | **RESOLVED (2026-10): keep 4.0 and the per-post licence block.** The original had *no* non-commercial restriction; the author chose the 4.0 terms deliberately. |
 | D2 | Per-post licence block | — | rendered on every post **and** note | The original has none (0 hits for `license-container` / `creative-commons` in every fetched old post page). This is an addition, not a migration. |
 | D3 | Context menu | 9 actions + a "导航" header row; "blog" → `/blog` | the same 9 actions, no header row; "archive" → `/archive/` | `/blog` has no listing route here, so that item was repointed rather than dropped. |
 | D4 | Copy confirmation | `✓ 已复制` text | a checkmark **icon** | No `ctxCopied` key exists in this theme; the icon avoids inventing one. |
@@ -119,10 +117,12 @@ Handled: `public/_redirects` + a matching `redirects` map in `astro.config.mjs`
 
 ---
 
-## 4. Original features this build does NOT have (all out of scope)
+## 4. Original features this build does NOT have — DECIDED: will NOT be built
 
 These exist on the live old site and were **not** requested in the migration
-brief, so they were inventoried rather than built.
+brief, so they were inventoried rather than built. **The author has decided
+(2026-10) that none of these will be implemented** — this section is a record,
+not a backlog.
 
 | Feature | Old-site evidence |
 |---|---|
