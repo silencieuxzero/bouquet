@@ -1,0 +1,247 @@
+---
+// ============================================================================
+// 教程
+// ============================================================================
+// 纯静态列表页：条目录自 src/data/tutorials.json（与 src/data/links.json、
+// src/data/gallery.json 同一约定）。数据取自原站 /tutorials/ 页面的
+// `#tutorials-data` JSON（title/description/pubDate/category/url），
+// 仅使用本站既有类、CSS 变量与 Tailwind 工具类渲染。
+//
+// 选择方案 (a) 静态 JSON 而非内容集合，原因：
+//   1. 原站教程条目自带独立的短标题与分类名（wiki教程 / Astro教程），
+//      与文章本身的 category("教程") / tags 并不一致，无法从集合推导；
+//   2. 条目只是“文章索引”，正文已经由 src/pages/posts/[...slug].astro 渲染，
+//      无需再引入第二个集合（content.config.ts 亦不属本任务范围）。
+// ============================================================================
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getPostUrlBySlug } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import tutorialsData from "../data/tutorials.json";
+
+interface Tutorial {
+	slug: string;
+	title: string;
+	description?: string;
+	category?: string;
+	published?: string;
+}
+
+const tutorials: Tutorial[] = tutorialsData.tutorials.entries;
+
+/** 分类按首次出现顺序排列；原站每页 6 条 */
+const categories = tutorials
+	.map((tutorial) => tutorial.category)
+	.filter((category): category is string => !!category)
+	.filter((category, index, all) => all.indexOf(category) === index);
+---
+
+<MainGridLayout title={i18n(I18nKey.tutorials)} description={i18n(I18nKey.tutorials)}>
+    <div id="tutorials-page" class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
+        <div data-pagefind-body class="card-base z-10 px-6 md:px-9 py-6 relative w-full">
+            <div data-pagefind-meta="title" class="font-bold text-3xl text-90 mb-2">{i18n(I18nKey.tutorials)}</div>
+            <p class="text-50 text-sm mb-6">{tutorialsData.tutorials.subtitle}</p>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div class="relative w-full md:w-64 shrink-0">
+                    <Icon
+                        name="material-symbols:search-rounded"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-50 text-lg pointer-events-none"
+                    />
+                    <input
+                        id="tutorial-search"
+                        type="text"
+                        class="w-full h-9 pl-10 pr-3 rounded-lg text-sm text-90 bg-[var(--btn-regular-bg)] outline-none border-none transition focus:ring-1 focus:ring-[var(--primary)]"
+                        placeholder={i18n(I18nKey.search)}
+                        aria-label={i18n(I18nKey.search)}
+                    />
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button
+                        type="button"
+                        data-tutorial-category=""
+                        aria-pressed="true"
+                        class="tutorial-filter btn-plain scale-animation rounded-lg px-3 h-8 text-sm font-bold current-theme-btn"
+                    >
+                        {i18n(I18nKey.all)}
+                    </button>
+                    {categories.map((category) => (
+                        <button
+                            type="button"
+                            data-tutorial-category={category}
+                            aria-pressed="false"
+                            class="tutorial-filter btn-plain scale-animation rounded-lg px-3 h-8 text-sm font-bold"
+                        >
+                            {category}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div id="tutorials-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {tutorials.map((tutorial, i) => (
+                    <a
+                        href={getPostUrlBySlug(tutorial.slug)}
+                        data-tutorial-card
+                        data-category={tutorial.category ?? ""}
+                        data-search={`${tutorial.title} ${tutorial.description ?? ""}`.toLowerCase()}
+                        class="card-base group flex flex-col p-5 rounded-[var(--radius-large)] overflow-hidden relative onload-animation hover:bg-[var(--btn-card-bg-hover)] active:bg-[var(--btn-card-bg-active)] active:scale-95"
+                        style={`animation-delay: calc(var(--content-delay) + ${i * 60}ms);`}
+                    >
+                        <div class="flex items-center gap-2 mb-2">
+                            <Icon
+                                name="material-symbols:school-outline-rounded"
+                                class="text-[var(--primary)] text-xl shrink-0"
+                            />
+                            <span class="text-50 text-xs font-medium truncate">{tutorial.category}</span>
+                        </div>
+                        <div class="font-bold text-lg text-90 transition group-hover:text-[var(--primary)] mb-2">
+                            {tutorial.title}
+                        </div>
+                        <div class="text-75 text-sm line-clamp-2 flex-1 mb-3">{tutorial.description}</div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center text-30 text-xs">
+                                <Icon name="material-symbols:calendar-today-outline-rounded" class="text-base mr-1" />
+                                {tutorial.published ? formatDateToYYYYMMDD(new Date(tutorial.published)) : ""}
+                            </span>
+                            <Icon
+                                name="material-symbols:chevron-right-rounded"
+                                class="transition text-[var(--primary)] text-[1.75rem] shrink-0 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"
+                            />
+                        </div>
+                    </a>
+                ))}
+            </div>
+
+            <div id="tutorials-empty" data-pagefind-ignore class="text-50 text-center py-8" hidden>{i18n(I18nKey.noResults)}</div>
+
+            <nav id="tutorials-pagination" class="flex flex-wrap items-center justify-center gap-2 mt-6" aria-label={i18n(I18nKey.tutorials)}></nav>
+        </div>
+    </div>
+</MainGridLayout>
+
+<script>
+        const PAGE_SIZE = 6;
+
+        function initTutorials() {
+                const root = document.getElementById("tutorials-page");
+                if (!root || root.dataset.ready === "1") return;
+                root.dataset.ready = "1";
+
+                const input = document.getElementById("tutorial-search") as HTMLInputElement | null;
+                const cards = Array.from(
+                        root.querySelectorAll<HTMLElement>("[data-tutorial-card]"),
+                );
+                const empty = document.getElementById("tutorials-empty");
+                const pagination = document.getElementById("tutorials-pagination");
+                const filters = Array.from(
+                        root.querySelectorAll<HTMLElement>(".tutorial-filter"),
+                );
+
+                let keyword = "";
+                let category = "";
+                let page = 1;
+
+                function matched(): HTMLElement[] {
+                        return cards.filter((card) => {
+                                const okCategory =
+                                        !category || card.dataset.category === category;
+                                const okKeyword =
+                                        !keyword ||
+                                        (card.dataset.search ?? "").includes(keyword);
+                                return okCategory && okKeyword;
+                        });
+                }
+
+                function render() {
+                        const list = matched();
+                        const pageCount = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+                        if (page > pageCount) page = pageCount;
+
+                        const start = (page - 1) * PAGE_SIZE;
+                        cards.forEach((card) => {
+                                card.style.display = "none";
+                        });
+                        list.slice(start, start + PAGE_SIZE).forEach((card) => {
+                                card.style.display = "";
+                        });
+
+                        if (empty) empty.hidden = list.length > 0;
+                        if (!pagination) return;
+
+                        pagination.innerHTML = "";
+                        if (pageCount <= 1) return;
+
+                        // Mirrors src/components/control/Pagination.astro: `btn-card`
+                        // for every page, `disabled` for out-of-range, and the
+                        // primary background for the current page.
+                        const makeButton = (label: string, target: number, disabled: boolean) => {
+                                const button = document.createElement("button");
+                                button.type = "button";
+                                if (disabled) {
+                                        button.className =
+                                                "btn-card disabled overflow-hidden rounded-lg w-11 h-11 font-bold";
+                                } else if (target === page) {
+                                        button.className =
+                                                "rounded-lg w-11 h-11 flex items-center justify-center font-bold bg-[var(--primary)] text-white dark:text-black/70";
+                                } else {
+                                        button.className =
+                                                "btn-card overflow-hidden rounded-lg w-11 h-11 font-bold text-[var(--primary)] active:scale-[0.85]";
+                                }
+                                button.textContent = label;
+                                button.disabled = disabled;
+                                button.addEventListener("click", () => {
+                                        page = target;
+                                        render();
+                                });
+                                return button;
+                        };
+
+                        pagination.appendChild(makeButton("‹", page - 1, page <= 1));
+                        for (let i = 1; i <= pageCount; i++) {
+                                pagination.appendChild(makeButton(String(i), i, false));
+                        }
+                        pagination.appendChild(
+                                makeButton("›", page + 1, page >= pageCount),
+                        );
+                }
+
+                filters.forEach((filter) => {
+                        filter.addEventListener("click", () => {
+                                category = filter.dataset.tutorialCategory ?? "";
+                                page = 1;
+                                filters.forEach((other) => {
+                                        const active = other === filter;
+                                        other.classList.toggle("current-theme-btn", active);
+                                        other.setAttribute("aria-pressed", String(active));
+                                });
+                                render();
+                        });
+                });
+
+                let timer: number | undefined;
+                input?.addEventListener("input", () => {
+                        window.clearTimeout(timer);
+                        timer = window.setTimeout(() => {
+                                keyword = (input.value ?? "").trim().toLowerCase();
+                                page = 1;
+                                render();
+                        }, 200);
+                });
+
+                render();
+        }
+
+        initTutorials();
+        const w = window as any;
+        if (w?.swup?.hooks) {
+                w.swup.hooks.on("page:view", initTutorials);
+        } else {
+                document.addEventListener("swup:enable", () =>
+                        w.swup.hooks.on("page:view", initTutorials),
+                );
+        }
+</script>

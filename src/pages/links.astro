@@ -1,0 +1,75 @@
+---
+// ============================================================================
+// 友情链接
+// ============================================================================
+// 友链条目来自 src/data/links.json（与 src/data/gallery.json 同一约定），
+// 数据取自原站 /links/ 页面，仅使用本站既有类与 Tailwind 工具类渲染。
+// ============================================================================
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+import linksData from "../data/links.json";
+
+interface FriendLink {
+	name: string;
+	url: string;
+	description?: string;
+	avatar?: string;
+}
+
+const links: FriendLink[] = linksData.links.entries;
+---
+
+<MainGridLayout title={i18n(I18nKey.links)} description={i18n(I18nKey.links)}>
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
+        <div data-pagefind-body class="card-base z-10 px-6 md:px-9 py-6 relative w-full">
+            <div data-pagefind-meta="title" class="font-bold text-3xl text-90 mb-6">{i18n(I18nKey.links)}</div>
+
+            {links.length === 0 && (
+                <div class="text-50 text-center py-8">{i18n(I18nKey.noResults)}</div>
+            )}
+
+            {links.length > 0 && (
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {links.map((link, i) => (
+                        <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="card-base group flex items-center gap-4 p-4 w-full rounded-[var(--radius-large)] overflow-hidden relative onload-animation hover:bg-[var(--btn-card-bg-hover)] active:bg-[var(--btn-card-bg-active)] active:scale-95"
+                            style={`animation-delay: calc(var(--content-delay) + ${i * 50}ms);`}
+                        >
+                            {link.avatar ? (
+                                <img
+                                    src={link.avatar}
+                                    alt={link.name}
+                                    loading="lazy"
+                                    class="w-12 h-12 rounded-full object-cover shrink-0"
+                                />
+                            ) : (
+                                <div class="w-12 h-12 rounded-full shrink-0 bg-[var(--btn-regular-bg)] flex items-center justify-center">
+                                    <Icon name="material-symbols:person-rounded" class="text-[var(--primary)] text-2xl" />
+                                </div>
+                            )}
+
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-lg text-90 transition group-hover:text-[var(--primary)] mb-1 truncate">
+                                    {link.name}
+                                </div>
+                                {link.description && (
+                                    <div class="text-75 text-sm line-clamp-2">{link.description}</div>
+                                )}
+                            </div>
+
+                            <Icon
+                                name="material-symbols:chevron-right-rounded"
+                                class="transition text-[var(--primary)] text-[2rem] shrink-0 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"
+                            />
+                        </a>
+                    ))}
+                </div>
+            )}
+        </div>
+    </div>
+</MainGridLayout>

@@ -1,11 +1,13 @@
 ---
 import { render } from "astro:content";
+import EncryptedPost from "@components/misc/EncryptedPost.astro";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
+import { resolveOgImageUrl } from "@utils/seo-utils";
 import { getPostAssetBasePath, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
@@ -25,6 +27,12 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 
+// The cover is only usable as a share image when it is already addressable on
+// the live site; a src-relative cover ("./cover.jpeg") resolves to the default
+// public image instead of emitting an unusable URL. The same value feeds both
+// og:image and the JSON-LD, so the two never disagree.
+const coverImageUrl = resolveOgImageUrl(entry.data.image);
+
 const jsonLd = {
 	"@context": "https://schema.org",
 	"@type": "BlogPosting",
@@ -40,10 +48,11 @@ const jsonLd = {
 	inLanguage: entry.data.lang
 		? entry.data.lang.replace("_", "-")
 		: siteConfig.lang.replace("_", "-"),
-	// TODO include cover image here
+	url: new URL(getPostUrlBySlug(entry.id), import.meta.env.SITE).href,
+	image: coverImageUrl,
 };
 ---
-<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings}>
+<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} ogImage={entry.data.image} headings={headings}>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
@@ -100,9 +109,13 @@ const jsonLd = {
             }
 
 
-            <Markdown class="mb-6 markdown-content onload-animation">
-                <Content />
-            </Markdown>
+            {entry.data.encrypted ? (
+                <EncryptedPost slug={entry.id} class="mb-6 onload-animation" />
+            ) : (
+                <Markdown class="mb-6 markdown-content onload-animation">
+                    <Content />
+                </Markdown>
+            )}
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.id} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
 

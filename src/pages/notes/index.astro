@@ -1,0 +1,62 @@
+---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedNotesList } from "@utils/content-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getNoteUrlBySlug } from "@utils/url-utils";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+import { getPostAssetBasePath } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+
+const notes = await getSortedNotesList();
+---
+
+<MainGridLayout title={i18n(I18nKey.notes)} description={i18n(I18nKey.notes)}>
+    <div class="transition flex flex-col rounded-[var(--radius-large)] bg-[var(--card-bg)] py-1 md:py-0 md:bg-transparent md:gap-4 mb-4">
+        {notes.length === 0 && (
+            <div class="card-base px-6 py-8 text-center text-black/50 dark:text-white/50">
+                {i18n(I18nKey.noNotes)}
+            </div>
+        )}
+        {notes.map((note, i) => {
+            const hasCover = typeof note.data.image === "string" && note.data.image !== "";
+            return (
+            <a
+                href={getNoteUrlBySlug(note.slug)}
+                class="card-base group px-6 py-5 md:px-9 md:py-6 w-full rounded-[var(--radius-large)] overflow-hidden relative onload-animation"
+                style={`animation-delay: calc(var(--content-delay) + ${i * 50}ms);`}
+            >
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0">
+                        <div class="font-bold text-xl text-90 transition group-hover:text-[var(--primary)] mb-2">
+                            {note.data.title}
+                        </div>
+                        {note.data.description && (
+                            <div class="text-75 text-sm mb-2 line-clamp-2">{note.data.description}</div>
+                        )}
+                        <div class="flex flex-wrap items-center gap-3 text-sm text-black/30 dark:text-white/30">
+                            <span>{formatDateToYYYYMMDD(note.data.published)}</span>
+                            {note.data.category && <span>| {note.data.category}</span>}
+                        </div>
+                    </div>
+                    {hasCover && (
+                        <div class="shrink-0 w-24 h-16 md:w-32 md:h-20 rounded-xl overflow-hidden">
+                            <ImageWrapper
+                                src={note.data.image}
+                                basePath={getPostAssetBasePath(note.filePath)}
+                                alt={note.data.title}
+                                class="w-full h-full"
+                            />
+                        </div>
+                    )}
+                    <Icon
+                        name="material-symbols:chevron-right-rounded"
+                        class="transition text-[var(--primary)] text-[2rem] shrink-0 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0"
+                    />
+                </div>
+            </a>
+            );
+        })}
+    </div>
+</MainGridLayout>

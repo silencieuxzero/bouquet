@@ -1,3 +1,14 @@
+# The registry pnpm itself is downloaded from when it bootstraps the version pinned
+# in package.json ("packageManager"). It is deliberately separate from the registry
+# used for dependencies: mirrors that rewrite a package's "dist.tarball" to a
+# different host (npmreg.proxy.ustclug.org serves tarballs from registry.npmmirror.com)
+# make pnpm record a tarball next to the integrity hash, and pnpm 11.7+ rejects that in
+# packageManagerDependencies with "must use a registry package path and an
+# integrity-only resolution", so `pnpm dev` dies before the script ever runs.
+# Pinning the canonical registry keeps that bootstrap resolution integrity-only.
+packageManagerRegistries:
+  default: https://registry.npmjs.org/
+
 # pnpm 10 stopped running dependency lifecycle scripts automatically, so every
 # package that needs one must be listed explicitly. Before pnpm 10 this allow-list
 # lived in the "pnpm" field of package.json; pnpm 10 reads it from here instead.

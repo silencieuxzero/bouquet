@@ -21,6 +21,7 @@ interface Post {
 		tags: string[];
 		category?: string | null;
 		published: Date;
+		encrypted?: boolean;
 	};
 }
 
@@ -133,6 +134,13 @@ onMount(async () => {
                      group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)]
                      text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden"
                         >
+                            {#if post.data.encrypted}
+                                <span
+                                        class="inline-flex items-center align-middle mr-1.5 px-1.5 py-0.5
+                             rounded-md text-xs font-medium whitespace-nowrap
+                             bg-[var(--btn-regular-bg)] text-[var(--btn-content)]"
+                                >{i18n(I18nKey.encrypted)}</span>
+                            {/if}
                             {post.data.title}
                         </div>
 

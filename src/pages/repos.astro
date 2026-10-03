@@ -1,0 +1,111 @@
+---
+// ============================================================================
+// GitHub 仓库
+// ============================================================================
+// 纯静态列表页：条目录自 src/data/repos.json（与 src/data/links.json、
+// src/data/tutorials.json、src/data/gallery.json 同一约定）。数据取自原站
+// /repos/ 页面的 .repos-grid 结构（name/url/owner/description/language/stars/forks），
+// 仅使用本站既有类、CSS 变量与 Tailwind 工具类渲染。
+//
+// 原站行为还原说明：只有「非作者本人」的仓库才显示 owner 徽标
+// （原站副标题：“没有额外标注的仓库代表是作者的仓库”），因此 backrooms_escape
+// 在 repos.json 中没有 owner 字段，页面上也不渲染徽标。
+// ============================================================================
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+import reposData from "../data/repos.json";
+
+interface Repo {
+	name: string;
+	url: string;
+	owner?: string;
+	description?: string;
+	language?: string;
+	languageColor?: string;
+	stars?: number;
+	forks?: number;
+}
+
+const repos: Repo[] = reposData.repos.entries;
+---
+
+<MainGridLayout title={i18n(I18nKey.repos)} description={i18n(I18nKey.repos)}>
+	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
+		<div data-pagefind-body class="card-base z-10 px-6 md:px-9 py-6 relative w-full">
+			<div class="flex items-center gap-3 mb-2">
+				<Icon name="fa6-brands:github" class="text-90 text-2xl shrink-0" />
+				<div data-pagefind-meta="title" class="font-bold text-3xl text-90">{i18n(I18nKey.repos)}</div>
+			</div>
+			<p class="text-50 text-sm mb-6">{reposData.repos.subtitle}</p>
+
+			{
+				repos.length > 0 ? (
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{repos.map((repo, i) => (
+							<a
+								href={repo.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="card-base group flex flex-col gap-2 p-4 w-full rounded-[var(--radius-large)] overflow-hidden relative onload-animation hover:bg-[var(--btn-card-bg-hover)] active:bg-[var(--btn-card-bg-active)] active:scale-95"
+								style={`animation-delay: calc(var(--content-delay) + ${i * 50}ms);`}
+							>
+								<div class="flex items-start justify-between gap-2">
+									<div class="flex items-center gap-2 min-w-0">
+										<Icon
+											name="fa6-brands:github"
+											class="text-[var(--primary)] text-lg shrink-0"
+										/>
+										<div class="font-bold text-lg text-90 transition truncate group-hover:text-[var(--primary)]">
+											{repo.name}
+										</div>
+									</div>
+									<div class="flex items-center gap-3 shrink-0">
+										{repo.owner && (
+											<span class="text-50 text-xs font-medium bg-[var(--btn-regular-bg)] rounded-full px-2 py-0.5 mt-0.5">
+												{repo.owner}
+											</span>
+										)}
+										{repo.stars !== undefined && (
+											<span class="flex items-center text-50 text-xs" title="Stars">
+												<Icon name="fa6-solid:star" class="text-[0.8rem] mr-1" />
+												{repo.stars}
+											</span>
+										)}
+										{repo.forks !== undefined && (
+											<span class="flex items-center text-50 text-xs" title="Forks">
+												<Icon name="fa6-solid:code-fork" class="text-[0.8rem] mr-1" />
+												{repo.forks}
+											</span>
+										)}
+									</div>
+								</div>
+
+								<p class="text-75 text-sm line-clamp-2 m-0">{repo.description}</p>
+
+								<div class="flex items-center justify-between gap-2 mt-auto">
+									{repo.language && (
+										<span class="flex items-center text-50 text-xs">
+											<span
+												class="w-2.5 h-2.5 rounded-full shrink-0 mr-1.5"
+												style={`background-color: ${repo.languageColor ?? "var(--primary)"};`}
+											/>
+											{repo.language}
+										</span>
+									)}
+									<Icon
+										name="fa6-solid:arrow-up-right-from-square"
+										class="transition text-[0.875rem] -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2] group-hover:text-[var(--primary)]"
+									/>
+								</div>
+							</a>
+						))}
+					</div>
+				) : (
+					<div class="text-50 text-center py-8">{i18n(I18nKey.noResults)}</div>
+				)
+			}
+		</div>
+	</div>
+</MainGridLayout>

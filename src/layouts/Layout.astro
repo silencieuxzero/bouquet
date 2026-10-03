@@ -1,7 +1,9 @@
 ---
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
+/* Body font: Atkinson Hyperlegible, self-hosted from `public/fonts/` and registered by
+   `src/styles/fonts.css` (imported through app.css). The three `@fontsource/roboto/*`
+   imports that used to live here were removed: no `font-family` rule ever applied Roboto
+   (verified with grep), so they only shipped ~35 KB of unused `@font-face` CSS — 19.8% of
+   the main stylesheet at the last build, ~21 KB of it base64-inlined font data. */
 
 /* Global styles. These are imported explicitly: they used to reach the bundle only
    because ImageWrapper's `import.meta.glob("../../**")` happened to scan all of src/. */
@@ -10,6 +12,7 @@ import "../styles/variables.styl";
 import "../styles/markdown-extend.styl";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
+import MusicPlayer from "@components/widget/MusicPlayer.astro";
 import { profileConfig, siteConfig } from "@/config";
 import {
 	AUTO_MODE,
@@ -23,6 +26,7 @@ import {
 } from "../constants/constants";
 import { defaultFavicons } from "../constants/icon";
 import type { Favicon } from "../types/config";
+import { resolveOgImageUrl } from "../utils/seo-utils";
 import { pathsEqual, url } from "../utils/url-utils";
 import "katex/dist/katex.css";
 
@@ -32,9 +36,12 @@ interface Props {
 	description?: string;
 	lang?: string;
 	setOGTypeArticle?: boolean;
+	/** Cover image used for `og:image` / `twitter:image`. Relative to /public. */
+	ogImage?: string;
 }
 
-let { title, banner, description, lang, setOGTypeArticle } = Astro.props;
+let { title, banner, description, lang, setOGTypeArticle, ogImage } =
+	Astro.props;
 
 // apply a class to the body element to decide the height of the banner, only used for initial page load
 // Swup can update the body for each page visit, but it's after the page transition, causing a delay for banner height change
@@ -69,6 +76,24 @@ if (!lang) {
 }
 const siteLang = lang.replace("_", "-");
 
+// Optional full-page background image from siteConfig.backgroundImage
+const bgImageRaw = siteConfig.backgroundImage;
+const bgImageUrl = bgImageRaw
+	? bgImageRaw.startsWith("/")
+		? url(bgImageRaw)
+		: bgImageRaw
+	: "";
+
+// Absolute URL of this page, used for <link rel="canonical"> and og:url.
+// Astro.url is the dev/prod URL; import.meta.env.SITE is the configured `site`.
+const canonicalUrl = new URL(Astro.url.pathname, import.meta.env.SITE).href;
+
+// Social-share image. `og:image` must point at a file a crawler can fetch, so
+// only public paths ("/ds.png") or absolute http(s) URLs are usable; a bundled
+// src/ asset such as `siteConfig.banner.src` has no public URL and would leave
+// this empty, so resolveOgImageUrl falls back to a real public image.
+const ogImageUrl = resolveOgImageUrl(ogImage || siteConfig.banner.src);
+
 const bannerOffsetByPosition = {
 	top: `${BANNER_HEIGHT_EXTEND}vh`,
 	center: `${BANNER_HEIGHT_EXTEND / 2}vh`,
@@ -91,7 +116,7 @@ const bannerOffset =
 		<meta name="author" content={profileConfig.name}>
 
 		<meta property="og:site_name" content={siteConfig.title}>
-		<meta property="og:url" content={Astro.url}>
+		<meta property="og:url" content={canonicalUrl}>
 		<meta property="og:title" content={pageTitle}>
 		<meta property="og:description" content={description || pageTitle}>
 		{setOGTypeArticle ? (
@@ -99,11 +124,16 @@ const bannerOffset =
         ) : (
         <meta property="og:type" content="website" />
         )}
+		<meta property="og:image" content={ogImageUrl} />
 
 		<meta name="twitter:card" content="summary_large_image">
-		<meta property="twitter:url" content={Astro.url}>
+		<meta property="twitter:url" content={canonicalUrl}>
 		<meta name="twitter:title" content={pageTitle}>
 		<meta name="twitter:description" content={description || pageTitle}>
+		<meta name="twitter:image" content={ogImageUrl} />
+
+		<link rel="canonical" href={canonicalUrl}>
+		<link rel="sitemap" href={url("/sitemap-index.xml")}>
 
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
@@ -154,11 +184,15 @@ const bannerOffset =
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 	</head>
-	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner, "has-bg-image": !!bgImageUrl}]}
 		  data-overlayscrollbars-initialize
 	>
 		<ConfigCarrier></ConfigCarrier>
 		<slot />
+
+		<!-- Music player: fixed to the viewport, outside the swup container so it
+		     keeps playing across client-side navigations. -->
+		<MusicPlayer></MusicPlayer>
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
@@ -169,6 +203,7 @@ const bannerOffset =
 	bannerOffset,
 	'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
 	'banner-height': `${BANNER_HEIGHT}vh`,
+	'bg-image': bgImageUrl,
 }}>
 @reference "../styles/app.css";
 @layer components {
@@ -196,6 +231,21 @@ const bannerOffset =
 	}
 	.navbar-hidden {
 		@apply opacity-0 -translate-y-16
+	}
+
+	/* Optional full-page background image, washed with the page colour so text
+	   stays readable in both light and dark mode. */
+	body.has-bg-image {
+		background-image:
+			linear-gradient(
+				color-mix(in oklch, var(--page-bg) 80%, transparent),
+				color-mix(in oklch, var(--page-bg) 90%, transparent)
+			),
+			var(--bg-image);
+		background-size: cover;
+		background-position: center;
+		background-attachment: fixed;
+		background-repeat: no-repeat;
 	}
 }
 </style>

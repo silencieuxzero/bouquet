@@ -29,3 +29,11 @@ yarn.lock
 # ide
 .idea
 *.iml
+
+# Plaintext sources for encrypted posts - never commit these
+private/source/
+
+# Agent / scratch working directories - never commit these
+.agent-teams/
+.tmp-*/
+.workbuddy/

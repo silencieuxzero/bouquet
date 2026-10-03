@@ -1,0 +1,94 @@
+---
+/**
+ * Compact, labelled list of notes.
+ *
+ * Notes are their own collection and use `getNoteUrlBySlug`, so they get this
+ * separate section rather than being merged into `ArchivePanel.svelte` — that
+ * component hardcodes post URLs plus tag/category filter semantics, and notes
+ * share no tags with posts, so a merge would surface filters that match only
+ * half the list.
+ *
+ * Styling uses only existing site utilities (`card-base`, `btn-plain`,
+ * `text-75/50/30`, `dash-line`, `link`) — no new stylesheet, no upstream CSS.
+ */
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import type { NoteForList } from "@utils/content-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getNoteUrlBySlug, url } from "@utils/url-utils";
+
+interface Props {
+	notes: NoteForList[];
+	/** Render at most this many rows (the home page shows only the latest). */
+	limit?: number;
+	/** Render nothing at all when there are no notes (the home page). */
+	hideWhenEmpty?: boolean;
+	class?: string;
+}
+
+const { notes, limit, hideWhenEmpty } = Astro.props;
+const className = Astro.props.class;
+
+const shown = typeof limit === "number" ? notes.slice(0, limit) : notes;
+const shouldRender = shown.length > 0 || !hideWhenEmpty;
+---
+
+{shouldRender && (
+    <div class:list={["card-base px-8 py-6", className]}>
+        <div class="flex flex-row w-full items-center justify-between h-[3.75rem]">
+            <div class="text-2xl font-bold text-75">{i18n(I18nKey.notes)}</div>
+            <a href={url("/notes/")}
+               class="transition link text-[var(--primary)] font-medium text-sm">
+                {i18n(I18nKey.all)}
+            </a>
+        </div>
+
+        {shown.length === 0 && (
+            <div class="text-50 text-sm py-4">{i18n(I18nKey.noNotes)}</div>
+        )}
+
+        {shown.map((note) => (
+            <a
+                href={getNoteUrlBySlug(note.slug)}
+                aria-label={note.data.title}
+                class="group btn-plain !block h-10 w-full rounded-lg hover:text-[initial]"
+            >
+                <div class="flex flex-row justify-start items-center h-full">
+                    <!-- date -->
+                    <div class="w-[15%] md:w-[10%] transition text-sm text-right text-50">
+                        {formatDateToYYYYMMDD(note.data.published)}
+                    </div>
+
+                    <!-- dot and line -->
+                    <div class="w-[15%] md:w-[10%] relative dash-line h-full flex items-center">
+                        <div
+                            class="transition-all mx-auto w-1 h-1 rounded group-hover:h-5
+                                   bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)]
+                                   outline outline-4 z-50
+                                   outline-[var(--card-bg)]
+                                   group-hover:outline-[var(--btn-plain-bg-hover)]
+                                   group-active:outline-[var(--btn-plain-bg-active)]"
+                        ></div>
+                    </div>
+
+                    <!-- note title -->
+                    <div
+                        class="w-[70%] md:max-w-[65%] md:w-[65%] text-left font-bold
+                               group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)]
+                               text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden"
+                    >
+                        {note.data.title}
+                    </div>
+
+                    <!-- tag list -->
+                    <div
+                        class="hidden md:block md:w-[15%] text-left text-sm transition
+                               whitespace-nowrap overflow-ellipsis overflow-hidden text-30"
+                    >
+                        {(note.data.tags || []).map((t) => `#${t}`).join(" ")}
+                    </div>
+                </div>
+            </a>
+        ))}
+    </div>
+)}

@@ -1,5 +1,6 @@
 ---
 import BackToTop from "@components/control/BackToTop.astro";
+import ContextMenu from "@components/control/ContextMenu.astro";
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
 import SideBar from "@components/widget/SideBar.astro";
@@ -21,6 +22,8 @@ interface Props {
 	description?: string;
 	lang?: string;
 	setOGTypeArticle?: boolean;
+	/** Cover image used for `og:image` / `twitter:image`. Relative to /public. */
+	ogImage?: string;
 	headings?: MarkdownHeading[];
 }
 
@@ -30,6 +33,7 @@ const {
 	description,
 	lang,
 	setOGTypeArticle,
+	ogImage,
 	headings = [],
 } = Astro.props;
 const hasBannerCredit =
@@ -41,7 +45,7 @@ const mainPanelTop = siteConfig.banner.enable
 	: "5.5rem";
 ---
 
-<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle}>
+<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} ogImage={ogImage}>
 
 <!-- Navbar -->
 <slot slot="head" name="head"></slot>
@@ -122,4 +126,8 @@ const mainPanelTop = siteConfig.banner.enable
         {!siteConfig.toc.enable && <div id="toc"></div>}
     </div>
 </div>
+
+<!-- Custom right-click menu. Mounted outside the swup containers (["main", "#toc"])
+     so the node and its listeners survive client-side navigation. -->
+<ContextMenu></ContextMenu>
 </Layout>

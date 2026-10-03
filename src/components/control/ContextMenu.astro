@@ -1,0 +1,399 @@
+---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { url } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+
+/*
+ * Custom right-click menu.
+ *
+ * Styling reuses the site's existing primitives only: `.float-panel` +
+ * `.float-panel-closed` for the panel and its show/hide, `.btn-plain` +
+ * `.scale-animation` for the items (the same combination LightDarkSwitch.svelte
+ * uses for its own float panel), and the existing CSS variables.
+ *
+ * Labels are resolved at build time through i18n; no runtime dictionary.
+ */
+const items = [
+	{
+		action: "back",
+		key: I18nKey.ctxBack,
+		icon: "material-symbols:arrow-back-rounded",
+	},
+	{
+		action: "forward",
+		key: I18nKey.ctxForward,
+		icon: "material-symbols:arrow-forward-rounded",
+	},
+	{
+		action: "refresh",
+		key: I18nKey.ctxRefresh,
+		icon: "material-symbols:refresh-rounded",
+		divider: true,
+	},
+	{
+		action: "home",
+		key: I18nKey.ctxHome,
+		icon: "material-symbols:home-outline-rounded",
+		href: url("/"),
+	},
+	{
+		action: "archive",
+		key: I18nKey.archive,
+		icon: "material-symbols:article-outline-rounded",
+		href: url("/archive/"),
+	},
+	{
+		action: "about",
+		key: I18nKey.about,
+		icon: "material-symbols:info-outline-rounded",
+		href: url("/about/"),
+	},
+	{ action: "theme", key: I18nKey.ctxTheme, divider: true },
+	{ action: "copy", key: I18nKey.ctxCopyLink },
+	{
+		action: "source",
+		key: I18nKey.ctxViewSource,
+		icon: "material-symbols:code-rounded",
+		divider: true,
+	},
+];
+---
+
+<div
+	id="context-menu"
+	role="menu"
+	aria-label={i18n(I18nKey.contextMenu)}
+	inert
+	data-pagefind-ignore
+	class="float-panel float-panel-closed fixed top-0 left-0 z-[100] w-56 py-2 px-1.5 max-h-[calc(100vh-1rem)] overflow-y-auto hide-scrollbar"
+>
+	{
+		items.map((item) => (
+			<>
+				{item.divider && (
+					<div
+						role="separator"
+						class="border-[var(--line-divider)] border-t-[1px] my-1"
+					/>
+				)}
+				{item.href ? (
+					<a
+						data-ctx-action={item.action}
+						href={item.href}
+						role="menuitem"
+						class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95 mb-0.5"
+					>
+						<Icon name={item.icon} class="text-[1.25rem] mr-3" />
+						{i18n(item.key)}
+					</a>
+				) : (
+					<button
+						type="button"
+						data-ctx-action={item.action}
+						role="menuitem"
+						class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95 mb-0.5"
+					>
+						{item.action === "theme" ? (
+							<span class="relative flex items-center justify-center w-[1.25rem] h-[1.25rem] mr-3 shrink-0">
+								<Icon
+									data-ctx-theme-icon="moon"
+									name="material-symbols:dark-mode-outline-rounded"
+									class="absolute text-[1.25rem]"
+								/>
+								<Icon
+									data-ctx-theme-icon="sun"
+									name="material-symbols:wb-sunny-outline-rounded"
+									class="absolute text-[1.25rem] opacity-0"
+								/>
+							</span>
+						) : item.action === "copy" ? (
+							<span class="relative flex items-center justify-center w-[1.25rem] h-[1.25rem] mr-3 shrink-0">
+								<Icon
+									data-ctx-copy-icon="link"
+									name="material-symbols:link-rounded"
+									class="absolute text-[1.25rem]"
+								/>
+								<Icon
+									data-ctx-copy-icon="done"
+									name="material-symbols:check-rounded"
+									class="absolute text-[1.25rem] opacity-0"
+								/>
+							</span>
+						) : (
+							<Icon name={item.icon} class="text-[1.25rem] mr-3" />
+						)}
+						{i18n(item.key)}
+					</button>
+				)}
+			</>
+		))
+	}
+</div>
+
+<script>
+	/*
+	 * Handlers are assigned as element properties so that a re-run of this module
+	 * overwrites instead of stacking; every document/window listener is bound once
+	 * behind a marker on <html>. The menu is mounted outside the swup containers
+	 * (["main", "#toc"]), so its node survives client-side navigation.
+	 */
+	const CONTEXT_MENU_ID = "context-menu";
+	const MENU_MARGIN = 8;
+
+	function setupContextMenu() {
+		const menu = document.getElementById(CONTEXT_MENU_ID);
+		if (!menu) {
+			return;
+		}
+
+		// Open state is derived from the DOM (`.float-panel-closed`) rather than kept
+		// in a closure variable: this module is re-evaluated on every swup head
+		// update while the menu node itself survives, so the document listeners
+		// bound once below must never read a stale per-run flag.
+		const isOpen = () => !menu.classList.contains("float-panel-closed");
+
+		// Where focus was before the menu stole it, so Escape can hand it back.
+		let lastFocused: Element | null = null;
+
+		const getItems = () =>
+			Array.from(menu.querySelectorAll<HTMLElement>("[data-ctx-action]"));
+
+		const syncThemeIcon = () => {
+			const isDark = document.documentElement.classList.contains("dark");
+			menu
+				.querySelectorAll<HTMLElement>("[data-ctx-theme-icon]")
+				.forEach((icon) => {
+					const iconIsSun = icon.dataset.ctxThemeIcon === "sun";
+					icon.classList.toggle("opacity-0", iconIsSun !== isDark);
+				});
+		};
+
+		const showCopyFeedback = () => {
+			const icons = menu.querySelectorAll<HTMLElement>("[data-ctx-copy-icon]");
+			icons.forEach((icon) => {
+				icon.classList.toggle(
+					"opacity-0",
+					icon.dataset.ctxCopyIcon !== "done",
+				);
+			});
+			window.setTimeout(() => {
+				icons.forEach((icon) => {
+					icon.classList.toggle(
+						"opacity-0",
+						icon.dataset.ctxCopyIcon === "done",
+					);
+				});
+			}, 1200);
+		};
+
+		const close = (restoreFocus = false) => {
+			if (!isOpen()) {
+				return;
+			}
+			// Only hand focus back when it currently sits inside the menu (or was
+			// dropped to <body> by the panel going inert) — never when an item that
+			// navigates away triggered the close. `mousedown`/mouseleave closes keep
+			// whatever the user is already interacting with.
+			const shouldRestore =
+				restoreFocus &&
+				lastFocused?.isConnected === true &&
+				(document.activeElement === document.body ||
+					menu.contains(document.activeElement));
+			menu.classList.add("float-panel-closed");
+			menu.inert = true;
+			if (shouldRestore) {
+				(lastFocused as HTMLElement).focus();
+			}
+		};
+
+		const openAt = (x: number, y: number) => {
+			// Measure while closed: `.float-panel-closed` only fades/translates,
+			// so the element still has its final box.
+			menu.style.left = "0px";
+			menu.style.top = "0px";
+			const rect = menu.getBoundingClientRect();
+			const maxLeft = window.innerWidth - rect.width - MENU_MARGIN;
+			const maxTop = window.innerHeight - rect.height - MENU_MARGIN;
+			menu.style.left = `${Math.max(MENU_MARGIN, Math.min(x, maxLeft))}px`;
+			menu.style.top = `${Math.max(MENU_MARGIN, Math.min(y, maxTop))}px`;
+
+			syncThemeIcon();
+			if (!isOpen()) {
+				lastFocused = document.activeElement;
+			}
+			menu.classList.remove("float-panel-closed");
+			menu.inert = false;
+			getItems()[0]?.focus();
+		};
+
+		const copyCurrentUrl = () => {
+			const href = window.location.href;
+			const fallback = () => {
+				const area = document.createElement("textarea");
+				area.value = href;
+				area.setAttribute("readonly", "");
+				area.style.position = "fixed";
+				area.style.opacity = "0";
+				document.body.appendChild(area);
+				area.select();
+				document.execCommand("copy");
+				document.body.removeChild(area);
+			};
+			if (!navigator.clipboard) {
+				fallback();
+				showCopyFeedback();
+				return;
+			}
+			navigator.clipboard
+				.writeText(href)
+				.then(showCopyFeedback)
+				.catch(() => {
+					fallback();
+					showCopyFeedback();
+				});
+		};
+
+		const toggleTheme = () => {
+			// Reuse the site's own switcher so the navbar icon and localStorage
+			// stay in sync. `#scheme-switch` is rendered by LightDarkSwitch.svelte.
+			const schemeSwitch = document.getElementById("scheme-switch");
+			if (schemeSwitch) {
+				(schemeSwitch as HTMLElement).click();
+				return;
+			}
+			// Fallback: the same light/dark semantics as `switchTheme()` in Navbar.astro.
+			if (document.documentElement.classList.contains("dark")) {
+				document.documentElement.classList.remove("dark");
+				localStorage.theme = "light";
+			} else {
+				document.documentElement.classList.add("dark");
+				localStorage.theme = "dark";
+			}
+		};
+
+		menu.onclick = (event: MouseEvent) => {
+			const item = (event.target as HTMLElement | null)?.closest<HTMLElement>(
+				"[data-ctx-action]",
+			);
+			if (!item) {
+				return;
+			}
+			close();
+			switch (item.dataset.ctxAction) {
+				case "back":
+					window.history.back();
+					break;
+				case "forward":
+					window.history.forward();
+					break;
+				case "refresh":
+					window.location.reload();
+					break;
+				case "theme":
+					toggleTheme();
+					break;
+				case "copy":
+					copyCurrentUrl();
+					break;
+				case "source":
+					window.open(`view-source:${window.location.href}`, "_blank");
+					break;
+				// "home" / "archive" / "about" are real anchors: let the browser
+				// (and swup) handle the navigation.
+			}
+		};
+
+		menu.onkeydown = (event: KeyboardEvent) => {
+			const items = getItems();
+			const index = items.indexOf(document.activeElement as HTMLElement);
+			switch (event.key) {
+				case "ArrowDown":
+					event.preventDefault();
+					(index < items.length - 1 ? items[index + 1] : items[0])?.focus();
+					break;
+				case "ArrowUp":
+					event.preventDefault();
+					(index > 0 ? items[index - 1] : items[items.length - 1])?.focus();
+					break;
+				case "Home":
+					event.preventDefault();
+					items[0]?.focus();
+					break;
+				case "End":
+					event.preventDefault();
+					items[items.length - 1]?.focus();
+					break;
+				case "Tab":
+					close();
+					break;
+			}
+		};
+
+		if (document.documentElement.dataset.contextMenuBound === "true") {
+			return;
+		}
+		document.documentElement.dataset.contextMenuBound = "true";
+
+		document.addEventListener("contextmenu", (event: MouseEvent) => {
+			const target = event.target as HTMLElement | null;
+			const tag = target?.tagName;
+			if (
+				tag === "INPUT" ||
+				tag === "TEXTAREA" ||
+				tag === "SELECT" ||
+				target?.isContentEditable
+			) {
+				// Keep the native menu for editable fields.
+				return;
+			}
+			event.preventDefault();
+			openAt(event.clientX, event.clientY);
+		});
+
+		document.addEventListener("click", (event: MouseEvent) => {
+			if (isOpen() && !menu.contains(event.target as Node)) {
+				close();
+			}
+		});
+
+		document.addEventListener(
+			"scroll",
+			(event: Event) => {
+				// Scrolling the menu itself (it is `overflow-y-auto`) must not close it.
+				if (!menu.contains(event.target as Node)) {
+					close();
+				}
+			},
+			{ passive: true, capture: true },
+		);
+		document.addEventListener("keydown", (event: KeyboardEvent) => {
+			if (event.key === "Escape" && isOpen()) {
+				event.preventDefault();
+				close(true);
+			}
+		});
+		// `blur` does not bubble, so this must be a capture listener on `window` to
+		// observe the window itself losing focus. Capture also descends into the
+		// page, though, so it would otherwise fire for *every element* blur (e.g.
+		// moving focus between menu items, or a mousedown on an item). Calling
+		// `close()` there sets `inert` mid-interaction and the pending click is
+		// swallowed — keyboard navigation and all JS-only actions stop working.
+		// Guard on the event source so only genuine window focus loss closes it.
+		//
+		// Both of these deliberately drop the event argument: `close()` takes a
+		// `restoreFocus` flag, and passing the Event through would read as truthy.
+		window.addEventListener(
+			"blur",
+			(event) => {
+				if (event.target === window) {
+					close();
+				}
+			},
+			true,
+		);
+		window.addEventListener("resize", () => close());
+	}
+
+	setupContextMenu();
+</script>

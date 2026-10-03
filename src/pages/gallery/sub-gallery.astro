@@ -1,0 +1,286 @@
+---
+// ============================================================================
+// 子画廊（密码保护）
+// ============================================================================
+// 图片列表不随页面分发：它存放在 /encrypted/sub-gallery.enc，
+// 读者输入密码后在浏览器本地解密（PBKDF2 + AES-GCM，见 src/utils/webcrypto.ts）。
+// 仓库中不含明文列表，构建也无需密码。
+// ============================================================================
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { subGalleryConfig } from "../../config";
+
+const PAYLOAD_NAME = "sub-gallery";
+
+/** 传给客户端脚本的文案（浏览器端没有 i18n()） */
+const uiText = {
+	enterPassword: i18n(I18nKey.enterPassword),
+	decrypting: i18n(I18nKey.decrypting),
+	decryptFailed: i18n(I18nKey.decryptFailed),
+};
+const uiTextJson = JSON.stringify(uiText);
+---
+
+<MainGridLayout
+    title={subGalleryConfig.title}
+    description={subGalleryConfig.subtitle || subGalleryConfig.title}
+>
+    <div
+        id="sub-gallery"
+        data-encrypted-payload={PAYLOAD_NAME}
+        data-ui-text={uiTextJson}
+        class="card-base px-6 md:px-9 py-6 w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4"
+    >
+        <div class="font-bold text-3xl text-black/90 dark:text-white/90 mb-2">{subGalleryConfig.title}</div>
+        {subGalleryConfig.subtitle && (
+            <p class="text-sm text-black/50 dark:text-white/50 mb-6">{subGalleryConfig.subtitle}</p>
+        )}
+
+        <!-- 密码门禁 -->
+        <div class="encrypted-gate py-8">
+            <div class="flex flex-col items-center text-center">
+                <div class="transition h-14 w-14 rounded-full bg-[var(--btn-regular-bg)] text-[var(--primary)] flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28" width="28" viewBox="0 -960 960 960" fill="currentColor"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm240-200q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/></svg>
+                </div>
+                <div class="font-bold text-xl text-black/90 dark:text-white/90 mb-1">{i18n(I18nKey.encryptedGalleryTitle)}</div>
+                <div class="text-sm text-black/50 dark:text-white/50">{i18n(I18nKey.encryptedGalleryDesc)}</div>
+            </div>
+            <form class="encrypted-form mt-6 flex flex-col sm:flex-row gap-3 max-w-md mx-auto" autocomplete="off">
+                <input
+                    type="password"
+                    name="password"
+                    aria-label={i18n(I18nKey.password)}
+                    placeholder={i18n(I18nKey.password)}
+                    class="flex-1 rounded-lg px-4 h-11 bg-[var(--btn-regular-bg)] text-black/90 dark:text-white/90 outline-none border border-transparent focus:border-[var(--primary)] transition"
+                />
+                <button type="submit" class="btn-regular rounded-lg h-11 px-6 font-bold active:scale-95 transition">
+                    {i18n(I18nKey.unlock)}
+                </button>
+            </form>
+            <div class="encrypted-error hidden mt-3 text-center text-sm text-red-500" role="alert"></div>
+            <div class="encrypted-hint hidden mt-3 text-center text-sm text-[var(--primary)]"></div>
+        </div>
+
+        <!-- 解密后注入 -->
+        <div class="sub-gallery-content hidden"></div>
+    </div>
+
+    <!-- 灯箱 -->
+    <div class="lightbox-overlay" id="sub-lightbox" role="dialog" aria-modal="true" aria-label={i18n(I18nKey.imagePreview)}>
+        <button class="lightbox-close" aria-label={i18n(I18nKey.close)}>&times;</button>
+        <div class="lightbox-content"><img src="" alt={i18n(I18nKey.previewImage)} /></div>
+    </div>
+</MainGridLayout>
+
+<script>
+	import { decryptPayload, loadEncryptedPayload, recallPassword, rememberPassword } from "@utils/webcrypto";
+
+	type GalleryImage = { src: string; alt: string; copyright?: string; source?: string };
+
+	function initSubGallery() {
+		const root = document.getElementById("sub-gallery");
+		if (!root || root.dataset.ready === "1") return;
+		root.dataset.ready = "1";
+
+		const name = root.dataset.encryptedPayload;
+
+		const uiText = JSON.parse(root.dataset.uiText ?? "{}") as Record<string, string>;
+		if (!name) return;
+
+		const form = root.querySelector<HTMLFormElement>(".encrypted-form");
+		const input = root.querySelector<HTMLInputElement>('input[name="password"]');
+		const errorEl = root.querySelector<HTMLElement>(".encrypted-error");
+		const hintEl = root.querySelector<HTMLElement>(".encrypted-hint");
+		const gate = root.querySelector<HTMLElement>(".encrypted-gate");
+		const content = root.querySelector<HTMLElement>(".sub-gallery-content");
+		if (!form || !input || !content) return;
+
+		const showError = (msg: string) => {
+			if (errorEl) {
+				errorEl.textContent = msg;
+				errorEl.classList.remove("hidden");
+			}
+		};
+		const clearError = () => errorEl?.classList.add("hidden");
+
+		const render = (images: GalleryImage[]) => {
+			const grid = document.createElement("div");
+			grid.className = "gallery-grid";
+			images.forEach((img) => {
+				const fig = document.createElement("figure");
+				fig.className = "gallery-item";
+
+				const wrap = document.createElement("div");
+				wrap.className = "gallery-img-wrap";
+
+				const el = document.createElement("img");
+				el.src = img.src;
+				el.alt = img.alt;
+				el.loading = "lazy";
+				el.dataset.lightbox = "";
+				el.addEventListener("click", () => openLightbox(img.src, img.alt));
+				wrap.appendChild(el);
+
+				const cap = document.createElement("figcaption");
+				cap.className = "gallery-item-caption";
+				cap.textContent = img.alt;
+
+				fig.appendChild(wrap);
+				fig.appendChild(cap);
+				grid.appendChild(fig);
+			});
+			content.replaceChildren(grid);
+			content.classList.remove("hidden");
+			gate?.classList.add("hidden");
+		}
+
+		let busy = false;
+		form.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			if (busy) return;
+			const password = input.value;
+			if (!password) {
+				showError(uiText.enterPassword);
+				return;
+			}
+			busy = true;
+			clearError();
+			if (hintEl) {
+				hintEl.textContent = uiText.decrypting;
+				hintEl.classList.remove("hidden");
+			}
+			try {
+				const payload = await loadEncryptedPayload(name);
+				const json = await decryptPayload(payload, password);
+				const images = JSON.parse(json) as GalleryImage[];
+				rememberPassword(name, password);
+				render(images);
+			} catch (err) {
+				console.error("[sub-gallery]", err);
+				showError(uiText.decryptFailed);
+				if (hintEl) hintEl.classList.add("hidden");
+			} finally {
+				busy = false;
+			}
+		});
+
+		// 同一会话内自动解锁
+		const cached = recallPassword(name);
+		if (cached) {
+			input.value = cached;
+			form.requestSubmit();
+		}
+	}
+
+	// 灯箱
+	function openLightbox(src: string, alt: string) {
+		const lb = document.getElementById("sub-lightbox");
+		const img = lb?.querySelector<HTMLImageElement>(".lightbox-content img");
+		if (!lb || !img) return;
+		img.src = src;
+		img.alt = alt;
+		lb.classList.add("active");
+		document.body.style.overflow = "hidden";
+	}
+	function initLightbox() {
+		const lb = document.getElementById("sub-lightbox");
+		if (!lb || lb.dataset.ready === "1") return;
+		lb.dataset.ready = "1";
+		const close = () => {
+			lb.classList.remove("active");
+			document.body.style.overflow = "";
+		};
+		lb.querySelector(".lightbox-close")?.addEventListener("click", close);
+		lb.addEventListener("click", (e) => {
+			if (e.target === lb) close();
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") close();
+		});
+	}
+
+	function initAll() {
+		initSubGallery();
+		initLightbox();
+	}
+	initAll();
+
+	const w = window as any;
+	if (w?.swup?.hooks) {
+		w.swup.hooks.on("page:view", initAll);
+	} else {
+		document.addEventListener("swup:enable", () => w.swup.hooks.on("page:view", initAll));
+	}
+</script>
+
+<style>
+	.gallery-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1rem;
+	}
+	.gallery-item {
+		margin: 0;
+		border-radius: var(--radius-large, 0.75rem);
+		overflow: hidden;
+		background: var(--btn-regular-bg);
+	}
+	.gallery-img-wrap img {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		object-fit: cover;
+		display: block;
+		cursor: zoom-in;
+		transition: transform 0.25s ease;
+	}
+	.gallery-img-wrap img:hover {
+		transform: scale(1.04);
+	}
+	.gallery-item-caption {
+		padding: 0.5rem 0.7rem;
+		font-size: 0.8rem;
+		text-align: center;
+		color: var(--btn-content);
+	}
+	.lightbox-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 200;
+		background: rgba(0, 0, 0, 0.88);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.25s ease;
+	}
+	.lightbox-overlay.active {
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.lightbox-content img {
+		max-width: 92vw;
+		max-height: 88vh;
+		object-fit: contain;
+		display: block;
+		border-radius: 0.5rem;
+	}
+	.lightbox-close {
+		position: absolute;
+		top: 1.25rem;
+		right: 1.5rem;
+		width: 40px;
+		height: 40px;
+		border: none;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.15);
+		color: #fff;
+		font-size: 1.6rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+	.lightbox-close:hover {
+		background: rgba(255, 255, 255, 0.3);
+	}
+</style>

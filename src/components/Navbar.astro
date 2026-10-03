@@ -1,8 +1,12 @@
 ---
 import { Icon } from "astro-icon/components";
 import { navBarConfig, siteConfig } from "../config";
-import { LinkPresets } from "../constants/link-presets";
-import { LinkPreset, type NavBarLink } from "../types/config";
+import {
+	flattenNavBarItems,
+	isNavBarGroup,
+	navLabel,
+	resolveNavBarItems,
+} from "../utils/nav-utils";
 import { url } from "../utils/url-utils";
 import LightDarkSwitch from "./LightDarkSwitch.svelte";
 import Search from "./Search.svelte";
@@ -11,14 +15,9 @@ import NavMenuPanel from "./widget/NavMenuPanel.astro";
 
 const className = Astro.props.class;
 
-let links: NavBarLink[] = navBarConfig.links.map(
-	(item: NavBarLink | LinkPreset): NavBarLink => {
-		if (typeof item === "number") {
-			return LinkPresets[item];
-		}
-		return item;
-	},
-);
+const items = resolveNavBarItems(navBarConfig.links);
+// The mobile panel stays a flat list: every grouped link must remain reachable there.
+const links = flattenNavBarItems(items);
 ---
 <div id="navbar" class="z-50 onload-animation">
     <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation -->
@@ -32,13 +31,43 @@ let links: NavBarLink[] = navBarConfig.links.map(
             </div>
         </a>
         <div class="hidden md:flex">
-            {links.map((l) => {
-                return <a aria-label={l.name} href={l.external ? l.url : url(l.url)} target={l.external ? "_blank" : null}
-                          class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
+            {items.map((item, index) => {
+                if (isNavBarGroup(item)) {
+                    const panelId = `nav-group-panel-${index}`;
+                    return <div class="relative" data-nav-group>
+                        <button type="button" aria-haspopup="true" aria-expanded="false" aria-controls={panelId}
+                                data-nav-group-trigger
+                                class="btn-plain scale-animation rounded-lg h-11 font-bold px-3 lg:px-4 xl:px-5 active:scale-95"
+                        >
+                            <div class="flex items-center">
+                                {navLabel(item)}
+                                <Icon name="material-symbols:keyboard-arrow-down-rounded" class="text-[1.25rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>
+                            </div>
+                        </button>
+                        <div id={panelId} data-nav-group-panel
+                             class="float-panel float-panel-closed absolute top-full right-0 transition-all min-w-[9rem] py-1 px-1"
+                        >
+                            {item.children.map((child) => {
+                                return <a aria-label={navLabel(child)} href={child.external ? child.url : url(child.url)}
+                                          target={child.external ? "_blank" : null}
+                                          class="group flex items-center justify-between gap-4 rounded-lg px-3 py-2 font-bold whitespace-nowrap
+                                                 text-black/75 dark:text-white/75 transition
+                                                 hover:bg-[var(--btn-plain-bg-hover)] hover:text-[var(--primary)]
+                                                 active:bg-[var(--btn-plain-bg-active)] active:text-[var(--primary)]"
+                                >
+                                    {navLabel(child)}
+                                    {child.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.75rem] text-black/[0.2] dark:text-white/[0.2]"></Icon>}
+                                </a>;
+                            })}
+                        </div>
+                    </div>;
+                }
+                return <a aria-label={navLabel(item)} href={item.external ? item.url : url(item.url)} target={item.external ? "_blank" : null}
+                          class="btn-plain scale-animation rounded-lg h-11 font-bold px-3 lg:px-4 xl:px-5 active:scale-95"
                 >
                     <div class="flex items-center">
-                        {l.name}
-                        {l.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>}
+                        {navLabel(item)}
+                        {item.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>}
                     </div>
                 </a>;
             })}
@@ -101,7 +130,133 @@ function loadButtonScript() {
     }
 }
 
+/*
+ * Desktop nav groups (the "更多" dropdown).
+ *
+ * Reuses the site's only collapse mechanism: the `float-panel-closed` class on a
+ * `.float-panel`. No new CSS. Behaviour mirrors the original site: open on mouseenter
+ * after 150ms, close on mouseleave after 250ms, click toggles, a document click closes,
+ * Escape closes and returns focus to the trigger, `aria-expanded` tracks the state.
+ *
+ * Handlers are assigned as properties (`onclick`/`onmouseenter`) rather than with
+ * addEventListener so that re-running this module — swup replaces <head> with
+ * `updateHead: true` — overwrites instead of stacking. Document-level listeners are
+ * bound once behind a marker on <html>.
+ */
+const NAV_GROUP_OPEN_DELAY = 150;
+const NAV_GROUP_CLOSE_DELAY = 250;
+
+function setupNavGroups() {
+    const groups = document.querySelectorAll<HTMLElement>("[data-nav-group]");
+
+    groups.forEach((group) => {
+        const trigger = group.querySelector<HTMLButtonElement>("[data-nav-group-trigger]");
+        const panel = group.querySelector<HTMLElement>("[data-nav-group-panel]");
+        if (!trigger || !panel) {
+            return;
+        }
+
+        let openTimer = 0;
+        let closeTimer = 0;
+
+        const isOpen = () => !panel.classList.contains("float-panel-closed");
+
+        const open = () => {
+            window.clearTimeout(closeTimer);
+            panel.classList.remove("float-panel-closed");
+            panel.inert = false;
+            trigger.setAttribute("aria-expanded", "true");
+        };
+
+        const close = () => {
+            window.clearTimeout(openTimer);
+            window.clearTimeout(closeTimer);
+            panel.classList.add("float-panel-closed");
+            panel.inert = true;
+            trigger.setAttribute("aria-expanded", "false");
+        };
+
+        // Start closed and unfocusable; the class is already in the markup, this only
+        // keeps the panel's links out of the tab order while it is collapsed.
+        if ("inert" in panel) {
+            panel.inert = true;
+        }
+
+        group.onmouseenter = () => {
+            window.clearTimeout(closeTimer);
+            if (isOpen()) {
+                return;
+            }
+            window.clearTimeout(openTimer);
+            openTimer = window.setTimeout(open, NAV_GROUP_OPEN_DELAY);
+        };
+
+        group.onmouseleave = () => {
+            window.clearTimeout(openTimer);
+            if (!isOpen()) {
+                return;
+            }
+            window.clearTimeout(closeTimer);
+            closeTimer = window.setTimeout(close, NAV_GROUP_CLOSE_DELAY);
+        };
+
+        trigger.onclick = (event) => {
+            // Keep the document click handler below from immediately re-closing it.
+            event.stopPropagation();
+            window.clearTimeout(openTimer);
+            window.clearTimeout(closeTimer);
+            if (isOpen()) {
+                close();
+            } else {
+                // Only one group is ever open.
+                document.querySelectorAll<HTMLElement>("[data-nav-group]").forEach((other) => {
+                    if (other === group) {
+                        return;
+                    }
+                    other.querySelector<HTMLElement>("[data-nav-group-panel]")?.classList.add("float-panel-closed");
+                    other.querySelector<HTMLButtonElement>("[data-nav-group-trigger]")?.setAttribute("aria-expanded", "false");
+                });
+                open();
+            }
+        };
+    });
+
+    if (document.documentElement.dataset.navGroupsBound === "true") {
+        return;
+    }
+    document.documentElement.dataset.navGroupsBound = "true";
+
+    const closeAll = () => {
+        document.querySelectorAll<HTMLElement>("[data-nav-group]").forEach((group) => {
+            const trigger = group.querySelector<HTMLButtonElement>("[data-nav-group-trigger]");
+            const panel = group.querySelector<HTMLElement>("[data-nav-group-panel]");
+            if (!trigger || !panel || panel.classList.contains("float-panel-closed")) {
+                return;
+            }
+            panel.classList.add("float-panel-closed");
+            panel.inert = true;
+            trigger.setAttribute("aria-expanded", "false");
+        });
+    };
+
+    document.addEventListener("click", closeAll);
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") {
+            return;
+        }
+        // Escape closes the open group and hands focus back to its trigger.
+        const openGroup = document.querySelector<HTMLElement>("[data-nav-group] [data-nav-group-panel]:not(.float-panel-closed)")?.closest<HTMLElement>("[data-nav-group]");
+        if (!openGroup) {
+            return;
+        }
+        closeAll();
+        openGroup.querySelector<HTMLButtonElement>("[data-nav-group-trigger]")?.focus();
+    });
+}
+
 loadButtonScript();
+setupNavGroups();
 </script>
 
 {import.meta.env.PROD && <script is:inline define:vars={{scriptUrl: url('/pagefind/pagefind.js')}}>

@@ -1,0 +1,41 @@
+# Netlify redirect table for URLs from the pre-migration site.
+#
+# The old site served posts under `/blog/<slug>/` (see the legacy RSS) and had a
+# `/blog` index. Those URLs are live and indexed, so they must not 404 once this
+# build takes over the domain. Netlify serves this file from the publish root
+# and applies it at the edge as real 301s; `astro.config.mjs` declares the same
+# pair for hosts that ignore `_redirects` (and for `astro dev` / `astro preview`).
+
+# The trailing `!` is required. Astro's static build also emits an HTML
+# meta-refresh page for each configured redirect (build.redirects defaults to
+# true), and Netlify serves an existing static file in preference to a
+# `_redirects` rule — "shadowing". Forcing the rule makes the real 301 win at
+# the edge; the emitted HTML stays as the fallback for hosts that ignore
+# `_redirects`, and for `astro dev` / `astro preview`.
+#
+# Netlify's own pretty-URL 301 (`/x` -> `/x/`) runs first, so the no-slash
+# variants below only ever see already-normalized input.
+#
+# The legacy blog index has no counterpart here; the archive is its nearest
+# equivalent. Listed before the splat rules so `/blog` is not swallowed by them.
+/blog     /archive/   301!
+/blog/    /archive/   301!
+
+# Post permalinks: /blog/<slug>/ -> /posts/<slug>/ (all 15 legacy slugs exist
+# under /posts/ after the content migration, so the mapping is a complete 1:1).
+# The trailing-slash form is listed first so a slashed legacy URL resolves in
+# a single hop.
+/blog/:slug/   /posts/:slug/   301!
+/blog/:slug    /posts/:slug    301!
+
+# Fallback for any remaining legacy path under /blog (e.g. the exported JSON
+# payloads that referenced /blog/<slug> without a trailing slash).
+/blog/*    /posts/:splat   301!
+
+# NOT redirected (deliberate, see the t9 report):
+#   /categories/<name>/ and /tags/<name>/ are live legacy URLs that will 404
+#   after cutover. Arbitrary percent-encoded CJK names and a case-folding tag
+#   space (the live site lowercases /tags/CSS/ -> /tags/css/) do not map onto a
+#   static redirect table; this site instead routes taxonomy to
+#   /archive/?category=... via getCategoryUrl() in src/utils/url-utils.ts.
+#   Carried to the 待定清单 instead.

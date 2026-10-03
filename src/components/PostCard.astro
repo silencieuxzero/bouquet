@@ -19,6 +19,10 @@ interface Props {
 	image: string;
 	description: string;
 	draft: boolean;
+	/** Shows the "encrypted" badge next to the title. Falls back to the
+	 * entry's own frontmatter so a consumer that forgets to thread it
+	 * through still marks encrypted posts. */
+	encrypted?: boolean;
 	style: string;
 }
 const {
@@ -31,11 +35,14 @@ const {
 	category,
 	image,
 	description,
+	encrypted,
 	style,
 } = Astro.props;
 const className = Astro.props.class;
 
 const hasCover = image !== undefined && image !== null && image !== "";
+
+const isEncrypted = encrypted ?? entry.data.encrypted;
 
 const coverWidth = "28%";
 
@@ -50,6 +57,9 @@ const { remarkPluginFrontmatter } = await render(entry);
         before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
         before:absolute before:top-[35px] before:left-[18px] before:hidden md:before:block
         ">
+            {isEncrypted && (
+                <span class="inline-flex items-center align-middle mr-2 px-2 py-0.5 rounded-md text-sm font-medium whitespace-nowrap bg-[var(--btn-regular-bg)] text-[var(--btn-content)]">{i18n(I18nKey.encrypted)}</span>
+            )}
             {title}
             <Icon class="inline text-[2rem] text-[var(--primary)] md:hidden translate-y-0.5 absolute" name="material-symbols:chevron-right-rounded" ></Icon>
             <Icon class="text-[var(--primary)] text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>

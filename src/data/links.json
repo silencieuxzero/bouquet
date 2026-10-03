@@ -1,0 +1,19 @@
+{
+	"links": {
+		"title": "友情链接",
+		"entries": [
+			{
+				"name": "Dr.YMD的TCP世界",
+				"url": "https://yemodiao233-cpu.github.io/",
+				"description": "TCP协会，一个致力于收容、保护、清除世间异常的组织，在此，对每一位敢于以身入局的弈者，致以崇高的敬意。",
+				"avatar": "https://yemodiao233-cpu.github.io/assets/images/Dr.YMD.png"
+			},
+			{
+				"name": "中轴线",
+				"url": "https://baizhou830.github.io/",
+				"description": "轴中的个人博客，分享日常和生活",
+				"avatar": "https://baizhou830.github.io/images/avatar.jpg"
+			}
+		]
+	}
+}

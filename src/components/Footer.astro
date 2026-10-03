@@ -1,9 +1,18 @@
 ---
 
 import { profileConfig } from "../config";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
 import { url } from "../utils/url-utils";
 
 const currentYear = new Date().getFullYear();
+
+const imageServiceLabel = i18n(I18nKey.imageService);
+const imageServiceProvider = i18n(I18nKey.imageServiceProvider);
+// Upstream's footer was "本站图像服务由" + 蜜蜂图床 + "提供": zh_CN/zh_TW read
+// naturally with no separator, while the other locales carry an empty
+// provider string and therefore need a word space before the brand.
+const needsSpaceBeforeBrand = imageServiceProvider === "";
 ---
 
 <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">-->
@@ -16,6 +25,8 @@ const currentYear = new Date().getFullYear();
         <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={url('sitemap-index.xml')}>Sitemap</a><br>
         Powered by
         <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
-        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a>
+        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a><br>
+        {imageServiceLabel}{needsSpaceBeforeBrand ? " " : ""}<a class="transition link text-[var(--primary)] font-medium" target="_blank" rel="noopener" href="https://www.beeimg.cn/">蜜蜂图床</a>
+        {imageServiceProvider}
     </div>
 </div>

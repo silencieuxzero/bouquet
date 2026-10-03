@@ -27,9 +27,18 @@ import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-cop
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://fuwari.vercel.app/",
+	site: "https://luoshulv.netlify.app/",
 	base: "/",
 	trailingSlash: "always",
+	// Legacy URLs from the pre-migration site, which served posts under
+	// `/blog/<slug>/` and had a `/blog` index. This mirrors `public/_redirects`
+	// (which does the same job at the Netlify edge with real 301s and is the
+	// primary mechanism); these entries keep the redirects working on hosts
+	// that ignore `_redirects`, and in `astro dev`/`astro preview`.
+	redirects: {
+		"/blog": "/archive/",
+		"/blog/[...slug]": "/posts/[...slug]",
+	},
 	integrations: [
 		swup({
 			theme: false,

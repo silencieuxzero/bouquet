@@ -1,0 +1,29 @@
+{
+	"tutorials": {
+		"title": "教程",
+		"subtitle": "一些实用教程的集合",
+		"entries": [
+			{
+				"slug": "wiki",
+				"title": "Wikitext完整指南",
+				"description": "Fandom 平台的入门手册。",
+				"category": "wiki教程",
+				"published": "2026-07-14"
+			},
+			{
+				"slug": "character",
+				"title": "Character的使用方式",
+				"description": "创建一个自己的角色卡！",
+				"category": "wiki教程",
+				"published": "2026-07-16"
+			},
+			{
+				"slug": "firmamento",
+				"title": "Firmamento自定义指南",
+				"description": "快速上手Firmamento",
+				"category": "Astro教程",
+				"published": "2026-07-17"
+			}
+		]
+	}
+}

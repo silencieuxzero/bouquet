@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=187fdee8-ba47-49bd-8b13-3b2fda26ed47
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>悼溯茶馆 · 文字视觉小说</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ================= 封面 ================= -->
+  <section id="screen-cover" class="screen active">
+    <div class="cover-inner">
+      <div class="cover-mark">悼溯</div>
+      <h1 class="cover-title">悼溯茶馆</h1>
+      <p class="cover-sub">风铃声起，茶烟初升——<br>一段关于雨、茶与未说完的话的故事</p>
+      <div class="cover-btns">
+        <button class="btn btn-primary" data-action="start">推 门 而 入</button>
+        <button class="btn" data-action="menu-continue" id="cover-continue">继续上次的故事</button>
+      </div>
+      <p class="cover-foot">文字视觉小说 · 网页版 · 移植自 AstrBot 插件「悼溯茶馆」</p>
+    </div>
+  </section>
+
+  <!-- ================= 主菜单 ================= -->
+  <section id="screen-menu" class="screen">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="brand">悼溯茶馆</span>
+      </div>
+      <div class="topbar-right">
+        <button class="chip" data-action="open-changelog">更新日志</button>
+        <button class="chip" data-action="side-stories">小剧场</button>
+        <button class="chip" data-action="open-settings">设置</button>
+      </div>
+    </header>
+
+    <div class="menu-body">
+      <p class="menu-hint">夜深了，茶馆还亮着灯。<br>你想与谁共度这个夜晚？</p>
+
+      <div id="character-list" class="character-list"><!-- 动态渲染 --></div>
+
+      <section id="side-stories-panel" class="panel hidden">
+        <h3 class="panel-title">小剧场</h3>
+        <p class="panel-desc">茶馆里曾发生过的一些小事，与主线剧情互不影响，可随时重看。</p>
+        <div id="side-story-btns"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= 剧情舞台 ================= -->
+  <section id="screen-game" class="screen">
+    <header class="topbar game-topbar">
+      <div class="topbar-left">
+        <button class="chip" data-action="exit-game">← 返回</button>
+        <span id="game-chapter" class="chapter-label"></span>
+      </div>
+      <div class="topbar-right">
+        <div id="game-aff" class="aff-meter" title="好感度">
+          <span id="game-aff-label" class="aff-label"></span>
+          <div class="aff-track"><div id="game-aff-fill" class="aff-fill"></div></div>
+        </div>
+        <button class="chip" data-action="open-settings">设置</button>
+      </div>
+    </header>
+
+    <div class="stage">
+      <div class="stage-bg"></div>
+      <div class="stage-vignette"></div>
+
+      <div class="story-area">
+        <div id="story-speaker" class="story-speaker hidden"></div>
+        <p id="story-text" class="story-text"></p>
+        <div id="story-choices" class="story-choices"><!-- 动态 --></div>
+      </div>
+
+      <div class="stage-foot">
+        <button id="advance-btn" class="advance-btn hidden">▼ 继续</button>
+        <div id="chapter-progress" class="chapter-progress"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 自由聊天 ================= -->
+  <section id="screen-chat" class="screen">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="chip" data-action="chat-exit">← 返回茶馆</button>
+        <span id="chat-name" class="chapter-label"></span>
+      </div>
+      <div class="topbar-right">
+        <span id="chat-aff" class="aff-text"></span>
+        <button class="chip" data-action="open-settings">设置</button>
+      </div>
+    </header>
+
+    <div id="chat-log" class="chat-log"><!-- 动态 --></div>
+
+    <div class="chat-inputbar">
+      <input id="chat-input" type="text" placeholder="说点什么……（Enter 发送）" autocomplete="off">
+      <button id="chat-send" class="btn btn-primary btn-sm">发送</button>
+    </div>
+  </section>
+
+  <!-- ================= 存档 ================= -->
+  <section id="screen-saves" class="screen">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="chip" data-action="saves-back">← 返回</button>
+        <span class="chapter-label">存档管理</span>
+      </div>
+    </header>
+    <div class="panel">
+      <p id="save-mode-hint" class="panel-desc">共 20 个槽位。存档自动保存在本机浏览器（localStorage）中，无需联网。</p>
+      <div class="save-tools">
+        <button class="chip" data-action="export-saves">导出存档</button>
+        <button class="chip" data-action="import-saves">导入存档</button>
+        <input type="file" id="import-file" accept=".json,application/json" hidden>
+      </div>
+      <div id="save-slots" class="save-grid"><!-- 动态 --></div>
+    </div>
+  </section>
+
+  <!-- ================= 设置 ================= -->
+  <section id="screen-settings" class="screen">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="chip" data-action="settings-back">← 返回</button>
+        <span class="chapter-label">设置</span>
+      </div>
+    </header>
+    <div class="panel settings-panel">
+      <h3 class="panel-title">自由聊天（LLM）</h3>
+      <p class="panel-desc">剧情模式无需任何配置。自由聊天需要调用大模型 API，请填写你的 OpenAI 兼容接口信息（如 OpenAI、DeepSeek、Moonshot 等）。密钥仅保存在本机浏览器中。</p>
+
+      <label class="field">
+        <span>接口地址 Base URL</span>
+        <input id="cfg-base" type="text" placeholder="https://api.deepseek.com 或留空使用 OpenAI 官方">
+      </label>
+      <label class="field">
+        <span>API Key</span>
+        <input id="cfg-key" type="password" placeholder="sk-...">
+      </label>
+      <label class="field">
+        <span>模型名称</span>
+        <input id="cfg-model" type="text" placeholder="deepseek-chat / gpt-4o-mini / kimi-...">
+      </label>
+
+      <div class="field">
+        <span>文字大小</span>
+        <div class="row">
+          <button class="chip" data-action="font-sm">小</button>
+          <button class="chip" data-action="font-md">中</button>
+          <button class="chip" data-action="font-lg">大</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-primary" data-action="settings-save">保存设置</button>
+        <button class="btn btn-danger" data-action="factory-reset">清空全部数据</button>
+      </div>
+      <p id="settings-msg" class="settings-msg"></p>
+
+      <div class="row" style="margin-top:18px">
+        <button class="btn" data-action="open-devtools">开发者模式</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 开发者模式 ================= -->
+  <section id="screen-devtools" class="screen">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="chip" data-action="devtools-back">← 返回</button>
+        <span class="chapter-label">开发者模式</span>
+      </div>
+    </header>
+    <div class="panel devtools-panel">
+      <h3 class="panel-title">密钥验证</h3>
+      <p class="panel-desc">输入开发者密钥以启用好感度与剧情进程调试功能。此功能仅供调试，修改后请通过存档保留进度。</p>
+      <label class="field">
+        <span>开发者密钥</span>
+        <input id="dev-key" type="password" placeholder="请输入密钥">
+      </label>
+      <div class="row">
+        <button class="btn btn-primary" data-action="dev-unlock">解锁</button>
+      </div>
+      <p id="dev-msg" class="settings-msg"></p>
+
+      <div id="dev-controls" class="hidden">
+        <h3 class="panel-title">好感度</h3>
+        <div class="field">
+          <span>角色</span>
+          <select id="dev-char"></select>
+        </div>
+        <label class="field">
+          <span>好感度数值（-100 ~ 100）</span>
+          <input id="dev-aff" type="number" min="-100" max="100" step="1" value="0">
+        </label>
+        <div class="row">
+          <button class="btn btn-primary" data-action="dev-set-aff">设置好感度</button>
+        </div>
+
+        <h3 class="panel-title">剧情进程</h3>
+        <label class="field">
+          <span>已完成章节数（0 = 从头开始）</span>
+          <input id="dev-chapter" type="number" min="0" max="7" step="1" value="0">
+        </label>
+        <div class="row">
+          <button class="btn btn-primary" data-action="dev-set-chapter">设置剧情进程</button>
+          <button class="btn btn-danger" data-action="dev-reset">重置全部进度</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 模态（章节完成等） ================= -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h3 id="modal-title" class="modal-title"></h3>
+      <p id="modal-text" class="modal-text"></p>
+      <div id="modal-btns" class="row center"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="data/characters.js"></script>
+<script src="data/plots-luoshulv-01.js"></script>
+<script src="data/plots-luoshulv-02.js"></script>
+<script src="data/plots-luoshulv-03.js"></script>
+<script src="data/plots-luoshulv-04.js"></script>
+<script src="data/plots-luoshulv-05.js"></script>
+<script src="data/plots-luoshulv-06.js"></script>
+<script src="data/plots-luoshulv-07.js"></script>
+<script src="data/plots-xaviel-01.js"></script>
+<script src="data/plots-xaviel-02.js"></script>
+<script src="data/plots-xaviel-03.js"></script>
+<script src="data/plots-xaviel-04.js"></script>
+<script src="data/plots-xaviel-05.js"></script>
+<script src="data/plots-xaviel-06.js"></script>
+<script src="data/events.js"></script>
+<script src="data/meta.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

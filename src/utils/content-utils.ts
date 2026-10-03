@@ -112,3 +112,45 @@ export async function getCategoryList(): Promise<Category[]> {
 	}
 	return ret;
 }
+
+// ============================================================================
+// Notes collection
+// ============================================================================
+// Notes mirror posts, but live in their own collection so the blog list and the
+// study-notes section stay separate.
+async function getRawSortedNotes() {
+	const allNotes = await getCollection("notes", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	return allNotes.sort((a, b) => {
+		const dateA = new Date(a.data.published);
+		const dateB = new Date(b.data.published);
+		return dateA > dateB ? -1 : 1;
+	});
+}
+
+export async function getSortedNotes(): Promise<CollectionEntry<"notes">[]> {
+	const sorted = await getRawSortedNotes();
+
+	for (let i = 1; i < sorted.length; i++) {
+		sorted[i].data.nextSlug = sorted[i - 1].id;
+		sorted[i].data.nextTitle = sorted[i - 1].data.title;
+	}
+	for (let i = 0; i < sorted.length - 1; i++) {
+		sorted[i].data.prevSlug = sorted[i + 1].id;
+		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	}
+
+	return sorted;
+}
+
+export type NoteForList = {
+	slug: string;
+	data: CollectionEntry<"notes">["data"];
+};
+
+export async function getSortedNotesList(): Promise<NoteForList[]> {
+	const sortedFullNotes = await getRawSortedNotes();
+	return sortedFullNotes.map((note) => ({ slug: note.id, data: note.data }));
+}

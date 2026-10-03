@@ -1,0 +1,49 @@
+{
+	"gallery": {
+		"title": "画廊",
+		"subtitle": "一些精美图片（点击查看大图，切换到其他大图时建议刷新一下再切换）",
+		"images": [
+			{
+				"src": "/洛疏律和洛疏议.jpg",
+				"alt": "洛疏律和洛疏议的古装合照",
+				"copyright": "LuLu",
+				"source": "朋友授权转载"
+			},
+			{
+				"src": "https://bee-reg-ab.imagency.cn/e/d11f8fd9e7f06ebd116973f426821a81.jpg",
+				"alt": "SCP壁纸",
+				"copyright": "SCP基金会",
+				"source": "https://scp-wiki.wikidot.com/"
+			},
+			{
+				"src": "https://bee-reg-ab.imagency.cn/e/ae8c966892418c571b138f4484b68d01.jpeg",
+				"alt": "长征机图片",
+				"copyright": "B站：大白兔喝柠檬水",
+				"source": "https://space.bilibili.com/201324441?spm_id_from=333.337.search-card.all.click"
+			},
+			{
+				"src": "https://bee-reg-ab.imagency.cn/e/3867215f309601b2bd014d407c7de00c.png",
+				"alt": "DeepSeek娘化",
+				"copyright": "B站：A肆零溪竹",
+				"source": "https://space.bilibili.com/288217159?spm_id_from=333.337.search-card.all.click"
+			},
+			{
+				"src": "/LZH1958.jpg",
+				"alt": "Level ZH 1958拟人全身图",
+				"copyright": "Green flower bool（绿花）",
+				"source": "https://backrooms.fandom.com/zh/wiki/User:Green_flower_bool"
+			},
+			{
+				"src": "/LZH1958设定.jpg",
+				"alt": "Level ZH 1958拟人设定图",
+				"copyright": "Green flower bool（绿花）",
+				"source": "https://backrooms.fandom.com/zh/wiki/User:Green_flower_bool"
+			}
+		]
+	},
+	"subGallery": {
+		"title": "三十天友谊挑战",
+		"subtitle": "和朋友的三十天友谊挑战图片汇集（暂未完成）",
+		"images": []
+	}
+}

@@ -1,0 +1,108 @@
+---
+// ============================================================================
+// 悼溯茶馆 · 文字视觉小说
+// ============================================================================
+// 原站 /games/daosu/ 的做法是：一层页面外壳 + 一个指向静态游戏本体
+// /daosu/index.html 的 <iframe>。游戏本体自带样式表与完整 DOM，因此这里沿用
+// iframe 隔离方案：游戏只能作用于它自己的文档，无法泄漏或覆盖本站样式表，
+// 页面本身零新增 CSS（仅 Tailwind 工具类 + 既有 main.css 类与变量）。
+//
+// 游戏本体已存在于 public/daosu/（20 个文件，与 /daosu/ 上的静态资源逐字节一致），
+// 由 public/ 直接透传，不做任何构建处理，也不改动其中的 css/style.css。
+//
+// 文案（游戏名、副标题、游戏说明）为原站作者撰写的内容，作为数据放在
+// src/data/games.json —— 与 links.json / tutorials.json / repos.json 同一约定；
+// 页面自身可见的界面词只有 i18n(I18nKey.games)。
+//
+// 原站没有 /games/ 索引页（实测 404，导航也直接指向 /games/daosu/），
+// 因此不创建 src/pages/games/index.astro。
+// ============================================================================
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { url } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import gamesData from "../../data/games.json";
+
+interface Game {
+	id: string;
+	title: string;
+	subtitle?: string;
+	frameSrc: string;
+	frameTitle: string;
+	standaloneUrl: string;
+	standaloneLabel: string;
+	notes?: string[];
+}
+
+const games: Game[] = gamesData.games.entries;
+---
+
+<MainGridLayout
+	title={i18n(I18nKey.games)}
+	description={games[0]?.subtitle ?? i18n(I18nKey.games)}
+>
+	<div class="flex flex-col w-full gap-4">
+		{
+			games.map((game, i) => (
+				<div
+					class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative onload-animation"
+					style={`animation-delay: calc(var(--content-delay) + ${i * 50}ms);`}
+				>
+					<div class="card-base z-10 px-6 md:px-9 py-6 relative w-full">
+						<div class="flex items-center gap-3 mb-3">
+							<Icon
+								name="material-symbols:sports-esports-outline-rounded"
+								class="text-90 text-2xl shrink-0"
+							/>
+							<div class="font-bold text-3xl text-90">
+								{i18n(I18nKey.games)}
+							</div>
+						</div>
+
+						<div class="font-bold text-xl text-90 mb-1">{game.title}</div>
+						{game.subtitle && (
+							<p class="text-50 text-sm mb-5">{game.subtitle}</p>
+						)}
+
+						{/* 游戏本体：独立文档，自带 css/style.css 与 DAOSU_DATA 数据模块 */}
+						<div class="card-base w-full overflow-hidden">
+							<iframe
+								src={url(game.frameSrc)}
+								title={game.frameTitle}
+								loading="lazy"
+								allowfullscreen
+								class="w-full aspect-square sm:aspect-[4/3] md:aspect-video border-0"
+							/>
+						</div>
+
+						{game.notes && game.notes.length > 0 && (
+							<div class="rounded-lg bg-[var(--btn-regular-bg)] px-4 py-3 mt-5">
+								{game.notes.map((note) => (
+									<p class="text-75 text-sm leading-relaxed mb-2 last:mb-0">
+										{note}
+									</p>
+								))}
+							</div>
+						)}
+
+						<div class="flex mt-5">
+							<a
+								href={url(game.standaloneUrl)}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="btn-regular h-10 px-5 rounded-lg text-sm font-bold active:scale-95"
+							>
+								<Icon
+									name="material-symbols:open-in-new-rounded"
+									class="mr-2"
+								/>
+								{game.standaloneLabel}
+							</a>
+						</div>
+					</div>
+				</div>
+			))
+		}
+	</div>
+</MainGridLayout>
