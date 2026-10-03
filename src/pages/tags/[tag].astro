@@ -13,10 +13,12 @@ export const getStaticPaths = (async () => {
 	const [tags, posts] = await Promise.all([getTagList(), getSortedPosts()]);
 
 	return tags.map((tag) => ({
-		// The name is emitted exactly as stored: no lowercasing, no manual
-		// percent-encoding. Astro encodes the segment when it writes the route,
-		// so "CSS" stays /tags/CSS/ and never becomes /tags/css/.
-		params: { tag: tag.name },
+		// Latin tags are lower-cased so the route matches the old site's
+		// canonical URLs byte-for-byte (CSS -> /tags/css/); CJK labels are
+		// caseless and unchanged. Astro percent-encodes the segment when it
+		// writes the route. The display name in props keeps the stored
+		// casing, so pages still read "标签：CSS".
+		params: { tag: tag.name.toLowerCase() },
 		props: {
 			name: tag.name,
 			count: tag.count,

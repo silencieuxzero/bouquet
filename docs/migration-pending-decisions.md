@@ -79,12 +79,19 @@ site's own rule — it only redirects when a case-insensitive match exists
 (`/ABOUT/` → 301 `/about/`, but `/NOTAREALPATH/` → plain 404), and it folds
 mid-path segments too (`/Tags/css/` → 301 `/tags/css/`).
 
-Expected outcome after cutover: `/tags/css/` resolves via a case-correction 301 to
-`/tags/CSS/`, so nothing 404s — but the canonical casing *flips* from what search
-engines have indexed. Worth confirming on the real deploy; if you want the indexed
-lower-case form kept as canonical, the route should lower-case its param instead.
+**2a-ii. ~~Latin tag URL casing~~ — RESOLVED**
 
-The CJK tags are unaffected.
+*Decision (2026-10): adopt the old site's lower-case form.* The tag route now
+lower-cases its param (`tag.name.toLowerCase()` in
+`src/pages/tags/[tag].astro`) and `getTagUrl()` emits the lower-cased segment
+(`src/utils/url-utils.ts`). Built routes are `/tags/css/`, `/tags/astro/`,
+`/tags/fandom/`, `/tags/minecraft/`, `/tags/wikitext/` — byte-identical to the
+URLs search engines have indexed on the live site. Visible labels keep their
+stored casing (`<title>标签 · CSS - Firmamento</title>`), so readers see no
+change. The upper-case paths no longer exist in `dist/`; on Netlify a visit to
+`/tags/CSS/` will fall to host case-correction (301 → `/tags/css/`), mirroring
+exactly how the old site treated the reverse direction. The CJK tags are
+unaffected.
 
 ### 2b. The 15 legacy `/blog/<slug>/` permalinks
 

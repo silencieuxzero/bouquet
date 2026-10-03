@@ -23,8 +23,11 @@ export function getNoteUrlBySlug(slug: string): string {
 export function getTagUrl(tag: string): string {
 	if (!tag) return url("/archive/");
 	// Per-name detail page (src/pages/tags/[tag].astro). The page also keeps
-	// the 18 legacy taxonomy URLs alive.
-	return url(`/tags/${encodeURIComponent(tag.trim())}/`);
+	// the 18 legacy taxonomy URLs alive. Latin tags are lower-cased so URLs
+	// match the old site's canonical form byte-for-byte (CSS -> css); CJK
+	// labels are caseless and pass through unchanged. The visible label
+	// always keeps its stored casing.
+	return url(`/tags/${encodeURIComponent(tag.trim().toLowerCase())}/`);
 }
 
 export function getCategoryUrl(category: string | null): string {
