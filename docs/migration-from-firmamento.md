@@ -88,6 +88,10 @@ POST_PASSWORD='<the real password>' pnpm encrypt personoc yanchui story-4 story-
 POST_PASSWORD='<the gallery password>' pnpm encrypt-file private/source/sub-gallery.json
 ```
 
+As of 2026-10-05 all six payloads use the same password, `10086`. To change it
+again, re-run both commands above with the new value and re-deploy — the site
+needs no other change, because the password is never referenced in the source.
+
 The password is never stored in the repo, so it cannot be recovered from here —
 keep it wherever the plaintext is backed up, or the ciphertext becomes unreadable.
 
@@ -100,12 +104,14 @@ To add a new encrypted post:
 ## Caveats
 
 - The ciphertext is public. Protection rests entirely on password strength.
+  `10086` is a five-digit password: it keeps casual readers out, but anyone who
+  guesses it reads everything. Consider a stronger one for public deployment.
 - An encrypted post's **title and description** still appear in the listing pages
   and RSS; only the body is secret.
 - `docs/*.md` and text posts still contain the original site's *documentation*,
   including example config such as `password = "30days"`. Those are code-fence
-  samples with placeholder values, not live credentials — but the real
-  sub-gallery password is different from that old sample.
+  samples with placeholder values, not live credentials — the real password is
+  `10086`, and it was never committed.
 - `src/content/posts/firmamento.md` is the original theme's own customization
   guide. It documents Firmamento's TOML config, which does not apply to this
   site; treat it as a historical document.
