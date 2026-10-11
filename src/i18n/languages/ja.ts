@@ -97,4 +97,10 @@ export const ja: Translation = {
 	[Key.viewCopyrightInfo]: "著作権情報を表示",
 	[Key.imageSource]: "出典：",
 	[Key.imageOwner]: "著作権者：",
+	[Key.timezone]: "タイムゾーン",
+	[Key.renderTime]: "描画時間",
+	[Key.themeMode]: "テーマ",
+	[Key.viewport]: "ビューポート",
+	[Key.language]: "言語",
+	[Key.siteTitle]: "サイト",
 };

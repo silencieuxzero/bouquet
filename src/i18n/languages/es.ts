@@ -97,4 +97,10 @@ export const es: Translation = {
 	[Key.viewCopyrightInfo]: "Ver información de derechos de autor",
 	[Key.imageSource]: "Fuente: ",
 	[Key.imageOwner]: "Titular de los derechos: ",
+	[Key.timezone]: "Zona horaria",
+	[Key.renderTime]: "Tiempo de renderizado",
+	[Key.themeMode]: "Tema",
+	[Key.viewport]: "Viewport",
+	[Key.language]: "Idioma",
+	[Key.siteTitle]: "Sitio",
 };

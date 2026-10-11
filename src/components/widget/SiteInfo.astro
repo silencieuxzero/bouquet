@@ -1,0 +1,171 @@
+---
+import { Icon } from "astro-icon/components";
+import I18nKey from "../../i18n/i18nKey";
+import { i18n } from "../../i18n/translation";
+import { siteConfig } from "../../config";
+---
+
+<!--
+  下滑后淡入的站点信息：主题、视口、语言、访客时区与本页渲染耗时。
+
+  条目数量刻意与下面的分类/标签栏接近，让三张卡片在侧栏里的观感一致，
+  不会一张明显偏矮。
+
+  显隐用 grid-template-rows: 0fr → 1fr 过渡，而不是 max-height 猜值，
+  这样高度动画结束后是内容自然高度，下面的分类/标签栏平滑下移而非突然跳动。
+-->
+<div id="site-info"
+     class="grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-500 ease-out">
+    <div class="overflow-hidden">
+        <div class="card-base pb-4">
+            <div class="px-4 pt-4 flex flex-col gap-1.5 text-sm text-neutral-700 dark:text-neutral-300">
+                <div class="flex items-center gap-2">
+                    <Icon name="material-symbols:language" class="text-[1.15rem] shrink-0 opacity-70"></Icon>
+                    <span class="opacity-70">{i18n(I18nKey.timezone)}</span>
+                    <span id="site-info-timezone" class="ml-auto font-mono text-xs">--</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Icon name="material-symbols:schedule" class="text-[1.15rem] shrink-0 opacity-70"></Icon>
+                    <span class="opacity-70">{i18n(I18nKey.renderTime)}</span>
+                    <span id="site-info-render" class="ml-auto font-mono text-xs">--</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Icon name="material-symbols:contrast" class="text-[1.15rem] shrink-0 opacity-70"></Icon>
+                    <span class="opacity-70">{i18n(I18nKey.themeMode)}</span>
+                    <span id="site-info-theme" class="ml-auto font-mono text-xs">--</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Icon name="material-symbols:desktop-windows" class="text-[1.15rem] shrink-0 opacity-70"></Icon>
+                    <span class="opacity-70">{i18n(I18nKey.viewport)}</span>
+                    <span id="site-info-viewport" class="ml-auto font-mono text-xs">--</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Icon name="material-symbols:translate" class="text-[1.15rem] shrink-0 opacity-70"></Icon>
+                    <span class="opacity-70">{i18n(I18nKey.language)}</span>
+                    <span id="site-info-language" class="ml-auto font-mono text-xs">{siteConfig.lang}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Icon name="material-symbols:public" class="text-[1.15rem] shrink-0 opacity-70"></Icon>
+                    <span class="opacity-70">{i18n(I18nKey.siteTitle)}</span>
+                    <span class="ml-auto font-mono text-xs truncate max-w-[9rem]">{siteConfig.title}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+	// 下滑到这个距离后淡入。只触发一次：往回滚不隐藏，避免来回滚动时闪烁。
+	const REVEAL_AT = 120;
+
+	let revealed = false;
+
+	function reveal() {
+		if (revealed) return;
+		const box = document.getElementById("site-info");
+		if (!box) return;
+		revealed = true;
+		box.classList.remove("grid-rows-[0fr]", "opacity-0");
+		box.classList.add("grid-rows-[1fr]", "opacity-100");
+	}
+
+	// swup 换页会重建 main 内的 DOM，所以每次都按 id 重新取元素；
+	// 监听器只在首次加载挂一次即可。
+	function checkScroll() {
+		if (revealed) return;
+		const y = window.scrollY || document.documentElement.scrollTop || 0;
+		if (y > REVEAL_AT) reveal();
+	}
+
+	function setTimezone() {
+		let tz = "UTC";
+		try {
+			tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+		} catch {
+			// 个别环境禁用 Intl 时退回 UTC
+		}
+		const el = document.getElementById("site-info-timezone");
+		if (el) el.textContent = tz;
+	}
+
+	function setRender(ms: number) {
+		const el = document.getElementById("site-info-render");
+		if (el) el.textContent = ms > 0 ? `${Math.round(ms)} ms` : "--";
+	}
+
+	// 主题：localStorage.theme 存的是 light / dark / auto 三态之一，
+	// auto 表示跟随系统，所以要结合 matchMedia 判断实际生效的是哪一种。
+	function setTheme() {
+		const el = document.getElementById("site-info-theme");
+		if (!el) return;
+		const stored = localStorage.getItem("theme") || "auto";
+		const effective = document.documentElement.classList.contains("dark") ? "dark" : "light";
+		const labels: Record<string, string> = { light: "Light", dark: "Dark", auto: "Auto" };
+		const label = labels[effective] ?? effective;
+		el.textContent = stored === "auto" ? `${label} / Auto` : label;
+	}
+
+	function setViewport() {
+		const el = document.getElementById("site-info-viewport");
+		if (!el) return;
+		const write = () => {
+			el.textContent = `${window.innerWidth}×${window.innerHeight}`;
+		};
+		write();
+		// 断点切换不会重跑本模块，所以直接挂监听，重复赋值同一元素是幂等的。
+		window.addEventListener("resize", write, { passive: true });
+	}
+
+	// 首屏用 Navigation Timing 的 loadEventEnd：导航开始到全部资源加载完成。
+	function measureLoad() {
+		const read = () => {
+			const nav = performance.getEntriesByType("navigation")[0] as
+				| PerformanceNavigationTiming
+				| undefined;
+			return nav ? nav.loadEventEnd || nav.domContentLoadedEventEnd : 0;
+		};
+
+		const end = read();
+		if (end > 0) {
+			setRender(end);
+			return;
+		}
+		// 这段脚本被内联在 HTML 里、解析阶段就跑完了，此时 load 事件还没发生，
+		// navigation 的时间戳仍是 0，等 load 之后再取一次。
+		window.addEventListener(
+			"load",
+			() => {
+				setRender(read());
+			},
+			{ once: true },
+		);
+	}
+
+	setTimezone();
+	setTheme();
+	setViewport();
+	measureLoad();
+	checkScroll();
+	window.addEventListener("scroll", checkScroll, { passive: true });
+
+	// swup 站内跳转不会产生新的 navigation entry，所以改用
+	// visit:start → page:view 量这一页的切换耗时，翻到哪页显示哪页的数据。
+	let visitStart = 0;
+
+	function bindSwup() {
+		window.swup?.hooks?.on("visit:start", () => {
+			visitStart = performance.now();
+		});
+		window.swup?.hooks?.on("page:view", () => {
+			if (!visitStart) return;
+			setRender(performance.now() - visitStart);
+			visitStart = 0;
+		});
+	}
+
+	if (window?.swup?.hooks) {
+		bindSwup();
+	} else {
+		document.addEventListener("swup:enable", bindSwup);
+	}
+</script>

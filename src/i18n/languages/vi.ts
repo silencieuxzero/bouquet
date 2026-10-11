@@ -97,4 +97,10 @@ export const vi: Translation = {
 	[Key.viewCopyrightInfo]: "Xem thông tin bản quyền",
 	[Key.imageSource]: "Nguồn: ",
 	[Key.imageOwner]: "Chủ sở hữu bản quyền: ",
+	[Key.timezone]: "Múi giờ",
+	[Key.renderTime]: "Thời gian hiển thị",
+	[Key.themeMode]: "Chủ đề",
+	[Key.viewport]: "Khung nhìn",
+	[Key.language]: "Ngôn ngữ",
+	[Key.siteTitle]: "Trang",
 };

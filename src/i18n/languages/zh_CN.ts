@@ -97,4 +97,10 @@ export const zh_CN: Translation = {
 	[Key.viewCopyrightInfo]: "查看版权信息",
 	[Key.imageSource]: "来源：",
 	[Key.imageOwner]: "版权方：",
+	[Key.timezone]: "时区",
+	[Key.renderTime]: "渲染耗时",
+	[Key.themeMode]: "主题",
+	[Key.viewport]: "视口",
+	[Key.language]: "语言",
+	[Key.siteTitle]: "站点",
 };

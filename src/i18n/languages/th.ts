@@ -97,4 +97,10 @@ export const th: Translation = {
 	[Key.viewCopyrightInfo]: "ดูข้อมูลลิขสิทธิ์",
 	[Key.imageSource]: "แหล่งที่มา: ",
 	[Key.imageOwner]: "เจ้าของลิขสิทธิ์: ",
+	[Key.timezone]: "เขตเวลา",
+	[Key.renderTime]: "เวลาแสดงผล",
+	[Key.themeMode]: "ธีม",
+	[Key.viewport]: "วิวพอร์ต",
+	[Key.language]: "ภาษา",
+	[Key.siteTitle]: "เว็บไซต์",
 };

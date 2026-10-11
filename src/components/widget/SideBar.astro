@@ -2,6 +2,7 @@
 import type { MarkdownHeading } from "astro";
 import Categories from "./Categories.astro";
 import Profile from "./Profile.astro";
+import SiteInfo from "./SiteInfo.astro";
 import Tag from "./Tags.astro";
 
 interface Props {
@@ -15,7 +16,14 @@ const className = Astro.props.class;
     <div class="flex flex-col w-full gap-4 mb-4">
         <Profile></Profile>
     </div>
-    <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4">
+    <!--
+        下滑时吸顶，留一小段空隙（top-3 = 0.75rem）而不是完全贴死视口顶端，
+        视觉上不顶格、但也不会像原始的 top-4 那样显得松散。
+        导航栏是 #top-row 里的 sticky 包裹层，自身高度有限，滚过一段就会
+        随页面滚走，不会一直悬在顶部遮挡这里。
+    -->
+    <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-3 sticky top-3">
+        <SiteInfo></SiteInfo>
         <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
         <Tag class="onload-animation" style="animation-delay: 200ms"></Tag>
     </div>

@@ -97,4 +97,10 @@ export const tr: Translation = {
 	[Key.viewCopyrightInfo]: "Telif hakkı bilgisini görüntüle",
 	[Key.imageSource]: "Kaynak: ",
 	[Key.imageOwner]: "Telif hakkı sahibi: ",
+	[Key.timezone]: "Saat dilimi",
+	[Key.renderTime]: "Render süresi",
+	[Key.themeMode]: "Tema",
+	[Key.viewport]: "Görüntü alanı",
+	[Key.language]: "Dil",
+	[Key.siteTitle]: "Site",
 };

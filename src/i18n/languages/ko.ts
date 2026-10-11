@@ -97,4 +97,10 @@ export const ko: Translation = {
 	[Key.viewCopyrightInfo]: "저작권 정보 보기",
 	[Key.imageSource]: "출처: ",
 	[Key.imageOwner]: "저작권자: ",
+	[Key.timezone]: "시간대",
+	[Key.renderTime]: "렌더링 시간",
+	[Key.themeMode]: "테마",
+	[Key.viewport]: "뷰포트",
+	[Key.language]: "언어",
+	[Key.siteTitle]: "사이트",
 };

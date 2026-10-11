@@ -98,6 +98,12 @@ enum I18nKey {
 	viewCopyrightInfo = "viewCopyrightInfo",
 	imageSource = "imageSource",
 	imageOwner = "imageOwner",
+	timezone = "timezone",
+	renderTime = "renderTime",
+	themeMode = "themeMode",
+	viewport = "viewport",
+	language = "language",
+	siteTitle = "siteTitle",
 }
 
 export default I18nKey;

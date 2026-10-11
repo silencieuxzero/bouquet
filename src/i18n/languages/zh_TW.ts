@@ -97,4 +97,10 @@ export const zh_TW: Translation = {
 	[Key.viewCopyrightInfo]: "檢視版權資訊",
 	[Key.imageSource]: "來源：",
 	[Key.imageOwner]: "版權方：",
+	[Key.timezone]: "時區",
+	[Key.renderTime]: "渲染耗時",
+	[Key.themeMode]: "主題",
+	[Key.viewport]: "視口",
+	[Key.language]: "語言",
+	[Key.siteTitle]: "站點",
 };

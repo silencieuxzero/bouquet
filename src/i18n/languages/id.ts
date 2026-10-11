@@ -97,4 +97,10 @@ export const id: Translation = {
 	[Key.viewCopyrightInfo]: "Lihat info hak cipta",
 	[Key.imageSource]: "Sumber: ",
 	[Key.imageOwner]: "Pemegang hak cipta: ",
+	[Key.timezone]: "Zona waktu",
+	[Key.renderTime]: "Waktu render",
+	[Key.themeMode]: "Tema",
+	[Key.viewport]: "Viewport",
+	[Key.language]: "Bahasa",
+	[Key.siteTitle]: "Situs",
 };

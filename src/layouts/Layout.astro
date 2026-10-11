@@ -184,7 +184,7 @@ const bannerOffset =
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 	</head>
-	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner, "has-bg-image": !!bgImageUrl}]}
+	<body class=" min-h-screen transition " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner, "has-bg-image": !!bgImageUrl}]}
 		  data-overlayscrollbars-initialize
 	>
 		<ConfigCarrier></ConfigCarrier>
@@ -220,14 +220,32 @@ const bannerOffset =
 	.enable-banner #banner {
 		@apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)]
 	}
+	/*
+	  首页 banner 占住顶部，主内容面板要整体下移让开。
+
+	  这里必须用 margin-top 而不是 translate-y：translate 会给 #main-grid
+	  建立新的包含块，position:sticky 的侧栏于是改为相对这个被平移的盒子定位，
+	  结果是「贴到容器顶」而不是「贴到视口顶」，视觉上永远差一段
+	  --banner-height-extend 的空隙。margin-top 只影响布局流，不建立包含块，
+	  侧栏下滑后能真正顶格。
+	*/
 	.enable-banner.is-home #main-grid {
-		@apply translate-y-[var(--banner-height-extend)];
+		@apply mt-[var(--banner-height-extend)];
 	}
 	.enable-banner #top-row {
 		@apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300
 	}
+	/*
+	  侧栏吸顶间距：必须与 SideBar.astro 的 `top-3` 保持一致。
+
+	  这条规则原本是给旧的 `top-4` 配套的——首页 banner 占 30vh 并把
+	  #main-grid 整体下推，侧栏需要 `1rem - 30vh` 才能抵消那段位移。
+	  现在 sticky 偏移是固定的小间距，这里必须同步成同样的值；
+	  否则这条 #id 规则（优先级高于 Tailwind 工具类）会让首页侧栏
+	  和内页对不齐，首页重新出现那段大空隙。
+	*/
 	.enable-banner.is-home #sidebar-sticky {
-		@apply top-[calc(1rem_-_var(--banner-height-extend))]
+		@apply top-3
 	}
 	.navbar-hidden {
 		@apply opacity-0 -translate-y-16
@@ -453,7 +471,7 @@ const setup = () => {
 		}
 		let threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 72 - 16
 		let navbar = document.getElementById('navbar-wrapper')
-		if (!navbar || !document.body.classList.contains('lg:is-home')) {
+		if (!navbar || !document.body.classList.contains('is-home')) {
 			return
 		}
 		if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
@@ -465,9 +483,9 @@ const setup = () => {
 		// change banner height immediately when a link is clicked
 		const bodyElement = document.querySelector('body')
 		if (pathsEqual(visit.to.url, url('/'))) {
-			bodyElement!.classList.add('lg:is-home');
+			bodyElement!.classList.add('is-home');
 		} else {
-			bodyElement!.classList.remove('lg:is-home');
+			bodyElement!.classList.remove('is-home');
 		}
 
 		// increase the page height during page transition to prevent the scrolling animation from jumping
@@ -538,7 +556,7 @@ function scrollFunction() {
 		const MAIN_PANEL_EXCESS_HEIGHT = MAIN_PANEL_OVERLAPS_BANNER_HEIGHT * 16			// The height the main panel overlaps the banner
 
 		let bannerHeight = BANNER_HEIGHT
-		if (document.body.classList.contains('lg:is-home') && window.innerWidth >= 1024) {
+		if (document.body.classList.contains('is-home') && window.innerWidth >= 1024) {
 			bannerHeight = BANNER_HEIGHT_HOME
 		}
 		let threshold = window.innerHeight * (bannerHeight / 100) - NAVBAR_HEIGHT - MAIN_PANEL_EXCESS_HEIGHT - 16
