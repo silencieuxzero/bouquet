@@ -12,7 +12,7 @@ import type {
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
-	title: "Firmamento",
+	title: "bouquet",
 	subtitle: "这里是互联网无尽海洋中的一片星空，欢迎来到这里~",
 	lang: "zh_CN", // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	backgroundImage: "/scp.jpg", // Full-page background image, relative to /public
