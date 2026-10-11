@@ -7,6 +7,8 @@ category: "设定"
 tags: ["设定", "人物"]
 draft: false
 encrypted: true
+words: 2687
+minutes: 13
 ---
 
 <!-- Body is stored encrypted in /encrypted/personoc.enc -->

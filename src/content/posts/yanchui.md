@@ -7,6 +7,8 @@ category: "设定"
 tags: ["设定", "人物"]
 draft: false
 encrypted: true
+words: 1456
+minutes: 7
 ---
 
 <!-- Body is stored encrypted in /encrypted/yanchui.enc -->

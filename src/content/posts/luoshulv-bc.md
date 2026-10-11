@@ -7,6 +7,8 @@ category: "设定"
 tags: ["设定", "IF线", "人物"]
 draft: false
 encrypted: true
+words: 863
+minutes: 4
 ---
 
 <!-- Body is stored encrypted in /encrypted/luoshulv-bc.enc -->

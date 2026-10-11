@@ -7,6 +7,8 @@ category: "随笔"
 tags: ["随笔", "原创"]
 draft: false
 encrypted: true
+words: 692
+minutes: 3
 ---
 
 <!-- Body is stored encrypted in /encrypted/story-4.enc -->

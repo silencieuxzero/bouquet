@@ -21,8 +21,13 @@ export const siteConfig: SiteConfig = {
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
-		enable: false,
-		src: "assets/images/demo-banner.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		enable: true,
+		// liquid_silk_v01_5120_2880.png, re-encoded to WebP (quality 88) at full
+		// 5120x2880: 8.7 MB -> 280 KB with no visible loss, since the artwork is a
+		// smooth gradient. Keep the full resolution so 4K/retina screens stay sharp;
+		// Astro's <Image> re-optimises this at build time. Original PNG lives in the
+		// user's wallpaper folder and is intentionally not committed here.
+		src: "assets/images/liquid-silk-banner.webp", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
 		credit: {
 			enable: false, // Display the credit text of the banner image

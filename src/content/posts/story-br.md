@@ -7,6 +7,8 @@ category: "创作"
 tags: ["后室", "创作"]
 draft: false
 encrypted: true
+words: 637
+minutes: 3
 ---
 
 <!-- Body is stored encrypted in /encrypted/story-br.enc -->
