@@ -1,15 +1,19 @@
 ---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
 // ============================================================================
 // 子画廊（密码保护）
 // ============================================================================
 // 图片列表不随页面分发：它存放在 /encrypted/sub-gallery.enc，
 // 读者输入密码后在浏览器本地解密（PBKDF2 + AES-GCM，见 src/utils/webcrypto.ts）。
 // 仓库中不含明文列表，构建也无需密码。
+//
+// 卡片样式与主画廊共用 src/styles/gallery.css（全局样式表）：卡片是浏览器端
+// 动态创建的，组件内的 <style> 带 data-astro-cid-* 作用域，匹配不到它们。
 // ============================================================================
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
 import { subGalleryConfig } from "../../config";
+import "../../styles/gallery.css";
 
 const PAYLOAD_NAME = "sub-gallery";
 
@@ -18,6 +22,8 @@ const uiText = {
 	enterPassword: i18n(I18nKey.enterPassword),
 	decrypting: i18n(I18nKey.decrypting),
 	decryptFailed: i18n(I18nKey.decryptFailed),
+	viewCopyrightInfo: i18n(I18nKey.viewCopyrightInfo),
+	copyrightInfo: i18n(I18nKey.copyrightInfo),
 };
 const uiTextJson = JSON.stringify(uiText);
 ---
@@ -71,6 +77,16 @@ const uiTextJson = JSON.stringify(uiText);
         <button class="lightbox-close" aria-label={i18n(I18nKey.close)}>&times;</button>
         <div class="lightbox-content"><img src="" alt={i18n(I18nKey.previewImage)} /></div>
     </div>
+
+    <!-- 版权信息弹窗 -->
+    <div class="copyright-modal-overlay" id="copyrightModal" role="dialog" aria-modal="true" aria-label={i18n(I18nKey.copyrightInfo)}>
+        <div class="copyright-modal card-base">
+            <button class="copyright-modal-close" aria-label={i18n(I18nKey.close)}>&times;</button>
+            <h3 class="font-bold mb-3">{i18n(I18nKey.copyrightInfo)}</h3>
+            <p class="text-sm mb-1"><strong>{i18n(I18nKey.imageSource)}</strong><span id="copyrightSource"></span></p>
+            <p class="text-sm"><strong>{i18n(I18nKey.imageOwner)}</strong><span id="copyrightOwner"></span></p>
+        </div>
+    </div>
 </MainGridLayout>
 
 <script>
@@ -107,9 +123,10 @@ const uiTextJson = JSON.stringify(uiText);
 		const render = (images: GalleryImage[]) => {
 			const grid = document.createElement("div");
 			grid.className = "gallery-grid";
-			images.forEach((img) => {
+			images.forEach((img, i) => {
 				const fig = document.createElement("figure");
-				fig.className = "gallery-item";
+				fig.className = "gallery-item onload-animation";
+				fig.style.animationDelay = `calc(var(--content-delay) + ${i * 40}ms)`;
 
 				const wrap = document.createElement("div");
 				wrap.className = "gallery-img-wrap";
@@ -119,8 +136,23 @@ const uiTextJson = JSON.stringify(uiText);
 				el.alt = img.alt;
 				el.loading = "lazy";
 				el.dataset.lightbox = "";
-				el.addEventListener("click", () => openLightbox(img.src, img.alt));
+				el.addEventListener("click", () => openLightbox(el.src, img.alt));
 				wrap.appendChild(el);
+
+				// 与主画廊一致：有版权信息时在图片右上角显示 © 角标，点击弹出来源/作者。
+				if (img.copyright || img.source) {
+					const btn = document.createElement("button");
+					btn.type = "button";
+					btn.className = "copyright-btn";
+					btn.textContent = "©";
+					btn.setAttribute("aria-label", uiText.viewCopyrightInfo);
+					btn.title = uiText.copyrightInfo;
+					btn.addEventListener("click", (e) => {
+						e.stopPropagation();
+						openCopyright(img.source ?? "", img.copyright ?? "");
+					});
+					wrap.appendChild(btn);
+				}
 
 				const cap = document.createElement("figcaption");
 				cap.className = "gallery-item-caption";
@@ -200,9 +232,34 @@ const uiTextJson = JSON.stringify(uiText);
 		});
 	}
 
+	// 版权信息弹窗（与主画廊同一套 DOM 与样式）
+	function openCopyright(source: string, owner: string) {
+		const modal = document.getElementById("copyrightModal");
+		const modalSource = document.getElementById("copyrightSource");
+		const modalOwner = document.getElementById("copyrightOwner");
+		if (!modal || !modalSource || !modalOwner) return;
+		modalSource.textContent = source || "—";
+		modalOwner.textContent = owner || "—";
+		modal.classList.add("active");
+	}
+	function initCopyrightModal() {
+		const modal = document.getElementById("copyrightModal");
+		if (!modal || modal.dataset.ready === "1") return;
+		modal.dataset.ready = "1";
+		const close = () => modal.classList.remove("active");
+		modal.querySelector(".copyright-modal-close")?.addEventListener("click", close);
+		modal.addEventListener("click", (e) => {
+			if (e.target === modal) close();
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") close();
+		});
+	}
+
 	function initAll() {
 		initSubGallery();
 		initLightbox();
+		initCopyrightModal();
 	}
 	initAll();
 
@@ -213,74 +270,3 @@ const uiTextJson = JSON.stringify(uiText);
 		document.addEventListener("swup:enable", () => w.swup.hooks.on("page:view", initAll));
 	}
 </script>
-
-<style>
-	.gallery-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 1rem;
-	}
-	.gallery-item {
-		margin: 0;
-		border-radius: var(--radius-large, 0.75rem);
-		overflow: hidden;
-		background: var(--btn-regular-bg);
-	}
-	.gallery-img-wrap img {
-		width: 100%;
-		aspect-ratio: 1 / 1;
-		object-fit: cover;
-		display: block;
-		cursor: zoom-in;
-		transition: transform 0.25s ease;
-	}
-	.gallery-img-wrap img:hover {
-		transform: scale(1.04);
-	}
-	.gallery-item-caption {
-		padding: 0.5rem 0.7rem;
-		font-size: 0.8rem;
-		text-align: center;
-		color: var(--btn-content);
-	}
-	.lightbox-overlay {
-		position: fixed;
-		inset: 0;
-		z-index: 200;
-		background: rgba(0, 0, 0, 0.88);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.25s ease;
-	}
-	.lightbox-overlay.active {
-		opacity: 1;
-		pointer-events: auto;
-	}
-	.lightbox-content img {
-		max-width: 92vw;
-		max-height: 88vh;
-		object-fit: contain;
-		display: block;
-		border-radius: 0.5rem;
-	}
-	.lightbox-close {
-		position: absolute;
-		top: 1.25rem;
-		right: 1.5rem;
-		width: 40px;
-		height: 40px;
-		border: none;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.15);
-		color: #fff;
-		font-size: 1.6rem;
-		line-height: 1;
-		cursor: pointer;
-	}
-	.lightbox-close:hover {
-		background: rgba(255, 255, 255, 0.3);
-	}
-</style>

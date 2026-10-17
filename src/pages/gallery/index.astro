@@ -1,4 +1,6 @@
 ---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
 // ============================================================================
 // 画廊
 // ============================================================================
@@ -6,11 +8,10 @@
 // 图片列表来自 src/data/gallery.json（经 src/config.ts 的 galleryConfig 导出）。
 // ============================================================================
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
 import { url } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { galleryConfig, subGalleryConfig } from "../../config";
+import "../../styles/gallery.css";
 
 const images = galleryConfig.images;
 
@@ -157,166 +158,3 @@ function resolveSrc(src: string): string {
 		document.addEventListener("swup:enable", () => w.swup.hooks.on("page:view", initGallery));
 	}
 </script>
-
-<style>
-	.gallery-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-		gap: 1rem;
-	}
-	.gallery-item {
-		margin: 0;
-		border-radius: var(--radius-large, 0.75rem);
-		overflow: hidden;
-		background: var(--btn-regular-bg);
-		display: flex;
-		flex-direction: column;
-		transition: transform 0.2s ease;
-	}
-	.gallery-item:hover {
-		transform: scale(1.02);
-	}
-	.gallery-img-wrap {
-		position: relative;
-		overflow: hidden;
-	}
-	.gallery-img-wrap img {
-		width: 100%;
-		aspect-ratio: 16 / 10;
-		object-fit: cover;
-		display: block;
-		cursor: zoom-in;
-	}
-	.copyright-btn {
-		position: absolute;
-		top: 0.5rem;
-		right: 0.5rem;
-		width: 30px;
-		height: 30px;
-		border: none;
-		border-radius: 50%;
-		background: rgba(0, 0, 0, 0.55);
-		color: #fff;
-		font-size: 0.8rem;
-		font-weight: bold;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		opacity: 0;
-		transition: opacity 0.2s ease, transform 0.2s ease;
-		z-index: 2;
-		line-height: 1;
-	}
-	.gallery-img-wrap:hover .copyright-btn {
-		opacity: 1;
-	}
-	.copyright-btn:hover {
-		transform: scale(1.1);
-		background: rgba(0, 0, 0, 0.8);
-	}
-	.gallery-item-caption {
-		padding: 0.5rem 0.7rem;
-		font-size: 0.8rem;
-		text-align: center;
-		color: var(--btn-content);
-	}
-	.sub-gallery-card {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-top: 1.75rem;
-		padding: 1.1rem 1.4rem;
-		border-radius: var(--radius-large, 0.75rem);
-		background: var(--btn-regular-bg);
-		text-decoration: none;
-		transition: background 0.25s ease;
-	}
-	.sub-gallery-card:hover {
-		background: var(--btn-regular-bg-hover);
-	}
-
-	/* 灯箱 */
-	.lightbox-overlay {
-		position: fixed;
-		inset: 0;
-		z-index: 200;
-		background: rgba(0, 0, 0, 0.88);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.25s ease;
-	}
-	.lightbox-overlay.active {
-		opacity: 1;
-		pointer-events: auto;
-	}
-	.lightbox-content {
-		max-width: 92vw;
-		max-height: 88vh;
-	}
-	.lightbox-content img {
-		max-width: 92vw;
-		max-height: 88vh;
-		object-fit: contain;
-		display: block;
-		border-radius: 0.5rem;
-	}
-	.lightbox-close {
-		position: absolute;
-		top: 1.25rem;
-		right: 1.5rem;
-		width: 40px;
-		height: 40px;
-		border: none;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.15);
-		color: #fff;
-		font-size: 1.6rem;
-		line-height: 1;
-		cursor: pointer;
-		transition: background 0.2s;
-	}
-	.lightbox-close:hover {
-		background: rgba(255, 255, 255, 0.3);
-	}
-
-	/* 版权弹窗 */
-	.copyright-modal-overlay {
-		position: fixed;
-		inset: 0;
-		z-index: 210;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.25s ease;
-	}
-	.copyright-modal-overlay.active {
-		opacity: 1;
-		pointer-events: auto;
-	}
-	.copyright-modal {
-		position: relative;
-		min-width: 280px;
-		max-width: 90vw;
-		padding: 1.4rem 1.6rem;
-		border-radius: var(--radius-large, 0.75rem);
-	}
-	.copyright-modal-close {
-		position: absolute;
-		top: 0.5rem;
-		right: 0.6rem;
-		border: none;
-		background: none;
-		font-size: 1.3rem;
-		line-height: 1;
-		cursor: pointer;
-		color: var(--btn-content);
-	}
-</style>

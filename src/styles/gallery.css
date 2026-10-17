@@ -1,0 +1,181 @@
+/* ============================================================================
+ * 画廊通用样式（主画廊 /gallery/ 与子画廊 /gallery/sub-gallery/ 共用）
+ * ============================================================================
+ * 为什么是全局样式而不是组件内的 <style>：
+ * 子画廊的卡片是浏览器端解密成功后用 document.createElement 动态插入的，
+ * 而 Astro 的 <style> 会给模板元素加上 data-astro-cid-* 作用域属性，
+ * 动态创建的节点没有这个属性，选择器匹配不到 —— 卡片会完全没有样式。
+ * 因此这里的规则必须对运行时插入的 DOM 同样生效，故以全局样式表引入
+ * （由 src/pages/gallery/index.astro 与 sub-gallery.astro 在 frontmatter 里 import）。
+ *
+ * 类名只在这两个页面使用，作用域互不干扰。
+ * ============================================================================ */
+
+.gallery-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 1rem;
+}
+
+.gallery-item {
+	margin: 0;
+	border-radius: var(--radius-large, 0.75rem);
+	overflow: hidden;
+	background: var(--btn-regular-bg);
+	display: flex;
+	flex-direction: column;
+	transition: transform 0.2s ease;
+}
+.gallery-item:hover {
+	transform: scale(1.02);
+}
+
+.gallery-img-wrap {
+	position: relative;
+	overflow: hidden;
+}
+.gallery-img-wrap img {
+	width: 100%;
+	aspect-ratio: 16 / 10;
+	object-fit: cover;
+	display: block;
+	cursor: zoom-in;
+}
+
+.gallery-item-caption {
+	padding: 0.5rem 0.7rem;
+	font-size: 0.8rem;
+	text-align: center;
+	color: var(--btn-content);
+}
+
+/* 版权角标：悬停图片时淡入 */
+.copyright-btn {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	width: 30px;
+	height: 30px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	font-size: 0.8rem;
+	font-weight: bold;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+	z-index: 2;
+	line-height: 1;
+}
+.gallery-img-wrap:hover .copyright-btn,
+.copyright-btn:focus-visible {
+	opacity: 1;
+}
+.copyright-btn:hover {
+	transform: scale(1.1);
+	background: rgba(0, 0, 0, 0.8);
+}
+
+/* 子画廊入口卡片（仅主画廊使用） */
+.sub-gallery-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-top: 1.75rem;
+	padding: 1.1rem 1.4rem;
+	border-radius: var(--radius-large, 0.75rem);
+	background: var(--btn-regular-bg);
+	text-decoration: none;
+	transition: background 0.25s ease;
+}
+.sub-gallery-card:hover {
+	background: var(--btn-regular-bg-hover);
+}
+
+/* 灯箱 */
+.lightbox-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	background: rgba(0, 0, 0, 0.88);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.25s ease;
+}
+.lightbox-overlay.active {
+	opacity: 1;
+	pointer-events: auto;
+}
+.lightbox-content {
+	max-width: 92vw;
+	max-height: 88vh;
+}
+.lightbox-content img {
+	max-width: 92vw;
+	max-height: 88vh;
+	object-fit: contain;
+	display: block;
+	border-radius: 0.5rem;
+}
+.lightbox-close {
+	position: absolute;
+	top: 1.25rem;
+	right: 1.5rem;
+	width: 40px;
+	height: 40px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+	font-size: 1.6rem;
+	line-height: 1;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.lightbox-close:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+/* 版权信息弹窗 */
+.copyright-modal-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 210;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.25s ease;
+}
+.copyright-modal-overlay.active {
+	opacity: 1;
+	pointer-events: auto;
+}
+.copyright-modal {
+	position: relative;
+	min-width: 280px;
+	max-width: 90vw;
+	padding: 1.4rem 1.6rem;
+	border-radius: var(--radius-large, 0.75rem);
+}
+.copyright-modal-close {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.6rem;
+	border: none;
+	background: none;
+	font-size: 1.3rem;
+	line-height: 1;
+	cursor: pointer;
+	color: var(--btn-content);
+}
