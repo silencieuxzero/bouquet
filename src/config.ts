@@ -65,7 +65,6 @@ export const siteConfig: SiteConfig = {
 export const navBarConfig: NavBarConfig = {
 	links: [
 		LinkPreset.Home,
-		LinkPreset.Notes,
 		LinkPreset.Gallery,
 		LinkPreset.Archive,
 		LinkPreset.About,
@@ -73,19 +72,45 @@ export const navBarConfig: NavBarConfig = {
 			name: "GitHub",
 			url: "https://github.com/silencieuxzero", // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
+			icon: "fa6-brands:github",
 		},
 		{
 			// Group heading: opens a panel instead of navigating. The label is an i18n key
 			// resolved at render time (see src/utils/nav-utils.ts) — never call i18n() at
 			// module scope here, translation.ts imports this file.
 			key: I18nKey.more,
+			icon: "material-symbols:more-horiz",
 			children: [
-				{ key: I18nKey.links, url: "/links/" },
-				{ key: I18nKey.tutorials, url: "/tutorials/" },
-				{ key: I18nKey.repos, url: "/repos/" },
-				{ key: I18nKey.games, url: "/games/daosu/" },
-				{ key: I18nKey.categories, url: "/categories/" },
-				{ key: I18nKey.tags, url: "/tags/" },
+				{
+					key: I18nKey.notes,
+					url: "/notes/",
+					icon: "material-symbols:sticky-note-2-outline-rounded",
+				},
+				{
+					key: I18nKey.links,
+					url: "/links/",
+					icon: "material-symbols:link-rounded",
+				},
+				{
+					key: I18nKey.tutorials,
+					url: "/tutorials/",
+					icon: "material-symbols:school-outline-rounded",
+				},
+				{
+					key: I18nKey.repos,
+					url: "/repos/",
+					icon: "material-symbols:folder-open-outline-rounded",
+				},
+				{
+					key: I18nKey.categories,
+					url: "/categories/",
+					icon: "material-symbols:category-outline-rounded",
+				},
+				{
+					key: I18nKey.tags,
+					url: "/tags/",
+					icon: "material-symbols:label-outline-rounded",
+				},
 			],
 		},
 	],

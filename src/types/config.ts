@@ -62,7 +62,10 @@ export enum LinkPreset {
  * src/config.ts, so a module-scope `i18n()` call there can observe an uninitialised
  * binding (`ReferenceError: Cannot access 'map' before initialization`).
  */
-export type NavBarLabel = { name: string } | { key: I18nKey };
+export type NavBarLabel = ({ name: string } | { key: I18nKey }) & {
+	/** Optional astro-icon name (e.g. "material-symbols:home-outline-rounded") shown before the label. */
+	icon?: string;
+};
 
 export type NavBarLink = NavBarLabel & {
 	url: string;

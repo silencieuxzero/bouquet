@@ -40,6 +40,7 @@ const links = flattenNavBarItems(items);
                                 class="btn-plain scale-animation rounded-lg h-11 font-bold px-3 lg:px-4 xl:px-5 active:scale-95"
                         >
                             <div class="flex items-center">
+                                {item.icon && <Icon name={item.icon} class="text-[1.15rem] shrink-0 mr-1.5 transition" />}
                                 {navLabel(item)}
                                 <Icon name="material-symbols:keyboard-arrow-down-rounded" class="text-[1.25rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>
                             </div>
@@ -50,12 +51,13 @@ const links = flattenNavBarItems(items);
                             {item.children.map((child) => {
                                 return <a aria-label={navLabel(child)} href={child.external ? child.url : url(child.url)}
                                           target={child.external ? "_blank" : null}
-                                          class="group flex items-center justify-between gap-4 rounded-lg px-3 py-2 font-bold whitespace-nowrap
+                                          class="group flex items-center gap-2 rounded-lg px-3 py-2 font-bold whitespace-nowrap
                                                  text-black/75 dark:text-white/75 transition
                                                  hover:bg-[var(--btn-plain-bg-hover)] hover:text-[var(--primary)]
                                                  active:bg-[var(--btn-plain-bg-active)] active:text-[var(--primary)]"
                                 >
-                                    {navLabel(child)}
+                                    {child.icon && <Icon name={child.icon} class="text-[1.1rem] shrink-0 transition" />}
+                                    <span class="flex-1">{navLabel(child)}</span>
                                     {child.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.75rem] text-black/[0.2] dark:text-white/[0.2]"></Icon>}
                                 </a>;
                             })}
@@ -66,6 +68,7 @@ const links = flattenNavBarItems(items);
                           class="btn-plain scale-animation rounded-lg h-11 font-bold px-3 lg:px-4 xl:px-5 active:scale-95"
                 >
                     <div class="flex items-center">
+                        {item.icon && <Icon name={item.icon} class="text-[1.15rem] shrink-0 mr-1.5 transition" />}
                         {navLabel(item)}
                         {item.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>}
                     </div>
