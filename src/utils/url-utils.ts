@@ -54,7 +54,7 @@ export function getDir(path: string): string {
  *
  * Content Layer ids drop the trailing `/index`, so an entry's id is no longer a
  * usable directory. `filePath` (root-relative, POSIX) still carries the real
- * location, e.g. `src/content/posts/guide/index.md` -> `content/posts/guide/`.
+ * location, e.g. `src/content/posts/<dir>/index.md` -> `content/posts/<dir>/`.
  */
 export function getPostAssetBasePath(filePath: string | undefined): string {
 	if (!filePath) return "content/posts/";
