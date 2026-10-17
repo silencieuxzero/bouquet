@@ -1,3 +1,7 @@
+import {
+	BANNER_HEIGHT_DEFAULT,
+	BANNER_HEIGHT_HOME_DEFAULT,
+} from "./constants/constants";
 import galleryData from "./data/gallery.json";
 import I18nKey from "./i18n/i18nKey";
 import type {
@@ -29,6 +33,10 @@ export const siteConfig: SiteConfig = {
 		// user's wallpaper folder and is intentionally not committed here.
 		src: "assets/images/liquid-silk-banner.webp", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
+		// 可见的 banner 高度（单位 vh）：内页是一条横带，首页是一整幅大图。
+		// 两者相等 = 首页不再特殊处理；extend 会自动按差值推导，不用单独配。
+		height: 35,
+		homeHeight: 65,
 		credit: {
 			enable: false, // Display the credit text of the banner image
 			text: "", // Credit text to be displayed
@@ -61,6 +69,21 @@ export const siteConfig: SiteConfig = {
 		// browsers request as a favicon; left unwired deliberately.
 	],
 };
+
+/**
+ * 解析后的 banner 高度（单位 vh），供布局与客户端脚本共用。
+ *
+ * height / homeHeight 来自上方 siteConfig.banner，留空时回退到 constants.ts 的默认值。
+ * extend = homeHeight - height：banner 外壳上移 extend、图再按 position 下移，
+ * 净效果是内页只露出 height 高的横带，而首页露出完整的 homeHeight。
+ * 把两者配成相同值即可让首页与内页完全一致。
+ */
+export const bannerHeights = {
+	height: siteConfig.banner.height ?? BANNER_HEIGHT_DEFAULT,
+	homeHeight: siteConfig.banner.homeHeight ?? BANNER_HEIGHT_HOME_DEFAULT,
+};
+export const bannerHeightExtend =
+	bannerHeights.homeHeight - bannerHeights.height;
 
 export const navBarConfig: NavBarConfig = {
 	links: [
@@ -200,5 +223,4 @@ export const galleryConfig = galleryData.gallery;
 export const subGalleryConfig: SubGalleryConfig = {
 	title: galleryData.subGallery.title,
 	subtitle: galleryData.subGallery.subtitle,
-	images: [],
 };

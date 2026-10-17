@@ -27,6 +27,10 @@ export type SiteConfig = {
 		enable: boolean;
 		src: string;
 		position?: "top" | "center" | "bottom";
+		/** Visible banner height on inner pages, unit: vh. Defaults to 35. */
+		height?: number;
+		/** Visible banner height on the home page, unit: vh. Defaults to 65. Set it equal to height to render the home page like an inner page. */
+		homeHeight?: number;
 		credit: {
 			enable: boolean;
 			text: string;
@@ -155,6 +159,4 @@ export type GalleryConfig = {
 export type SubGalleryConfig = {
 	title: string;
 	subtitle?: string;
-	/** Password-encrypted like the blog posts: only a salted hash is stored. */
-	images: GalleryImage[];
 };
