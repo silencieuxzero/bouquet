@@ -1,4 +1,5 @@
 ---
+import { musicConfig } from "../../config";
 // ============================================================================
 // 音乐播放器
 // ============================================================================
@@ -9,7 +10,6 @@
 // ============================================================================
 import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
-import { musicConfig } from "../../config";
 
 const songs = musicConfig.songs.map((s) => ({
 	src: s.url,
@@ -21,7 +21,8 @@ const loopLabels: Record<string, string> = {
 	one: i18n(I18nKey.loopOne),
 	all: i18n(I18nKey.loopAll),
 };
-const initialLoopLabel = loopLabels[musicConfig.loopMode] ?? i18n(I18nKey.loopAll);
+const initialLoopLabel =
+	loopLabels[musicConfig.loopMode] ?? i18n(I18nKey.loopAll);
 
 /** 客户端脚本用的文案（浏览器端没有 i18n()） */
 const uiText = {

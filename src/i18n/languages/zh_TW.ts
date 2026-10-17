@@ -11,11 +11,6 @@ export const zh_TW: Translation = {
 
 	[Key.tags]: "標籤",
 	[Key.categories]: "分類",
-	[Key.recentPosts]: "最新文章",
-
-	[Key.comments]: "評論",
-
-	[Key.untitled]: "無標題",
 	[Key.uncategorized]: "未分類",
 	[Key.noTags]: "無標籤",
 
@@ -40,7 +35,6 @@ export const zh_TW: Translation = {
 	[Key.links]: "友情連結",
 	[Key.tutorials]: "教學",
 	[Key.repos]: "倉庫",
-	[Key.games]: "遊戲",
 	[Key.all]: "全部",
 	[Key.noResults]: "未找到符合的結果",
 	[Key.notFound]: "頁面不存在",

@@ -11,11 +11,6 @@ export const en: Translation = {
 
 	[Key.tags]: "Tags",
 	[Key.categories]: "Categories",
-	[Key.recentPosts]: "Recent Posts",
-
-	[Key.comments]: "Comments",
-
-	[Key.untitled]: "Untitled",
 	[Key.uncategorized]: "Uncategorized",
 	[Key.noTags]: "No Tags",
 
@@ -40,11 +35,11 @@ export const en: Translation = {
 	[Key.links]: "Links",
 	[Key.tutorials]: "Tutorials",
 	[Key.repos]: "Repos",
-	[Key.games]: "Games",
 	[Key.all]: "All",
 	[Key.noResults]: "No results found",
 	[Key.notFound]: "Page Not Found",
-	[Key.pageNotFoundDesc]: "The page you are looking for does not exist or has been moved.",
+	[Key.pageNotFoundDesc]:
+		"The page you are looking for does not exist or has been moved.",
 	[Key.backToHome]: "Back to Home",
 	[Key.encrypted]: "Encrypted",
 	[Key.noNotes]: "No notes yet",
@@ -81,8 +76,10 @@ export const en: Translation = {
 	[Key.playlist]: "Playlist",
 	[Key.volumeLabel]: "Volume",
 	[Key.loadingTrack]: "Loading...",
-	[Key.playFailedCheck]: "Playback failed. Check the audio link or the browser console",
-	[Key.musicLoadTimeout]: "Music loading timed out. Check your network or the audio link",
+	[Key.playFailedCheck]:
+		"Playback failed. Check the audio link or the browser console",
+	[Key.musicLoadTimeout]:
+		"Music loading timed out. Check your network or the audio link",
 	[Key.playFailed]: "Playback failed",
 	[Key.loadFailed]: "Loading failed",
 	[Key.mediaErrAborted]: "Loading was aborted",

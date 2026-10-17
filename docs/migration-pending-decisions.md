@@ -232,3 +232,14 @@ P0, the nav 「更多」 dropdown + custom context menu, P2 and P3 as briefed:
 **Zero** original-site CSS was imported. Every page carries **0** `<style>` blocks
 that came from upstream; the only `<style>` blocks are pre-existing theme files or
 migration-era files that were rewritten against this site's own tokens.
+
+---
+
+## 9. 迁移完成后的删减（本节记录现状，上文表格是迁移当时的历史快照）
+
+以下内容在迁移收尾后被移除，上文 §1 路由表与 §8 清单里对应的「200 / 已完成」条目因此不再成立：
+
+- **悼溯茶馆 /games/daosu/** — 页面外壳、src/data/games.json、public/daosu/ 全部删除；「更多」分组里的导航项一并去掉。该路由现在 404。
+- **Fuwari 模板示例内容** — markdown.md、markdown-extended.md、expressive-code.md、video.md、draft.md、guide/（含封面），以及 public/blog-placeholder-*.jpg 四张占位图。
+- **未使用的演示资源** — src/assets/images/demo-avatar.png、demo-banner.png（banner 现用 liquid-silk-banner.webp）。
+- **导航改动** — 顶层链接全部加了前置图标；「笔记」从顶层移入「更多」。

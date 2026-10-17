@@ -11,11 +11,6 @@ export const tr: Translation = {
 
 	[Key.tags]: "Taglar",
 	[Key.categories]: "Katagoriler",
-	[Key.recentPosts]: "Son Paylaşımlar",
-
-	[Key.comments]: "Yorumlar",
-
-	[Key.untitled]: "Başlıksız",
 	[Key.uncategorized]: "Katagorisiz",
 	[Key.noTags]: "Tag Bulunamadı",
 
@@ -40,7 +35,6 @@ export const tr: Translation = {
 	[Key.links]: "Bağlantılar",
 	[Key.tutorials]: "Eğitimler",
 	[Key.repos]: "Depolar",
-	[Key.games]: "Oyunlar",
 	[Key.all]: "Tümü",
 	[Key.noResults]: "Sonuç bulunamadı",
 	[Key.notFound]: "Sayfa Bulunamadı",
@@ -81,14 +75,17 @@ export const tr: Translation = {
 	[Key.playlist]: "Çalma listesi",
 	[Key.volumeLabel]: "Ses düzeyi",
 	[Key.loadingTrack]: "Yükleniyor...",
-	[Key.playFailedCheck]: "Oynatma başarısız. Ses bağlantısını veya tarayıcı konsolunu denetleyin",
-	[Key.musicLoadTimeout]: "Müzik yüklemesi zaman aşımına uğradı. Ağınızı veya ses bağlantısını denetleyin",
+	[Key.playFailedCheck]:
+		"Oynatma başarısız. Ses bağlantısını veya tarayıcı konsolunu denetleyin",
+	[Key.musicLoadTimeout]:
+		"Müzik yüklemesi zaman aşımına uğradı. Ağınızı veya ses bağlantısını denetleyin",
 	[Key.playFailed]: "Oynatma başarısız",
 	[Key.loadFailed]: "Yükleme başarısız",
 	[Key.mediaErrAborted]: "Yükleme iptal edildi",
 	[Key.mediaErrNetwork]: "Ağ hatası, müzik alınamadı",
 	[Key.mediaErrDecode]: "Kod çözme başarısız, desteklenmeyen ses biçimi",
-	[Key.mediaErrUnsupported]: "Ses bağlantısı kullanılamıyor veya biçim desteklenmiyor",
+	[Key.mediaErrUnsupported]:
+		"Ses bağlantısı kullanılamıyor veya biçim desteklenmiyor",
 	[Key.playbackEnded]: "Oynatma bitti",
 	[Key.close]: "Kapat",
 	[Key.imagePreview]: "Görsel önizleme",

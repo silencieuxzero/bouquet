@@ -5,7 +5,7 @@ import { url } from "./url-utils";
  *
  * It MUST be a real file under `public/`: crawlers fetch `og:image`, so an asset
  * that is bundled from `src/` (such as `siteConfig.banner.src`
- * = `assets/images/demo-banner.png`) has no public URL and can never be used
+ * = `assets/images/liquid-silk-banner.webp`) has no public URL and can never be used
  * here. This is a wide 1920x1079 artwork, which matches the 1.91:1 ratio that
  * `summary_large_image` cards expect.
  */

@@ -11,11 +11,6 @@ export const vi: Translation = {
 
 	[Key.tags]: "Thẻ",
 	[Key.categories]: "Danh mục",
-	[Key.recentPosts]: "Bài viết mới nhất",
-
-	[Key.comments]: "Bình luận",
-
-	[Key.untitled]: "Không tiêu đề",
 	[Key.uncategorized]: "Chưa phân loại",
 	[Key.noTags]: "Chưa có thẻ",
 
@@ -40,7 +35,6 @@ export const vi: Translation = {
 	[Key.links]: "Liên kết",
 	[Key.tutorials]: "Hướng dẫn",
 	[Key.repos]: "Kho mã",
-	[Key.games]: "Trò chơi",
 	[Key.all]: "Tất cả",
 	[Key.noResults]: "Không tìm thấy kết quả",
 	[Key.notFound]: "Không tìm thấy trang",
@@ -81,14 +75,18 @@ export const vi: Translation = {
 	[Key.playlist]: "Danh sách phát",
 	[Key.volumeLabel]: "Âm lượng",
 	[Key.loadingTrack]: "Đang tải...",
-	[Key.playFailedCheck]: "Phát thất bại. Kiểm tra liên kết âm thanh hoặc bảng điều khiển trình duyệt",
-	[Key.musicLoadTimeout]: "Tải nhạc quá thời gian. Kiểm tra mạng hoặc liên kết âm thanh",
+	[Key.playFailedCheck]:
+		"Phát thất bại. Kiểm tra liên kết âm thanh hoặc bảng điều khiển trình duyệt",
+	[Key.musicLoadTimeout]:
+		"Tải nhạc quá thời gian. Kiểm tra mạng hoặc liên kết âm thanh",
 	[Key.playFailed]: "Phát thất bại",
 	[Key.loadFailed]: "Tải thất bại",
 	[Key.mediaErrAborted]: "Quá trình tải đã bị hủy",
 	[Key.mediaErrNetwork]: "Lỗi mạng, không thể tải nhạc",
-	[Key.mediaErrDecode]: "Giải mã thất bại, định dạng âm thanh không được hỗ trợ",
-	[Key.mediaErrUnsupported]: "Liên kết âm thanh không khả dụng hoặc định dạng không được hỗ trợ",
+	[Key.mediaErrDecode]:
+		"Giải mã thất bại, định dạng âm thanh không được hỗ trợ",
+	[Key.mediaErrUnsupported]:
+		"Liên kết âm thanh không khả dụng hoặc định dạng không được hỗ trợ",
 	[Key.playbackEnded]: "Phát xong",
 	[Key.close]: "Đóng",
 	[Key.imagePreview]: "Xem trước hình ảnh",

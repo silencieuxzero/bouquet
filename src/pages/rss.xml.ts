@@ -30,10 +30,7 @@ function rssContent(body: unknown): string {
 }
 
 export async function GET(context: APIContext): Promise<Response> {
-	const [blog, notes] = await Promise.all([
-		getSortedPosts(),
-		getSortedNotes(),
-	]);
+	const [blog, notes] = await Promise.all([getSortedPosts(), getSortedNotes()]);
 
 	const postItems = blog.map((post) => ({
 		title: post.data.title,
@@ -55,7 +52,8 @@ export async function GET(context: APIContext): Promise<Response> {
 	// reads chronologically across both collections.
 	const items = [...postItems, ...noteItems].sort(
 		(a, b) =>
-			new Date(b.pubDate as Date).getTime() - new Date(a.pubDate as Date).getTime(),
+			new Date(b.pubDate as Date).getTime() -
+			new Date(a.pubDate as Date).getTime(),
 	);
 
 	return rss({

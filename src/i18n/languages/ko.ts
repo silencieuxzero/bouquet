@@ -11,11 +11,6 @@ export const ko: Translation = {
 
 	[Key.tags]: "태그",
 	[Key.categories]: "카테고리",
-	[Key.recentPosts]: "최근 게시물",
-
-	[Key.comments]: "댓글",
-
-	[Key.untitled]: "제목 없음",
 	[Key.uncategorized]: "분류되지 않음",
 	[Key.noTags]: "태그 없음",
 
@@ -40,7 +35,6 @@ export const ko: Translation = {
 	[Key.links]: "링크",
 	[Key.tutorials]: "튜토리얼",
 	[Key.repos]: "저장소",
-	[Key.games]: "게임",
 	[Key.all]: "전체",
 	[Key.noResults]: "결과를 찾을 수 없습니다",
 	[Key.notFound]: "페이지를 찾을 수 없습니다",
@@ -81,14 +75,17 @@ export const ko: Translation = {
 	[Key.playlist]: "재생 목록",
 	[Key.volumeLabel]: "볼륨",
 	[Key.loadingTrack]: "불러오는 중...",
-	[Key.playFailedCheck]: "재생에 실패했습니다. 오디오 링크나 브라우저 콘솔을 확인하세요",
-	[Key.musicLoadTimeout]: "음악 로딩 시간이 초과되었습니다. 네트워크나 오디오 링크를 확인하세요",
+	[Key.playFailedCheck]:
+		"재생에 실패했습니다. 오디오 링크나 브라우저 콘솔을 확인하세요",
+	[Key.musicLoadTimeout]:
+		"음악 로딩 시간이 초과되었습니다. 네트워크나 오디오 링크를 확인하세요",
 	[Key.playFailed]: "재생 실패",
 	[Key.loadFailed]: "불러오기 실패",
 	[Key.mediaErrAborted]: "불러오기가 중단되었습니다",
 	[Key.mediaErrNetwork]: "네트워크 오류로 음악을 가져올 수 없습니다",
 	[Key.mediaErrDecode]: "디코딩 실패, 지원하지 않는 오디오 형식입니다",
-	[Key.mediaErrUnsupported]: "오디오 링크를 사용할 수 없거나 지원하지 않는 형식입니다",
+	[Key.mediaErrUnsupported]:
+		"오디오 링크를 사용할 수 없거나 지원하지 않는 형식입니다",
 	[Key.playbackEnded]: "재생이 끝났습니다",
 	[Key.close]: "닫기",
 	[Key.imagePreview]: "이미지 미리보기",

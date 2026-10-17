@@ -8,11 +8,6 @@ enum I18nKey {
 
 	tags = "tags",
 	categories = "categories",
-	recentPosts = "recentPosts",
-
-	comments = "comments",
-
-	untitled = "untitled",
 	uncategorized = "uncategorized",
 	noTags = "noTags",
 
@@ -39,7 +34,6 @@ enum I18nKey {
 	links = "links",
 	tutorials = "tutorials",
 	repos = "repos",
-	games = "games",
 	all = "all",
 	noResults = "noResults",
 	notFound = "notFound",

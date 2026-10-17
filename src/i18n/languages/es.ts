@@ -11,11 +11,6 @@ export const es: Translation = {
 
 	[Key.tags]: "Etiquetas",
 	[Key.categories]: "Categorías",
-	[Key.recentPosts]: "Publicaciones recientes",
-
-	[Key.comments]: "Comentarios",
-
-	[Key.untitled]: "Sin título",
 	[Key.uncategorized]: "Sin categoría",
 	[Key.noTags]: "Sin etiquetas",
 
@@ -40,7 +35,6 @@ export const es: Translation = {
 	[Key.links]: "Enlaces",
 	[Key.tutorials]: "Tutoriales",
 	[Key.repos]: "Repositorios",
-	[Key.games]: "Juegos",
 	[Key.all]: "Todo",
 	[Key.noResults]: "No se encontraron resultados",
 	[Key.notFound]: "Página no encontrada",
@@ -81,14 +75,18 @@ export const es: Translation = {
 	[Key.playlist]: "Lista de reproducción",
 	[Key.volumeLabel]: "Volumen",
 	[Key.loadingTrack]: "Cargando...",
-	[Key.playFailedCheck]: "Falló la reproducción. Revisa el enlace de audio o la consola del navegador",
-	[Key.musicLoadTimeout]: "Se agotó el tiempo de carga. Revisa tu red o el enlace de audio",
+	[Key.playFailedCheck]:
+		"Falló la reproducción. Revisa el enlace de audio o la consola del navegador",
+	[Key.musicLoadTimeout]:
+		"Se agotó el tiempo de carga. Revisa tu red o el enlace de audio",
 	[Key.playFailed]: "Falló la reproducción",
 	[Key.loadFailed]: "Error al cargar",
 	[Key.mediaErrAborted]: "La carga se interrumpió",
 	[Key.mediaErrNetwork]: "Error de red: no se pudo obtener la música",
-	[Key.mediaErrDecode]: "Falló la decodificación: formato de audio no compatible",
-	[Key.mediaErrUnsupported]: "Enlace de audio no disponible o formato no compatible",
+	[Key.mediaErrDecode]:
+		"Falló la decodificación: formato de audio no compatible",
+	[Key.mediaErrUnsupported]:
+		"Enlace de audio no disponible o formato no compatible",
 	[Key.playbackEnded]: "Reproducción finalizada",
 	[Key.close]: "Cerrar",
 	[Key.imagePreview]: "Vista previa de la imagen",

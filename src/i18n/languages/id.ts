@@ -11,11 +11,6 @@ export const id: Translation = {
 
 	[Key.tags]: "Tag",
 	[Key.categories]: "Kategori",
-	[Key.recentPosts]: "Postingan Terbaru",
-
-	[Key.comments]: "Komentar",
-
-	[Key.untitled]: "Tanpa Judul",
 	[Key.uncategorized]: "Tanpa Kategori",
 	[Key.noTags]: "Tanpa Tag",
 
@@ -40,11 +35,11 @@ export const id: Translation = {
 	[Key.links]: "Tautan",
 	[Key.tutorials]: "Tutorial",
 	[Key.repos]: "Repositori",
-	[Key.games]: "Gim",
 	[Key.all]: "Semua",
 	[Key.noResults]: "Hasil tidak ditemukan",
 	[Key.notFound]: "Halaman Tidak Ditemukan",
-	[Key.pageNotFoundDesc]: "Halaman yang Anda cari tidak ada atau telah dipindahkan.",
+	[Key.pageNotFoundDesc]:
+		"Halaman yang Anda cari tidak ada atau telah dipindahkan.",
 	[Key.backToHome]: "Kembali ke Beranda",
 	[Key.encrypted]: "Terenkripsi",
 	[Key.noNotes]: "Belum ada catatan",
@@ -81,14 +76,17 @@ export const id: Translation = {
 	[Key.playlist]: "Daftar putar",
 	[Key.volumeLabel]: "Volume",
 	[Key.loadingTrack]: "Memuat...",
-	[Key.playFailedCheck]: "Pemutaran gagal. Periksa tautan audio atau konsol peramban",
-	[Key.musicLoadTimeout]: "Waktu pemuatan musik habis. Periksa jaringan atau tautan audio",
+	[Key.playFailedCheck]:
+		"Pemutaran gagal. Periksa tautan audio atau konsol peramban",
+	[Key.musicLoadTimeout]:
+		"Waktu pemuatan musik habis. Periksa jaringan atau tautan audio",
 	[Key.playFailed]: "Pemutaran gagal",
 	[Key.loadFailed]: "Gagal memuat",
 	[Key.mediaErrAborted]: "Pemuatan dibatalkan",
 	[Key.mediaErrNetwork]: "Kesalahan jaringan, tidak dapat mengambil musik",
 	[Key.mediaErrDecode]: "Dekode gagal, format audio tidak didukung",
-	[Key.mediaErrUnsupported]: "Tautan audio tidak tersedia atau format tidak didukung",
+	[Key.mediaErrUnsupported]:
+		"Tautan audio tidak tersedia atau format tidak didukung",
 	[Key.playbackEnded]: "Pemutaran selesai",
 	[Key.close]: "Tutup",
 	[Key.imagePreview]: "Pratinjau gambar",

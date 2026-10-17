@@ -4,10 +4,7 @@ import NotesSection from "@components/NotesSection.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import {
-	getSortedNotesList,
-	getSortedPostsList,
-} from "../utils/content-utils";
+import { getSortedNotesList, getSortedPostsList } from "../utils/content-utils";
 
 const sortedPostsList = await getSortedPostsList();
 const sortedNotesList = await getSortedNotesList();

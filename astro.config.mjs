@@ -55,8 +55,10 @@ export default defineConfig({
 			globalInstance: true,
 		}),
 		icon({
+			// Only the Font Awesome sets are pre-bundled; Material Symbols icons are
+			// resolved on demand from @iconify-json/material-symbols. Local SVGs, if
+			// any are ever added, belong in src/icons (astro-icon's default iconDir).
 			include: {
-				"preprocess: vitePreprocess(),": ["*"],
 				"fa6-brands": ["*"],
 				"fa6-regular": ["*"],
 				"fa6-solid": ["*"],

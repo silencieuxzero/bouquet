@@ -11,11 +11,6 @@ export const ja: Translation = {
 
 	[Key.tags]: "タグ",
 	[Key.categories]: "カテゴリ",
-	[Key.recentPosts]: "最近の投稿",
-
-	[Key.comments]: "コメント",
-
-	[Key.untitled]: "タイトルなし",
 	[Key.uncategorized]: "カテゴリなし",
 	[Key.noTags]: "タグなし",
 
@@ -40,7 +35,6 @@ export const ja: Translation = {
 	[Key.links]: "リンク",
 	[Key.tutorials]: "チュートリアル",
 	[Key.repos]: "リポジトリ",
-	[Key.games]: "ゲーム",
 	[Key.all]: "すべて",
 	[Key.noResults]: "結果が見つかりません",
 	[Key.notFound]: "ページが見つかりません",
@@ -66,7 +60,8 @@ export const ja: Translation = {
 	[Key.unlock]: "ロック解除",
 	[Key.enterPassword]: "パスワードを入力してください",
 	[Key.decrypting]: "復号中…",
-	[Key.decryptFailed]: "パスワードが間違っているか、暗号化ファイルが存在しません。",
+	[Key.decryptFailed]:
+		"パスワードが間違っているか、暗号化ファイルが存在しません。",
 	[Key.loopNone]: "リピートなし",
 	[Key.loopOne]: "1曲リピート",
 	[Key.loopAll]: "全曲リピート",
@@ -81,8 +76,10 @@ export const ja: Translation = {
 	[Key.playlist]: "プレイリスト",
 	[Key.volumeLabel]: "音量",
 	[Key.loadingTrack]: "読み込み中...",
-	[Key.playFailedCheck]: "再生に失敗しました。音声リンクまたはブラウザのコンソールを確認してください",
-	[Key.musicLoadTimeout]: "音楽の読み込みがタイムアウトしました。ネットワークまたは音声リンクを確認してください",
+	[Key.playFailedCheck]:
+		"再生に失敗しました。音声リンクまたはブラウザのコンソールを確認してください",
+	[Key.musicLoadTimeout]:
+		"音楽の読み込みがタイムアウトしました。ネットワークまたは音声リンクを確認してください",
 	[Key.playFailed]: "再生に失敗しました",
 	[Key.loadFailed]: "読み込みに失敗しました",
 	[Key.mediaErrAborted]: "読み込みが中断されました",
