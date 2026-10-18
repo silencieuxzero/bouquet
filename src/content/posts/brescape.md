@@ -4,7 +4,7 @@ published: 2026-07-10T10:00:00
 description: "通过这篇文章，你可以了解如何使用后室：逃出生天插件。你可以在后室中找到出口，到达最终出口 Level 399，从而回到现实世界。"
 image: "/ds.png"
 category: "教程"
-tags: ["教程", "后室", "Minecraft"]
+tags: ["后室", "Minecraft"]
 draft: false
 ---
 

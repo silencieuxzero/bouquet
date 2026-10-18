@@ -4,7 +4,7 @@ published: 2026-07-14T13:43:00
 description: "代码详解"
 image: "/长征机头像.png"
 category: "教程"
-tags: ["教程", "Fandom", "CSS"]
+tags: ["Fandom", "CSS"]
 draft: false
 ---
 

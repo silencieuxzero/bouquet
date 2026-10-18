@@ -16,13 +16,6 @@
 				"description": "创建一个自己的角色卡！",
 				"category": "wiki教程",
 				"published": "2026-07-16"
-			},
-			{
-				"slug": "firmamento",
-				"title": "Firmamento自定义指南",
-				"description": "快速上手Firmamento",
-				"category": "Astro教程",
-				"published": "2026-07-17"
 			}
 		]
 	}

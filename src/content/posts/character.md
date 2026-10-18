@@ -4,7 +4,7 @@ published: 2026-07-16T21:49:00
 description: "全面介绍 Character 模板的使用方法和参数详解，适合新用户入门参考。"
 image: "/长征机头像.png"
 category: "教程"
-tags: ["教程", "Fandom", "模板"]
+tags: ["Fandom", "模板"]
 draft: false
 ---
 

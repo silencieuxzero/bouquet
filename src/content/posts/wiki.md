@@ -4,7 +4,7 @@ published: 2026-07-14T13:44:00
 description: "全面介绍 Fandom 平台的核心概念、用户权限体系与 Wikitext 编辑语法，涵盖文本格式化、链接、表格、模板、媒体嵌入等所有常用功能，适合新用户入门参考。"
 image: "/LZH1958.jpg"
 category: "教程"
-tags: ["教程", "Fandom", "Wikitext"]
+tags: ["Fandom", "Wikitext"]
 draft: false
 ---
 
