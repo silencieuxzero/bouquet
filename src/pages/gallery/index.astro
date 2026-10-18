@@ -82,9 +82,8 @@ function resolveSrc(src: string): string {
             <p class="text-sm"><strong>{i18n(I18nKey.imageOwner)}</strong><span id="copyrightOwner"></span></p>
         </div>
     </div>
-</MainGridLayout>
 
-<script>
+    <script>
 	function initGallery() {
 		const lightbox = document.getElementById("lightbox");
 		if (!lightbox || lightbox.dataset.ready === "1") return;
@@ -157,4 +156,5 @@ function resolveSrc(src: string): string {
 	} else {
 		document.addEventListener("swup:enable", () => w.swup.hooks.on("page:view", initGallery));
 	}
-</script>
+    </script>
+</MainGridLayout>

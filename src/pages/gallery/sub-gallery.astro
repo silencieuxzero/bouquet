@@ -87,9 +87,8 @@ const uiTextJson = JSON.stringify(uiText);
             <p class="text-sm"><strong>{i18n(I18nKey.imageOwner)}</strong><span id="copyrightOwner"></span></p>
         </div>
     </div>
-</MainGridLayout>
 
-<script>
+    <script>
 	import { decryptPayload, loadEncryptedPayload, recallPassword, rememberPassword } from "@utils/webcrypto";
 
 	type GalleryImage = { src: string; alt: string; copyright?: string; source?: string };
@@ -269,4 +268,5 @@ const uiTextJson = JSON.stringify(uiText);
 	} else {
 		document.addEventListener("swup:enable", () => w.swup.hooks.on("page:view", initAll));
 	}
-</script>
+    </script>
+</MainGridLayout>

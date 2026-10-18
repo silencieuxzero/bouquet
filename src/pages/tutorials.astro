@@ -121,9 +121,8 @@ const categories = tutorials
             <nav id="tutorials-pagination" class="flex flex-wrap items-center justify-center gap-2 mt-6" aria-label={i18n(I18nKey.tutorials)}></nav>
         </div>
     </div>
-</MainGridLayout>
 
-<script>
+    <script>
         const PAGE_SIZE = 6;
 
         function initTutorials() {
@@ -244,4 +243,5 @@ const categories = tutorials
                         w.swup.hooks.on("page:view", initTutorials),
                 );
         }
-</script>
+    </script>
+</MainGridLayout>

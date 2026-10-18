@@ -19,10 +19,11 @@ html.is-animating .transition-swup-fade {
 }
 
 /* Main components */
+/* backwards 只在延迟期套用 0% 帧，动画结束后回落到基样式（transform: none）——
+   若用 forwards 保留 translateY(0)，归零的 transform 仍是后代 position:fixed
+   元素的包含块，会把画廊灯箱/版权弹窗困在内容列里。 */
 .onload-animation {
-    opacity: 0;
-    animation: 300ms fade-in-up;
-    animation-fill-mode: forwards;
+    animation: 300ms fade-in-up backwards;
 }
 #navbar {
     animation-delay: 0ms
