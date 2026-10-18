@@ -42,6 +42,8 @@ export const th: Translation = {
 	[Key.backToHome]: "กลับหน้าหลัก",
 	[Key.encrypted]: "เข้ารหัส",
 	[Key.noNotes]: "ยังไม่มีบันทึก",
+	[Key.oc]: "การตั้งค่า OC",
+	[Key.noOc]: "ยังไม่มีการตั้งค่า OC",
 	[Key.imageService]: "บริการรูปภาพโดย",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "เมนูคลิกขวา",
@@ -97,4 +99,5 @@ export const th: Translation = {
 	[Key.viewport]: "วิวพอร์ต",
 	[Key.language]: "ภาษา",
 	[Key.siteTitle]: "เว็บไซต์",
+	[Key.lastUpdated]: "อัปเดตล่าสุด",
 };

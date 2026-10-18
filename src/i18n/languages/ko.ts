@@ -42,6 +42,8 @@ export const ko: Translation = {
 	[Key.backToHome]: "홈으로 돌아가기",
 	[Key.encrypted]: "암호화됨",
 	[Key.noNotes]: "아직 노트가 없습니다",
+	[Key.oc]: "OC 설정",
+	[Key.noOc]: "아직 OC 설정이 없습니다",
 	[Key.imageService]: "이미지 서비스 제공:",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "컨텍스트 메뉴",
@@ -100,4 +102,5 @@ export const ko: Translation = {
 	[Key.viewport]: "뷰포트",
 	[Key.language]: "언어",
 	[Key.siteTitle]: "사이트",
+	[Key.lastUpdated]: "최근 업데이트",
 };

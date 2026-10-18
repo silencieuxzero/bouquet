@@ -10,9 +10,10 @@
 //
 // 构建时无需密码：站点只分发密文，由浏览器在读者输入密码后解密。
 //
-// 每次处理都会顺带把明文的真实字数/阅读时间写进
-// src/content/posts/<slug>.md 的 frontmatter（加密文章正文只剩占位注释，
-// 构建时无法自行算出真实篇幅，详见 scripts/lib/post-stats.mjs）。
+// 每次处理都会顺带把明文的真实字数/阅读时间写进文章 frontmatter，目标文件
+// 按 src/content/posts/<slug>.md → src/content/oc/<slug>.md 的顺序查找（「设定」
+// 类文章已迁到 oc 集合）。加密文章正文只剩占位注释，构建时无法自行算出真实
+// 篇幅，详见 scripts/lib/post-stats.mjs）。
 // 密文已是最新的、只想刷新统计时，用免密模式：
 //   node scripts/encrypt-post.mjs <slug> [...] --stats-only
 // ============================================================================
@@ -27,6 +28,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE_DIR = path.join(ROOT, "private", "source");
 const OUT_DIR = path.join(ROOT, "public", "encrypted");
 const POSTS_DIR = path.join(ROOT, "src", "content", "posts");
+// 「设定」类文章已迁到 oc 集合，统计回写要在这两个目录里找目标文件
+const STATS_DIRS = [POSTS_DIR, path.join(ROOT, "src", "content", "oc")];
+
+// 按候选顺序定位统计目标文件；两个目录都没有时抛错，由调用处走「跳过统计」分支
+async function resolveStatsFile(slug) {
+	const tried = [];
+	for (const dir of STATS_DIRS) {
+		const file = path.join(dir, `${slug}.md`);
+		try {
+			await fs.access(file);
+			return file;
+		} catch {
+			// 该目录没有这篇，继续试下一个候选
+			tried.push(path.relative(ROOT, dir));
+		}
+	}
+	throw new Error(`在 ${tried.join(" / ")} 下都找不到 ${slug}.md`);
+}
 
 async function main() {
 	const args = process.argv.slice(2);
@@ -61,7 +80,7 @@ async function main() {
 		// 先写统计：即使后面的加密步骤失败，frontmatter 也已与明文保持一致
 		const stats = computeStats(plaintext);
 		try {
-			await writePostStats(path.join(POSTS_DIR, `${slug}.md`), stats);
+			await writePostStats(await resolveStatsFile(slug), stats);
 			console.log(`[统计] ${slug}: ${stats.words} 字 / ${stats.minutes} 分钟`);
 		} catch (err) {
 			console.error(`[跳过统计] ${slug}: ${err.message}`);

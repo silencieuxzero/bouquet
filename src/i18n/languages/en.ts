@@ -43,6 +43,8 @@ export const en: Translation = {
 	[Key.backToHome]: "Back to Home",
 	[Key.encrypted]: "Encrypted",
 	[Key.noNotes]: "No notes yet",
+	[Key.oc]: "OC Settings",
+	[Key.noOc]: "No OC settings yet",
 	[Key.imageService]: "Image service provided by",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "Context menu",
@@ -100,4 +102,5 @@ export const en: Translation = {
 	[Key.viewport]: "Viewport",
 	[Key.language]: "Language",
 	[Key.siteTitle]: "Site",
+	[Key.lastUpdated]: "Last updated",
 };

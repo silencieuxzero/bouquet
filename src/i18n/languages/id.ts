@@ -43,6 +43,8 @@ export const id: Translation = {
 	[Key.backToHome]: "Kembali ke Beranda",
 	[Key.encrypted]: "Terenkripsi",
 	[Key.noNotes]: "Belum ada catatan",
+	[Key.oc]: "Setelan OC",
+	[Key.noOc]: "Belum ada setelan OC",
 	[Key.imageService]: "Layanan gambar oleh",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "Menu konteks",
@@ -101,4 +103,5 @@ export const id: Translation = {
 	[Key.viewport]: "Viewport",
 	[Key.language]: "Bahasa",
 	[Key.siteTitle]: "Situs",
+	[Key.lastUpdated]: "Terakhir diperbarui",
 };

@@ -42,6 +42,8 @@ export const vi: Translation = {
 	[Key.backToHome]: "Về trang chủ",
 	[Key.encrypted]: "Đã mã hóa",
 	[Key.noNotes]: "Chưa có ghi chú",
+	[Key.oc]: "Cài đặt OC",
+	[Key.noOc]: "Chưa có cài đặt OC",
 	[Key.imageService]: "Dịch vụ hình ảnh bởi",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "Menu chuột phải",
@@ -101,4 +103,5 @@ export const vi: Translation = {
 	[Key.viewport]: "Khung nhìn",
 	[Key.language]: "Ngôn ngữ",
 	[Key.siteTitle]: "Trang",
+	[Key.lastUpdated]: "Cập nhật lần cuối",
 };

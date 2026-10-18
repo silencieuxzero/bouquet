@@ -110,6 +110,11 @@ export const navBarConfig: NavBarConfig = {
 					icon: "material-symbols:sticky-note-2-outline-rounded",
 				},
 				{
+					key: I18nKey.oc,
+					url: "/settings/",
+					icon: "material-symbols:id-card-outline-rounded",
+				},
+				{
 					key: I18nKey.links,
 					url: "/links/",
 					icon: "material-symbols:link-rounded",

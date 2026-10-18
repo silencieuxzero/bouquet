@@ -38,6 +38,12 @@ export default defineConfig({
 	redirects: {
 		"/blog": "/archive/",
 		"/blog/[...slug]": "/posts/[...slug]",
+		// OC 设定区：4 篇「设定」文章迁入独立集合 `oc`，公开路由改为 /settings/<slug>/。
+		"/posts/personoc": "/settings/personoc/",
+		"/posts/luoshulv-bc": "/settings/luoshulv-bc/",
+		"/posts/luoshulv-if": "/settings/luoshulv-if/",
+		"/posts/yanchui": "/settings/yanchui/",
+		"/categories/设定": "/settings/",
 	},
 	integrations: [
 		swup({

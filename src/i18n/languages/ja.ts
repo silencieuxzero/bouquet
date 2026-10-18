@@ -42,6 +42,8 @@ export const ja: Translation = {
 	[Key.backToHome]: "ホームに戻る",
 	[Key.encrypted]: "暗号化",
 	[Key.noNotes]: "ノートはまだありません",
+	[Key.oc]: "OC設定",
+	[Key.noOc]: "OC設定はまだありません",
 	[Key.imageService]: "画像サービス提供:",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "コンテキストメニュー",
@@ -100,4 +102,5 @@ export const ja: Translation = {
 	[Key.viewport]: "ビューポート",
 	[Key.language]: "言語",
 	[Key.siteTitle]: "サイト",
+	[Key.lastUpdated]: "最終更新",
 };

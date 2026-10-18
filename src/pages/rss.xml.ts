@@ -1,5 +1,9 @@
 import rss from "@astrojs/rss";
-import { getSortedNotes, getSortedPosts } from "@utils/content-utils";
+import {
+	getSortedNotes,
+	getSortedOcs,
+	getSortedPosts,
+} from "@utils/content-utils";
 import { url } from "@utils/url-utils";
 import type { APIContext } from "astro";
 import MarkdownIt from "markdown-it";
@@ -17,10 +21,11 @@ function stripInvalidXmlChars(str: string): string {
 }
 
 /**
- * Notes are a separate collection, but they belong in the same feed — the
- * published content of this site is posts + notes, and `/notes/<slug>/` is a
- * real page. Items are built with the collection's own URL helper so a note can
- * never be emitted under `/posts/`.
+ * Notes and OC settings are separate collections, but they belong in the same
+ * feed — the published content of this site is posts + notes + oc, and
+ * `/notes/<slug>/` and `/settings/<slug>/` are real pages. Items are built with
+ * each collection's own URL shape so a note or a setting can never be emitted
+ * under `/posts/`.
  */
 function rssContent(body: unknown): string {
 	const content = typeof body === "string" ? body : String(body || "");
@@ -30,7 +35,11 @@ function rssContent(body: unknown): string {
 }
 
 export async function GET(context: APIContext): Promise<Response> {
-	const [blog, notes] = await Promise.all([getSortedPosts(), getSortedNotes()]);
+	const [blog, notes, ocs] = await Promise.all([
+		getSortedPosts(),
+		getSortedNotes(),
+		getSortedOcs(),
+	]);
 
 	const postItems = blog.map((post) => ({
 		title: post.data.title,
@@ -48,9 +57,18 @@ export async function GET(context: APIContext): Promise<Response> {
 		content: rssContent(note.body),
 	}));
 
+	// oc 集合的公开路由是 /settings/（集合键与路由刻意不同名），链接在这里拼。
+	const ocItems = ocs.map((oc) => ({
+		title: oc.data.title,
+		pubDate: oc.data.published,
+		description: oc.data.description || "",
+		link: url(`/settings/${oc.id}/`),
+		content: rssContent(oc.body),
+	}));
+
 	// @astrojs/rss emits items in the order given; merge newest-first so the feed
-	// reads chronologically across both collections.
-	const items = [...postItems, ...noteItems].sort(
+	// reads chronologically across all three collections.
+	const items = [...postItems, ...noteItems, ...ocItems].sort(
 		(a, b) =>
 			new Date(b.pubDate as Date).getTime() -
 			new Date(a.pubDate as Date).getTime(),

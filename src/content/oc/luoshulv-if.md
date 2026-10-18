@@ -4,7 +4,7 @@ published: 2026-07-13T21:50:00
 description: "洛疏律的IF线档案。"
 image: "/洛疏律和洛疏议.jpg"
 category: "设定"
-tags: ["设定", "IF线", "人物"]
+tags: ["IF线", "人物"]
 draft: false
 ---
 

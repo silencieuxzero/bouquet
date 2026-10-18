@@ -49,6 +49,32 @@ const notesCollection = defineCollection({
 	}),
 });
 
+// OC 设定集合：内容按集合键 oc 命名，对外路由却是 /settings/（站点文案「设定」）。
+// 两者不一致是刻意的：所有 URL 拼接只走 getSettingsUrlBySlug。
+const ocCollection = defineCollection({
+	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/oc" }),
+	schema: z.object({
+		title: z.string(),
+		published: z.date(),
+		updated: z.date().optional(),
+		draft: z.boolean().optional().default(false),
+		description: z.string().optional().default(""),
+		image: z.string().optional().default(""),
+		tags: z.array(z.string()).optional().default([]),
+		category: z.string().optional().nullable().default(""),
+		lang: z.string().optional().default(""),
+		// 与 posts 同义：为 true 时正文换成客户端解密组件，明文只存在于
+		// public/encrypted/<id>.enc。缺了这个字段，三篇加密设定的正文会消失。
+		encrypted: z.boolean().optional().default(false),
+
+		/* For internal use */
+		prevTitle: z.string().default(""),
+		prevSlug: z.string().default(""),
+		nextTitle: z.string().default(""),
+		nextSlug: z.string().default(""),
+	}),
+});
+
 const specCollection = defineCollection({
 	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/spec" }),
 	schema: z.object({}),
@@ -57,5 +83,6 @@ const specCollection = defineCollection({
 export const collections = {
 	posts: postsCollection,
 	notes: notesCollection,
+	oc: ocCollection,
 	spec: specCollection,
 };

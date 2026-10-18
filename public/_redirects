@@ -32,6 +32,19 @@
 # payloads that referenced /blog/<slug> without a trailing slash).
 /blog/*    /posts/:splat   301!
 
+# OC 设定区迁移：4 篇「设定」文章改由独立内容集合 `oc` 提供，公开路由从
+# /posts/<slug>/ 变为 /settings/<slug>/；旧分类页 /categories/设定/ 并入 /settings/。
+/posts/personoc/        /settings/personoc/        301!
+/posts/personoc         /settings/personoc/        301!
+/posts/luoshulv-bc/     /settings/luoshulv-bc/     301!
+/posts/luoshulv-bc      /settings/luoshulv-bc/     301!
+/posts/luoshulv-if/     /settings/luoshulv-if/     301!
+/posts/luoshulv-if      /settings/luoshulv-if/     301!
+/posts/yanchui/         /settings/yanchui/         301!
+/posts/yanchui          /settings/yanchui/         301!
+/categories/设定/        /settings/                301!
+/categories/设定         /settings/                301!
+
 # NOT redirected (deliberate, see the t9 report):
 #   /categories/<name>/ and /tags/<name>/ are live legacy URLs that will 404
 #   after cutover. Arbitrary percent-encoded CJK names and a case-folding tag

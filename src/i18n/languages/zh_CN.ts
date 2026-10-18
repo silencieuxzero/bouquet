@@ -42,6 +42,8 @@ export const zh_CN: Translation = {
 	[Key.backToHome]: "返回首页",
 	[Key.encrypted]: "加密",
 	[Key.noNotes]: "暂无笔记",
+	[Key.oc]: "设定",
+	[Key.noOc]: "暂无设定",
 	[Key.imageService]: "本站图像服务由",
 	[Key.imageServiceProvider]: "提供",
 	[Key.contextMenu]: "右键菜单",
@@ -97,4 +99,5 @@ export const zh_CN: Translation = {
 	[Key.viewport]: "视口",
 	[Key.language]: "语言",
 	[Key.siteTitle]: "站点",
+	[Key.lastUpdated]: "最近更新",
 };

@@ -41,6 +41,8 @@ enum I18nKey {
 	backToHome = "backToHome",
 	encrypted = "encrypted",
 	noNotes = "noNotes",
+	oc = "oc",
+	noOc = "noOc",
 	imageService = "imageService",
 	imageServiceProvider = "imageServiceProvider",
 	contextMenu = "contextMenu",
@@ -98,6 +100,7 @@ enum I18nKey {
 	viewport = "viewport",
 	language = "language",
 	siteTitle = "siteTitle",
+	lastUpdated = "lastUpdated",
 }
 
 export default I18nKey;

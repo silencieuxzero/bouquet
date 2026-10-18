@@ -147,10 +147,63 @@ export async function getSortedNotes(): Promise<CollectionEntry<"notes">[]> {
 
 export type NoteForList = {
 	slug: string;
+	// 列表页要用封面，filePath 是 ImageWrapper 拼 basePath 的唯一来源。
+	filePath: CollectionEntry<"notes">["filePath"];
 	data: CollectionEntry<"notes">["data"];
 };
 
 export async function getSortedNotesList(): Promise<NoteForList[]> {
 	const sortedFullNotes = await getRawSortedNotes();
-	return sortedFullNotes.map((note) => ({ slug: note.id, data: note.data }));
+	return sortedFullNotes.map((note) => ({
+		slug: note.id,
+		filePath: note.filePath,
+		data: note.data,
+	}));
+}
+
+// ============================================================================
+// OC 设定集合（集合键 oc，对外路由 /settings/）
+// ============================================================================
+// 与 notes 段同构：同样的 draft 过滤、同样的发布时间倒序，只是换了集合。
+async function getRawSortedOc() {
+	const allOc = await getCollection("oc", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	return allOc.sort((a, b) => {
+		const dateA = new Date(a.data.published);
+		const dateB = new Date(b.data.published);
+		return dateA > dateB ? -1 : 1;
+	});
+}
+
+export async function getSortedOcs(): Promise<CollectionEntry<"oc">[]> {
+	const sorted = await getRawSortedOc();
+
+	for (let i = 1; i < sorted.length; i++) {
+		sorted[i].data.nextSlug = sorted[i - 1].id;
+		sorted[i].data.nextTitle = sorted[i - 1].data.title;
+	}
+	for (let i = 0; i < sorted.length - 1; i++) {
+		sorted[i].data.prevSlug = sorted[i + 1].id;
+		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	}
+
+	return sorted;
+}
+
+export type OcForList = {
+	slug: string;
+	// 同 NoteForList：封面缩略图的 basePath 依赖 filePath。
+	filePath: CollectionEntry<"oc">["filePath"];
+	data: CollectionEntry<"oc">["data"];
+};
+
+export async function getSortedOcList(): Promise<OcForList[]> {
+	const sortedFullOc = await getRawSortedOc();
+	return sortedFullOc.map((oc) => ({
+		slug: oc.id,
+		filePath: oc.filePath,
+		data: oc.data,
+	}));
 }

@@ -42,6 +42,8 @@ export const tr: Translation = {
 	[Key.backToHome]: "Anasayfaya dön",
 	[Key.encrypted]: "Şifreli",
 	[Key.noNotes]: "Henüz not yok",
+	[Key.oc]: "OC Ayarları",
+	[Key.noOc]: "Henüz OC ayarı yok",
 	[Key.imageService]: "Görsel hizmeti:",
 	[Key.imageServiceProvider]: "",
 	[Key.contextMenu]: "Bağlam menüsü",
@@ -100,4 +102,5 @@ export const tr: Translation = {
 	[Key.viewport]: "Görüntü alanı",
 	[Key.language]: "Dil",
 	[Key.siteTitle]: "Site",
+	[Key.lastUpdated]: "Son güncelleme",
 };

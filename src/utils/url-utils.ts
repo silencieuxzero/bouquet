@@ -20,6 +20,11 @@ export function getNoteUrlBySlug(slug: string): string {
 	return url(`/notes/${slug}/`);
 }
 
+// oc 集合的详情页在 /settings/：集合键按内容叫 oc，路由按站点文案叫「设定」。
+export function getSettingsUrlBySlug(slug: string): string {
+	return url(`/settings/${slug}/`);
+}
+
 export function getTagUrl(tag: string): string {
 	if (!tag) return url("/archive/");
 	// Per-name detail page (src/pages/tags/[tag].astro). The page also keeps

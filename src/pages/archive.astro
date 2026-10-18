@@ -1,16 +1,26 @@
 ---
 import ArchivePanel from "@components/ArchivePanel.svelte";
 import NotesSection from "@components/NotesSection.astro";
+import OcSection from "@components/OcSection.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getSortedNotesList, getSortedPostsList } from "../utils/content-utils";
+import {
+	getSortedNotesList,
+	getSortedOcList,
+	getSortedPostsList,
+} from "../utils/content-utils";
 
-const sortedPostsList = await getSortedPostsList();
-const sortedNotesList = await getSortedNotesList();
+// 三块列表互相独立，一起等，避免串行水合等待。
+const [sortedPostsList, sortedNotesList, sortedOcList] = await Promise.all([
+	getSortedPostsList(),
+	getSortedNotesList(),
+	getSortedOcList(),
+]);
 ---
 
 <MainGridLayout title={i18n(I18nKey.archive)}>
     <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
     <NotesSection notes={sortedNotesList} class="mt-4"></NotesSection>
+    <OcSection ocs={sortedOcList} class="mt-4"></OcSection>
 </MainGridLayout>
