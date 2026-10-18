@@ -243,3 +243,6 @@ migration-era files that were rewritten against this site's own tokens.
 - **Fuwari 模板示例内容** — markdown.md、markdown-extended.md、expressive-code.md、video.md、draft.md、guide/（含封面），以及 public/blog-placeholder-*.jpg 四张占位图。
 - **未使用的演示资源** — src/assets/images/demo-avatar.png、demo-banner.png（banner 现用 liquid-silk-banner.webp）。
 - **导航改动** — 顶层链接全部加了前置图标；「笔记」从顶层移入「更多」。
+- **Firmamento 自定义指南** — `src/content/posts/firmamento.md` 已删除（原主题的 TOML 配置文档，对本站不适用），`src/data/tutorials.json` 里对应条目一并去掉；`/posts/firmamento/` 现在 404。
+- **重复标签清理** — 「设定」「教程」两个标签与同名分类重复，已从 10 篇文章的 frontmatter 中移除；`/tags/设定/`、`/tags/教程/` 现在 404（分类页不受影响）。「随笔」「创作」「地理」同样与分类同名但本次保留。
+- **OC 设定区独立成页** — 4 篇 category 为「设定」的文章（personoc、luoshulv-bc、luoshulv-if、yanchui）从 `src/content/posts/` 迁到独立的 `oc` 集合（内容目录 `src/content/oc/`），公开路由由 `/posts/<slug>/` 改为 `/settings/<slug>/`；导航入口落在「更多」分组内、「笔记」之后。旧链接 `/posts/<slug>/` 与旧分类页 `/categories/设定/` 均已 301 到新地址（`public/_redirects` 与 `astro.config.mjs` 双写）。归档页与 RSS 会露出「设定」区，首页不露出。`scripts/encrypt-post.mjs` 的统计回写相应改为先查 `src/content/posts`、再查 `src/content/oc`。

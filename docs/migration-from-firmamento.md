@@ -112,6 +112,6 @@ To add a new encrypted post:
   including example config such as `password = "30days"`. Those are code-fence
   samples with placeholder values, not live credentials — the real password is
   `10086`, and it was never committed.
-- `src/content/posts/firmamento.md` is the original theme's own customization
-  guide. It documents Firmamento's TOML config, which does not apply to this
-  site; treat it as a historical document.
+- `src/content/posts/firmamento.md` (the original theme's own customization
+  guide, documenting Firmamento's TOML config that does not apply to this site)
+  was deleted, together with its `src/data/tutorials.json` entry.
