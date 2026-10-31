@@ -5,7 +5,7 @@ export const es: Translation = {
 	[Key.home]: "Inicio",
 	[Key.about]: "Sobre mí",
 	[Key.archive]: "Archivo",
-	[Key.notes]: "Notas",
+	[Key.essay]: "Ensayos",
 	[Key.gallery]: "Galería",
 	[Key.search]: "Buscar",
 
@@ -41,7 +41,7 @@ export const es: Translation = {
 	[Key.pageNotFoundDesc]: "La página que buscas no existe o ha sido movida.",
 	[Key.backToHome]: "Volver al inicio",
 	[Key.encrypted]: "Cifrado",
-	[Key.noNotes]: "Aún no hay notas",
+	[Key.noEssays]: "Aún no hay ensayos",
 	[Key.oc]: "Ajustes OC",
 	[Key.noOc]: "Aún no hay ajustes OC",
 	[Key.imageService]: "Servicio de imágenes por",

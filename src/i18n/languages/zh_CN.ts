@@ -5,7 +5,7 @@ export const zh_CN: Translation = {
 	[Key.home]: "主页",
 	[Key.about]: "关于",
 	[Key.archive]: "归档",
-	[Key.notes]: "笔记",
+	[Key.essay]: "随笔",
 	[Key.gallery]: "画廊",
 	[Key.search]: "搜索",
 
@@ -41,7 +41,7 @@ export const zh_CN: Translation = {
 	[Key.pageNotFoundDesc]: "你访问的页面不存在或已被移动。",
 	[Key.backToHome]: "返回首页",
 	[Key.encrypted]: "加密",
-	[Key.noNotes]: "暂无笔记",
+	[Key.noEssays]: "暂无随笔",
 	[Key.oc]: "设定",
 	[Key.noOc]: "暂无设定",
 	[Key.imageService]: "本站图像服务由",

@@ -9,8 +9,7 @@ import { i18n } from "@i18n/translation";
 // ============================================================================
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { url } from "@utils/url-utils";
-import { Icon } from "astro-icon/components";
-import { galleryConfig, subGalleryConfig } from "../../config";
+import { galleryConfig } from "../../config";
 import "../../styles/gallery.css";
 
 const images = galleryConfig.images;
@@ -52,17 +51,6 @@ function resolveSrc(src: string): string {
             ))}
         </div>
 
-        <a href={url("/gallery/sub-gallery/")} class="sub-gallery-card group">
-            <div class="min-w-0">
-                <div class="font-bold text-lg text-black/90 dark:text-white/90 transition group-hover:text-[var(--primary)]">
-                    {subGalleryConfig.title}
-                </div>
-                {subGalleryConfig.subtitle && (
-                    <div class="text-sm text-black/50 dark:text-white/50">{subGalleryConfig.subtitle}</div>
-                )}
-            </div>
-            <Icon name="material-symbols:chevron-right-rounded" class="transition text-[var(--primary)] text-[2rem] shrink-0" />
-        </a>
     </div>
 
     <!-- 灯箱 -->

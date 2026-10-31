@@ -11,6 +11,8 @@ const postsCollection = defineCollection({
 		draft: z.boolean().optional().default(false),
 		description: z.string().optional().default(""),
 		image: z.string().optional().default(""),
+		// 是否在正文开头渲染封面图；只影响详情页，列表缩略图与 og:image 照旧。
+		showCover: z.boolean().optional().default(false),
 		tags: z.array(z.string()).optional().default([]),
 		category: z.string().optional().nullable().default(""),
 		lang: z.string().optional().default(""),
@@ -26,20 +28,25 @@ const postsCollection = defineCollection({
 	}),
 });
 
-const notesCollection = defineCollection({
-	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/notes" }),
+const essayCollection = defineCollection({
+	loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/essays" }),
 	schema: z.object({
 		title: z.string(),
 		published: z.date(),
 		updated: z.date().optional(),
 		draft: z.boolean().optional().default(false),
 		description: z.string().optional().default(""),
-		// Optional cover, mirroring the posts schema. Notes without one fall
+		// Optional cover, mirroring the posts schema. Essays without one fall
 		// back to the compact no-cover card (never an invented placeholder).
 		image: z.string().optional().default(""),
+		// 是否在正文开头渲染封面图；只影响详情页，列表缩略图与 og:image 照旧。
+		showCover: z.boolean().optional().default(false),
 		tags: z.array(z.string()).optional().default([]),
 		category: z.string().optional().nullable().default(""),
 		lang: z.string().optional().default(""),
+		// 与 posts 同义：为 true 时正文换成客户端解密组件，明文只存在于
+		// public/encrypted/<id>.enc。缺了这个字段，加密随笔 story-4 的正文会消失。
+		encrypted: z.boolean().optional().default(false),
 
 		/* For internal use */
 		prevTitle: z.string().default(""),
@@ -60,6 +67,8 @@ const ocCollection = defineCollection({
 		draft: z.boolean().optional().default(false),
 		description: z.string().optional().default(""),
 		image: z.string().optional().default(""),
+		// 是否在正文开头渲染封面图；只影响详情页，列表缩略图与 og:image 照旧。
+		showCover: z.boolean().optional().default(false),
 		tags: z.array(z.string()).optional().default([]),
 		category: z.string().optional().nullable().default(""),
 		lang: z.string().optional().default(""),
@@ -82,7 +91,7 @@ const specCollection = defineCollection({
 
 export const collections = {
 	posts: postsCollection,
-	notes: notesCollection,
+	essay: essayCollection,
 	oc: ocCollection,
 	spec: specCollection,
 };

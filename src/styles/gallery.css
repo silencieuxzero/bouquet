@@ -1,12 +1,12 @@
 /* ============================================================================
- * 画廊通用样式（主画廊 /gallery/ 与子画廊 /gallery/sub-gallery/ 共用）
+ * 画廊通用样式（主画廊 /gallery/）
  * ============================================================================
  * 为什么是全局样式而不是组件内的 <style>：
  * 子画廊的卡片是浏览器端解密成功后用 document.createElement 动态插入的，
  * 而 Astro 的 <style> 会给模板元素加上 data-astro-cid-* 作用域属性，
  * 动态创建的节点没有这个属性，选择器匹配不到 —— 卡片会完全没有样式。
  * 因此这里的规则必须对运行时插入的 DOM 同样生效，故以全局样式表引入
- * （由 src/pages/gallery/index.astro 与 sub-gallery.astro 在 frontmatter 里 import）。
+ * （由 src/pages/gallery/index.astro 在 frontmatter 里 import）。
  *
  * 类名只在这两个页面使用，作用域互不干扰。
  * ============================================================================ */
@@ -78,23 +78,6 @@
 .copyright-btn:hover {
 	transform: scale(1.1);
 	background: rgba(0, 0, 0, 0.8);
-}
-
-/* 子画廊入口卡片（仅主画廊使用） */
-.sub-gallery-card {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-	margin-top: 1.75rem;
-	padding: 1.1rem 1.4rem;
-	border-radius: var(--radius-large, 0.75rem);
-	background: var(--btn-regular-bg);
-	text-decoration: none;
-	transition: background 0.25s ease;
-}
-.sub-gallery-card:hover {
-	background: var(--btn-regular-bg-hover);
 }
 
 /* 灯箱 */

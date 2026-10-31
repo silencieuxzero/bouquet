@@ -11,8 +11,8 @@
 // 构建时无需密码：站点只分发密文，由浏览器在读者输入密码后解密。
 //
 // 每次处理都会顺带把明文的真实字数/阅读时间写进文章 frontmatter，目标文件
-// 按 src/content/posts/<slug>.md → src/content/oc/<slug>.md 的顺序查找（「设定」
-// 类文章已迁到 oc 集合）。加密文章正文只剩占位注释，构建时无法自行算出真实
+// 按 src/content/posts/ → src/content/essays/ → src/content/oc/ 的顺序查找
+// （「随笔」在 essays 集合，「设定」类文章在 oc 集合）。加密文章正文只剩占位注释，构建时无法自行算出真实
 // 篇幅，详见 scripts/lib/post-stats.mjs）。
 // 密文已是最新的、只想刷新统计时，用免密模式：
 //   node scripts/encrypt-post.mjs <slug> [...] --stats-only
@@ -28,8 +28,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE_DIR = path.join(ROOT, "private", "source");
 const OUT_DIR = path.join(ROOT, "public", "encrypted");
 const POSTS_DIR = path.join(ROOT, "src", "content", "posts");
-// 「设定」类文章已迁到 oc 集合，统计回写要在这两个目录里找目标文件
-const STATS_DIRS = [POSTS_DIR, path.join(ROOT, "src", "content", "oc")];
+// 「随笔」已迁到 essays 集合、「设定」类文章已迁到 oc 集合，
+// 统计回写要在这三个目录里找目标文件
+const STATS_DIRS = [
+	POSTS_DIR,
+	path.join(ROOT, "src", "content", "essays"),
+	path.join(ROOT, "src", "content", "oc"),
+];
 
 // 按候选顺序定位统计目标文件；两个目录都没有时抛错，由调用处走「跳过统计」分支
 async function resolveStatsFile(slug) {

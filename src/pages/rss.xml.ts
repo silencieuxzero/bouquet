@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import {
-	getSortedNotes,
+	getSortedEssays,
 	getSortedOcs,
 	getSortedPosts,
 } from "@utils/content-utils";
@@ -21,10 +21,10 @@ function stripInvalidXmlChars(str: string): string {
 }
 
 /**
- * Notes and OC settings are separate collections, but they belong in the same
- * feed — the published content of this site is posts + notes + oc, and
- * `/notes/<slug>/` and `/settings/<slug>/` are real pages. Items are built with
- * each collection's own URL shape so a note or a setting can never be emitted
+ * Essays and OC settings are separate collections, but they belong in the same
+ * feed — the published content of this site is posts + essays + oc, and
+ * `/essays/<slug>/` and `/settings/<slug>/` are real pages. Items are built with
+ * each collection's own URL shape so an essay or a setting can never be emitted
  * under `/posts/`.
  */
 function rssContent(body: unknown): string {
@@ -35,9 +35,9 @@ function rssContent(body: unknown): string {
 }
 
 export async function GET(context: APIContext): Promise<Response> {
-	const [blog, notes, ocs] = await Promise.all([
+	const [blog, essays, ocs] = await Promise.all([
 		getSortedPosts(),
-		getSortedNotes(),
+		getSortedEssays(),
 		getSortedOcs(),
 	]);
 
@@ -49,12 +49,12 @@ export async function GET(context: APIContext): Promise<Response> {
 		content: rssContent(post.body),
 	}));
 
-	const noteItems = notes.map((note) => ({
-		title: note.data.title,
-		pubDate: note.data.published,
-		description: note.data.description || "",
-		link: url(`/notes/${note.id}/`),
-		content: rssContent(note.body),
+	const essayItems = essays.map((essay) => ({
+		title: essay.data.title,
+		pubDate: essay.data.published,
+		description: essay.data.description || "",
+		link: url(`/essays/${essay.id}/`),
+		content: rssContent(essay.body),
 	}));
 
 	// oc 集合的公开路由是 /settings/（集合键与路由刻意不同名），链接在这里拼。
@@ -68,7 +68,7 @@ export async function GET(context: APIContext): Promise<Response> {
 
 	// @astrojs/rss emits items in the order given; merge newest-first so the feed
 	// reads chronologically across all three collections.
-	const items = [...postItems, ...noteItems, ...ocItems].sort(
+	const items = [...postItems, ...essayItems, ...ocItems].sort(
 		(a, b) =>
 			new Date(b.pubDate as Date).getTime() -
 			new Date(a.pubDate as Date).getTime(),

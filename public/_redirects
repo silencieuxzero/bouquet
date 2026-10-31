@@ -21,8 +21,9 @@
 /blog     /archive/   301!
 /blog/    /archive/   301!
 
-# Post permalinks: /blog/<slug>/ -> /posts/<slug>/ (all 15 legacy slugs exist
-# under /posts/ after the content migration, so the mapping is a complete 1:1).
+# Post permalinks: /blog/<slug>/ -> /posts/<slug>/ for the legacy post slugs.
+# story-1..4 are the exception: they live in the `essay` collection under
+# /essays/ now, so they get their own mapping further down instead of a 1:1 hop.
 # The trailing-slash form is listed first so a slashed legacy URL resolves in
 # a single hop.
 /blog/:slug/   /posts/:slug/   301!
@@ -44,6 +45,30 @@
 /posts/yanchui          /settings/yanchui/         301!
 /categories/设定/        /settings/                301!
 /categories/设定         /settings/                301!
+
+# 子相册「三十天友谊挑战」已整册删除（页面 /gallery/sub-gallery/ 与加密载荷一并移除），
+# 旧地址并到画廊首页，避免书签、外链 404。
+/gallery/sub-gallery/   /gallery/   301!
+/gallery/sub-gallery    /gallery/   301!
+
+# 笔记区改名随笔区：集合键 notes -> essay，公开路由 /notes/<slug>/ -> /essays/<slug>/。
+# 旧笔记文章已下架，索引页与文章 URL 一律并到新的随笔区，避免书签与搜索结果 404。
+/notes     /essays/   301!
+/notes/    /essays/   301!
+/notes/:slug/   /essays/:slug/   301!
+/notes/:slug    /essays/:slug    301!
+/notes/*   /essays/:splat   301!
+
+# 原「随笔」分类的 4 篇文章从 /posts/<slug>/ 迁入随笔集合，公开路由改为
+# /essays/<slug>/（它们曾是 /posts/ 下的真实页面，所以必须逐条重定向）。
+/posts/story-1/   /essays/story-1/   301!
+/posts/story-1    /essays/story-1/   301!
+/posts/story-2/   /essays/story-2/   301!
+/posts/story-2    /essays/story-2/   301!
+/posts/story-3/   /essays/story-3/   301!
+/posts/story-3    /essays/story-3/   301!
+/posts/story-4/   /essays/story-4/   301!
+/posts/story-4    /essays/story-4/   301!
 
 # NOT redirected (deliberate, see the t9 report):
 #   /categories/<name>/ and /tags/<name>/ are live legacy URLs that will 404

@@ -1,20 +1,21 @@
 ---
 import { render } from "astro:content";
+import EncryptedPost from "@components/misc/EncryptedPost.astro";
 import ImageWrapper from "@components/misc/ImageWrapper.astro";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getSortedNotes } from "@utils/content-utils";
+import { getSortedEssays } from "@utils/content-utils";
 import { formatDateToYYYYMMDD } from "@utils/date-utils";
-import { getNoteUrlBySlug, getPostAssetBasePath } from "@utils/url-utils";
+import { getEssayUrlBySlug, getPostAssetBasePath } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
 
 export async function getStaticPaths() {
-	const notes = await getSortedNotes();
-	return notes.map((entry) => ({
+	const essays = await getSortedEssays();
+	return essays.map((entry) => ({
 		params: { slug: entry.id },
 		props: { entry },
 	}));
@@ -45,11 +46,12 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
                 </div>
             </div>
 
-            <!-- optional cover: only rendered when the note actually has one.
+            <!-- optional cover: only rendered when the essay has one AND the
+                 frontmatter opts in with showCover: true (default false).
                  Reuses the same #post-cover id as posts so the existing
                  `.custom-md img, #post-cover img` PhotoSwipe wiring in
                  Layout.astro picks it up with no new CSS. -->
-            {entry.data.image && (
+            {entry.data.showCover && entry.data.image && (
                 <ImageWrapper
                     id="post-cover"
                     src={entry.data.image}
@@ -59,19 +61,25 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
                 />
             )}
 
-            <Markdown class="mb-6 markdown-content onload-animation">
-                <Content />
-            </Markdown>
+            <!-- 加密随笔走客户端解密分支；story-4 的正文只存在于
+                 /encrypted/story-4.enc，缺这一支会让整篇正文消失。 -->
+            {entry.data.encrypted ? (
+                <EncryptedPost slug={entry.id} class="mb-6 onload-animation" />
+            ) : (
+                <Markdown class="mb-6 markdown-content onload-animation">
+                    <Content />
+                </Markdown>
+            )}
 
             <!-- Same license block as posts/[...slug].astro, reusing the existing
                  component and its props verbatim (no restyling). License.astro
-                 derives the URL from Astro.url, so it resolves to /notes/<slug>/. -->
+                 derives the URL from Astro.url, so it resolves to /essays/<slug>/. -->
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.id} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
         </div>
     </div>
 
     <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
-        <a href={entry.data.nextSlug ? getNoteUrlBySlug(entry.data.nextSlug) : "#"}
+        <a href={entry.data.nextSlug ? getEssayUrlBySlug(entry.data.nextSlug) : "#"}
            class:list={["w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.nextSlug}]}>
             {entry.data.nextSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4">
                 <Icon name="material-symbols:chevron-left-rounded" class="text-[2rem] text-[var(--primary)]" />
@@ -80,7 +88,7 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
                 </div>
             </div>}
         </a>
-        <a href={entry.data.prevSlug ? getNoteUrlBySlug(entry.data.prevSlug) : "#"}
+        <a href={entry.data.prevSlug ? getEssayUrlBySlug(entry.data.prevSlug) : "#"}
            class:list={["w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.prevSlug}]}>
             {entry.data.prevSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-end gap-4">
                 <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75">

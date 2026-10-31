@@ -44,6 +44,16 @@ export default defineConfig({
 		"/posts/luoshulv-if": "/settings/luoshulv-if/",
 		"/posts/yanchui": "/settings/yanchui/",
 		"/categories/设定": "/settings/",
+		// 子相册「三十天友谊挑战」整册删除，旧地址并到画廊首页。
+		"/gallery/sub-gallery": "/gallery/",
+		// 笔记区改名随笔区：集合键 notes -> essay，公开路由改为 /essays/<slug>/。
+		"/notes": "/essays/",
+		"/notes/[...slug]": "/essays/[...slug]",
+		// 原「随笔」分类的 4 篇文章从 /posts/<slug>/ 迁入 essay 集合。
+		"/posts/story-1": "/essays/story-1/",
+		"/posts/story-2": "/essays/story-2/",
+		"/posts/story-3": "/essays/story-3/",
+		"/posts/story-4": "/essays/story-4/",
 	},
 	integrations: [
 		swup({

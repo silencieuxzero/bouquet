@@ -2,7 +2,7 @@ enum I18nKey {
 	home = "home",
 	about = "about",
 	archive = "archive",
-	notes = "notes",
+	essay = "essay",
 	gallery = "gallery",
 	search = "search",
 
@@ -40,7 +40,7 @@ enum I18nKey {
 	pageNotFoundDesc = "pageNotFoundDesc",
 	backToHome = "backToHome",
 	encrypted = "encrypted",
-	noNotes = "noNotes",
+	noEssays = "noEssays",
 	oc = "oc",
 	noOc = "noOc",
 	imageService = "imageService",

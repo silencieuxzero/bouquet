@@ -78,8 +78,9 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
                 {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
             </div>
 
-            <!-- 有封面就渲染，复用 #post-cover 让 Layout 里已有的 PhotoSwipe 逻辑生效 -->
-            {entry.data.image &&
+            <!-- 有封面且 frontmatter 写了 showCover: true 才渲染；复用 #post-cover
+                 让 Layout 里已有的 PhotoSwipe 逻辑生效 -->
+            {entry.data.showCover && entry.data.image &&
                 <ImageWrapper id="post-cover" src={entry.data.image} basePath={getPostAssetBasePath(entry.filePath)} alt={entry.data.title} class="mb-8 rounded-xl onload-animation"/>
             }
 

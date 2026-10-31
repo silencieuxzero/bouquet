@@ -114,24 +114,24 @@ export async function getCategoryList(): Promise<Category[]> {
 }
 
 // ============================================================================
-// Notes collection
+// Essays collection (随笔)
 // ============================================================================
-// Notes mirror posts, but live in their own collection so the blog list and the
-// study-notes section stay separate.
-async function getRawSortedNotes() {
-	const allNotes = await getCollection("notes", ({ data }) => {
+// Essays mirror posts, but live in their own collection so the blog list and the
+// essay section stay separate.
+async function getRawSortedEssays() {
+	const allEssays = await getCollection("essay", ({ data }) => {
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
 
-	return allNotes.sort((a, b) => {
+	return allEssays.sort((a, b) => {
 		const dateA = new Date(a.data.published);
 		const dateB = new Date(b.data.published);
 		return dateA > dateB ? -1 : 1;
 	});
 }
 
-export async function getSortedNotes(): Promise<CollectionEntry<"notes">[]> {
-	const sorted = await getRawSortedNotes();
+export async function getSortedEssays(): Promise<CollectionEntry<"essay">[]> {
+	const sorted = await getRawSortedEssays();
 
 	for (let i = 1; i < sorted.length; i++) {
 		sorted[i].data.nextSlug = sorted[i - 1].id;
@@ -145,26 +145,26 @@ export async function getSortedNotes(): Promise<CollectionEntry<"notes">[]> {
 	return sorted;
 }
 
-export type NoteForList = {
+export type EssayForList = {
 	slug: string;
 	// 列表页要用封面，filePath 是 ImageWrapper 拼 basePath 的唯一来源。
-	filePath: CollectionEntry<"notes">["filePath"];
-	data: CollectionEntry<"notes">["data"];
+	filePath: CollectionEntry<"essay">["filePath"];
+	data: CollectionEntry<"essay">["data"];
 };
 
-export async function getSortedNotesList(): Promise<NoteForList[]> {
-	const sortedFullNotes = await getRawSortedNotes();
-	return sortedFullNotes.map((note) => ({
-		slug: note.id,
-		filePath: note.filePath,
-		data: note.data,
+export async function getSortedEssayList(): Promise<EssayForList[]> {
+	const sortedFullEssays = await getRawSortedEssays();
+	return sortedFullEssays.map((essay) => ({
+		slug: essay.id,
+		filePath: essay.filePath,
+		data: essay.data,
 	}));
 }
 
 // ============================================================================
 // OC 设定集合（集合键 oc，对外路由 /settings/）
 // ============================================================================
-// 与 notes 段同构：同样的 draft 过滤、同样的发布时间倒序，只是换了集合。
+// 与 essay 段同构：同样的 draft 过滤、同样的发布时间倒序，只是换了集合。
 async function getRawSortedOc() {
 	const allOc = await getCollection("oc", ({ data }) => {
 		return import.meta.env.PROD ? data.draft !== true : true;

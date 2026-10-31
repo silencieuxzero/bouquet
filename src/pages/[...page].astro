@@ -1,11 +1,11 @@
 ---
 import type { GetStaticPaths } from "astro";
 import Pagination from "../components/control/Pagination.astro";
-import NotesSection from "../components/NotesSection.astro";
+import EssaysSection from "../components/EssaysSection.astro";
 import PostPage from "../components/PostPage.astro";
 import { PAGE_SIZE } from "../constants/constants";
 import MainGridLayout from "../layouts/MainGridLayout.astro";
-import { getSortedNotesList, getSortedPosts } from "../utils/content-utils";
+import { getSortedEssayList, getSortedPosts } from "../utils/content-utils";
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const allBlogPosts = await getSortedPosts();
@@ -17,19 +17,19 @@ const { page } = Astro.props;
 
 const len = page.data.length;
 
-// Notes are deliberately kept OUT of the paginated post stream. Posts and notes
+// Essays are deliberately kept OUT of the paginated post stream. Posts and essays
 // are separate collections with disjoint tag spaces, and merging them would
 // change what PAGE_SIZE means (a page would hold a variable mix of two kinds of
-// content). Instead the first page surfaces the latest notes in a clearly
+// content). Instead the first page surfaces the latest essays in a clearly
 // labelled section; deeper pages stay posts-only.
-const HOME_NOTES_LIMIT = 5;
-const notes = page.currentPage === 1 ? await getSortedNotesList() : [];
+const HOME_ESSAYS_LIMIT = 5;
+const essays = page.currentPage === 1 ? await getSortedEssayList() : [];
 ---
 
 <MainGridLayout>
     <PostPage page={page}></PostPage>
     <Pagination class="mx-auto onload-animation" page={page} style={`animation-delay: calc(var(--content-delay) + ${(len)*50}ms)`}></Pagination>
     {page.currentPage === 1 && (
-        <NotesSection notes={notes} limit={HOME_NOTES_LIMIT} hideWhenEmpty class="mt-6 onload-animation"></NotesSection>
+        <EssaysSection essays={essays} limit={HOME_ESSAYS_LIMIT} hideWhenEmpty class="mt-6 onload-animation"></EssaysSection>
     )}
 </MainGridLayout>

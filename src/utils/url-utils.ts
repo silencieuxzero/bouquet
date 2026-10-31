@@ -16,8 +16,9 @@ export function getPostUrlBySlug(slug: string): string {
 	return url(`/posts/${slug}/`);
 }
 
-export function getNoteUrlBySlug(slug: string): string {
-	return url(`/notes/${slug}/`);
+// essay 集合的详情页在 /essays/：集合键与路由同名。
+export function getEssayUrlBySlug(slug: string): string {
+	return url(`/essays/${slug}/`);
 }
 
 // oc 集合的详情页在 /settings/：集合键按内容叫 oc，路由按站点文案叫「设定」。

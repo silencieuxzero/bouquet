@@ -5,7 +5,7 @@ export const vi: Translation = {
 	[Key.home]: "Trang chủ",
 	[Key.about]: "Giới thiệu",
 	[Key.archive]: "Kho bài",
-	[Key.notes]: "Ghi chú",
+	[Key.essay]: "Tản văn",
 	[Key.gallery]: "Thư viện ảnh",
 	[Key.search]: "Tìm kiếm",
 
@@ -41,7 +41,7 @@ export const vi: Translation = {
 	[Key.pageNotFoundDesc]: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
 	[Key.backToHome]: "Về trang chủ",
 	[Key.encrypted]: "Đã mã hóa",
-	[Key.noNotes]: "Chưa có ghi chú",
+	[Key.noEssays]: "Chưa có tản văn",
 	[Key.oc]: "Cài đặt OC",
 	[Key.noOc]: "Chưa có cài đặt OC",
 	[Key.imageService]: "Dịch vụ hình ảnh bởi",

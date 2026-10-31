@@ -5,7 +5,7 @@ export const zh_TW: Translation = {
 	[Key.home]: "首頁",
 	[Key.about]: "關於",
 	[Key.archive]: "彙整",
-	[Key.notes]: "筆記",
+	[Key.essay]: "隨筆",
 	[Key.gallery]: "畫廊",
 	[Key.search]: "搜尋",
 
@@ -41,7 +41,7 @@ export const zh_TW: Translation = {
 	[Key.pageNotFoundDesc]: "你造訪的頁面不存在或已被移動。",
 	[Key.backToHome]: "返回首頁",
 	[Key.encrypted]: "加密",
-	[Key.noNotes]: "暫無筆記",
+	[Key.noEssays]: "暫無隨筆",
 	[Key.oc]: "設定",
 	[Key.noOc]: "暫無設定",
 	[Key.imageService]: "本站圖像服務由",

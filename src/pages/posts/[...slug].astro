@@ -102,9 +102,9 @@ const jsonLd = {
                 {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
             </div>
 
-            <!-- always show cover as long as it has one -->
+            <!-- 封面只在 frontmatter 显式写了 showCover: true 时渲染（默认不显示） -->
 
-            {entry.data.image &&
+            {entry.data.showCover && entry.data.image &&
                 <ImageWrapper id="post-cover" src={entry.data.image} basePath={getPostAssetBasePath(entry.filePath)} class="mb-8 rounded-xl banner-container onload-animation"/>
             }
 

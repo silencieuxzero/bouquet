@@ -5,7 +5,7 @@ export const tr: Translation = {
 	[Key.home]: "Anasayfa",
 	[Key.about]: "Hakkında",
 	[Key.archive]: "Arşiv",
-	[Key.notes]: "Notlar",
+	[Key.essay]: "Denemeler",
 	[Key.gallery]: "Galeri",
 	[Key.search]: "Ara",
 
@@ -41,7 +41,7 @@ export const tr: Translation = {
 	[Key.pageNotFoundDesc]: "Aradığınız sayfa mevcut değil veya taşınmış.",
 	[Key.backToHome]: "Anasayfaya dön",
 	[Key.encrypted]: "Şifreli",
-	[Key.noNotes]: "Henüz not yok",
+	[Key.noEssays]: "Henüz deneme yok",
 	[Key.oc]: "OC Ayarları",
 	[Key.noOc]: "Henüz OC ayarı yok",
 	[Key.imageService]: "Görsel hizmeti:",

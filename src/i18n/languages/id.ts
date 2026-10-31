@@ -5,7 +5,7 @@ export const id: Translation = {
 	[Key.home]: "Beranda",
 	[Key.about]: "Tentang",
 	[Key.archive]: "Arsip",
-	[Key.notes]: "Catatan",
+	[Key.essay]: "Esai",
 	[Key.gallery]: "Galeri",
 	[Key.search]: "Cari",
 
@@ -42,7 +42,7 @@ export const id: Translation = {
 		"Halaman yang Anda cari tidak ada atau telah dipindahkan.",
 	[Key.backToHome]: "Kembali ke Beranda",
 	[Key.encrypted]: "Terenkripsi",
-	[Key.noNotes]: "Belum ada catatan",
+	[Key.noEssays]: "Belum ada esai",
 	[Key.oc]: "Setelan OC",
 	[Key.noOc]: "Belum ada setelan OC",
 	[Key.imageService]: "Layanan gambar oleh",

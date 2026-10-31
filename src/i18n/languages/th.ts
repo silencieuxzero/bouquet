@@ -5,7 +5,7 @@ export const th: Translation = {
 	[Key.home]: "หน้าแรก",
 	[Key.about]: "เกี่ยวกับ",
 	[Key.archive]: "คลัง",
-	[Key.notes]: "บันทึก",
+	[Key.essay]: "เรียงความ",
 	[Key.gallery]: "แกลเลอรี",
 	[Key.search]: "ค้นหา",
 
@@ -41,7 +41,7 @@ export const th: Translation = {
 	[Key.pageNotFoundDesc]: "หน้าที่คุณค้นหาไม่มีอยู่หรือถูกย้ายไปแล้ว",
 	[Key.backToHome]: "กลับหน้าหลัก",
 	[Key.encrypted]: "เข้ารหัส",
-	[Key.noNotes]: "ยังไม่มีบันทึก",
+	[Key.noEssays]: "ยังไม่มีเรียงความ",
 	[Key.oc]: "การตั้งค่า OC",
 	[Key.noOc]: "ยังไม่มีการตั้งค่า OC",
 	[Key.imageService]: "บริการรูปภาพโดย",

@@ -13,9 +13,9 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/about/",
 		icon: "material-symbols:person-outline-rounded",
 	},
-	[LinkPreset.Notes]: {
-		name: i18n(I18nKey.notes),
-		url: "/notes/",
+	[LinkPreset.Essays]: {
+		name: i18n(I18nKey.essay),
+		url: "/essays/",
 		icon: "material-symbols:sticky-note-2-outline-rounded",
 	},
 	[LinkPreset.Gallery]: {

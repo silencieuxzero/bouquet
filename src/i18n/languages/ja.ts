@@ -5,7 +5,7 @@ export const ja: Translation = {
 	[Key.home]: "Home",
 	[Key.about]: "About",
 	[Key.archive]: "Archive",
-	[Key.notes]: "ノート",
+	[Key.essay]: "随筆",
 	[Key.gallery]: "ギャラリー",
 	[Key.search]: "検索",
 
@@ -41,7 +41,7 @@ export const ja: Translation = {
 	[Key.pageNotFoundDesc]: "お探しのページは存在しないか、移動されました。",
 	[Key.backToHome]: "ホームに戻る",
 	[Key.encrypted]: "暗号化",
-	[Key.noNotes]: "ノートはまだありません",
+	[Key.noEssays]: "随筆はまだありません",
 	[Key.oc]: "OC設定",
 	[Key.noOc]: "OC設定はまだありません",
 	[Key.imageService]: "画像サービス提供:",

@@ -11,7 +11,6 @@ import type {
 	NavBarConfig,
 	ProfileConfig,
 	SiteConfig,
-	SubGalleryConfig,
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 
@@ -105,8 +104,8 @@ export const navBarConfig: NavBarConfig = {
 			icon: "material-symbols:more-horiz",
 			children: [
 				{
-					key: I18nKey.notes,
-					url: "/notes/",
+					key: I18nKey.essay,
+					url: "/essays/",
 					icon: "material-symbols:sticky-note-2-outline-rounded",
 				},
 				{
@@ -221,11 +220,4 @@ export const musicConfig: MusicConfig = {
 // Gallery
 // ============================================================================
 // Image lists live in src/data/gallery.json (extracted from the original site).
-// The sub-gallery images are served only as an encrypted payload; see
-// src/pages/gallery/sub-gallery.astro and scripts/encrypt-file.mjs.
 export const galleryConfig = galleryData.gallery;
-
-export const subGalleryConfig: SubGalleryConfig = {
-	title: galleryData.subGallery.title,
-	subtitle: galleryData.subGallery.subtitle,
-};

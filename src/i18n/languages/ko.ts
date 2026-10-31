@@ -5,7 +5,7 @@ export const ko: Translation = {
 	[Key.home]: "홈",
 	[Key.about]: "소개",
 	[Key.archive]: "아카이브",
-	[Key.notes]: "노트",
+	[Key.essay]: "수필",
 	[Key.gallery]: "갤러리",
 	[Key.search]: "검색",
 
@@ -41,7 +41,7 @@ export const ko: Translation = {
 	[Key.pageNotFoundDesc]: "찾으시는 페이지가 존재하지 않거나 이동되었습니다.",
 	[Key.backToHome]: "홈으로 돌아가기",
 	[Key.encrypted]: "암호화됨",
-	[Key.noNotes]: "아직 노트가 없습니다",
+	[Key.noEssays]: "아직 수필이 없습니다",
 	[Key.oc]: "OC 설정",
 	[Key.noOc]: "아직 OC 설정이 없습니다",
 	[Key.imageService]: "이미지 서비스 제공:",

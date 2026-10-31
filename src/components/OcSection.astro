@@ -1,6 +1,6 @@
 ---
 /**
- * OC 设定的紧凑列表。与 NotesSection 的唯一区别只是集合（oc 而非 notes）
+ * OC 设定的紧凑列表。与 EssaysSection 的唯一区别只是集合（oc 而非 essay）
  * 和 URL 助手（getSettingsUrlBySlug 而非 getNoteUrlBySlug）：之所以单开一节，
  * 是因为设定作品不属于文章归档，也不该被 ArchivePanel 的标签/分类过滤器误伤。
  * 样式只用站点现有 utility class，不新增样式表。
@@ -71,6 +71,9 @@ const shouldRender = shown.length > 0 || !hideWhenEmpty;
                                group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)]
                                text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden"
                     >
+                        {oc.data.encrypted && (
+                            <span class="inline-flex items-center align-middle mr-1.5 px-1.5 rounded text-xs font-medium whitespace-nowrap bg-[var(--btn-regular-bg)] text-[var(--btn-content)]">{i18n(I18nKey.encrypted)}</span>
+                        )}
                         {oc.data.title}
                     </div>
 

@@ -55,7 +55,7 @@ export enum LinkPreset {
 	Home = 0,
 	Archive = 1,
 	About = 2,
-	Notes = 3,
+	Essays = 3,
 	Gallery = 4,
 }
 
@@ -156,7 +156,3 @@ export type GalleryConfig = {
 	images: GalleryImage[];
 };
 
-export type SubGalleryConfig = {
-	title: string;
-	subtitle?: string;
-};
