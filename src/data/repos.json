@@ -1,0 +1,54 @@
+{
+	"repos": {
+		"title": "GitHub 仓库",
+		"subtitle": "自己和朋友们的项目仓库（没有额外标注的仓库代表是作者的仓库）",
+		"entries": [
+			{
+				"name": "AxleScore",
+				"url": "https://github.com/baizhou830/AxleScore",
+				"owner": "baizhou830",
+				"description": "一个轻量（real？）的小组积分管理工具，基于 PyQt5 构建，以悬浮窗形式常驻桌面，方便教师实时加减分、查看趋势。",
+				"language": "Python",
+				"languageColor": "#3572A5",
+				"stars": 19
+			},
+			{
+				"name": "E33Chat",
+				"url": "https://github.com/E33EPUS/E33Chat",
+				"owner": "E33EPUS",
+				"description": "a minecraft mod",
+				"language": "Java",
+				"languageColor": "#b07219",
+				"stars": 15,
+				"forks": 5
+			},
+			{
+				"name": "AxleTouch",
+				"url": "https://github.com/baizhou830/AxleTouch",
+				"owner": "baizhou830",
+				"description": "雨竹bot-一个轻量化桌宠软件，基于PyQt以及QtNetwork异步请求构建。",
+				"language": "Python",
+				"languageColor": "#3572A5",
+				"stars": 7,
+				"forks": 2
+			},
+			{
+				"name": "c-daily-problem",
+				"url": "https://github.com/E33EPUS/c-daily-problem",
+				"owner": "E33EPUS",
+				"description": "MaiBot插件-C语言每日一题",
+				"language": "Python",
+				"languageColor": "#3572A5",
+				"stars": 2
+			},
+			{
+				"name": "backrooms_escape",
+				"url": "https://github.com/silencieuxzero/backrooms_escape",
+				"description": "麦麦的后室小游戏插件",
+				"language": "Python",
+				"languageColor": "#3572A5",
+				"stars": 1
+			}
+		]
+	}
+}

@@ -1,0 +1,166 @@
+---
+// ============================================================================
+// 加密文章阅读器
+// ============================================================================
+// 正文以 AES-256-GCM 密文形式存放于 /encrypted/<slug>.enc，
+// 仓库与构建产物中都不含明文。读者在浏览器输入密码后本地解密，
+// 密码不会离开浏览器，也不会发送到任何服务器。
+// ============================================================================
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+
+interface Props {
+	slug: string;
+	class?: string;
+}
+
+const { slug } = Astro.props;
+const className = Astro.props.class;
+
+/** 传给客户端脚本的文案（浏览器端没有 i18n()） */
+const uiText = {
+	enterPassword: i18n(I18nKey.enterPassword),
+	decrypting: i18n(I18nKey.decrypting),
+	decryptFailed: i18n(I18nKey.decryptFailed),
+};
+const uiTextJson = JSON.stringify(uiText);
+---
+
+<div
+	id={`encrypted-post-${slug}`}
+	data-encrypted-post={slug}
+	data-ui-text={uiTextJson}
+	class:list={["encrypted-post", className]}
+>
+	<div class="encrypted-gate card-base px-6 py-8 md:px-9 md:py-10">
+		<div class="flex flex-col items-center text-center">
+			<div class="transition h-14 w-14 rounded-full bg-[var(--btn-regular-bg)] text-[var(--primary)] flex items-center justify-center mb-4">
+				<svg xmlns="http://www.w3.org/2000/svg" height="28" width="28" viewBox="0 -960 960 960" fill="currentColor"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm240-200q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/></svg>
+			</div>
+			<div class="font-bold text-xl text-black/90 dark:text-white/90 mb-1">{i18n(I18nKey.encryptedPostTitle)}</div>
+			<div class="text-sm text-black/50 dark:text-white/50">{i18n(I18nKey.encryptedPostDesc)}</div>
+		</div>
+		<form class="encrypted-form mt-6 flex flex-col sm:flex-row gap-3 max-w-md mx-auto" autocomplete="off">
+			<input
+				type="password"
+				name="password"
+				aria-label={i18n(I18nKey.password)}
+				placeholder={i18n(I18nKey.password)}
+				class="flex-1 rounded-lg px-4 h-11 bg-[var(--btn-regular-bg)] text-black/90 dark:text-white/90 outline-none border border-transparent focus:border-[var(--primary)] transition"
+			/>
+			<button type="submit" class="btn-regular rounded-lg h-11 px-6 font-bold active:scale-95 transition">
+				{i18n(I18nKey.unlock)}
+			</button>
+		</form>
+		<div class="encrypted-error hidden mt-3 text-center text-sm text-red-500" role="alert"></div>
+		<div class="encrypted-hint hidden mt-3 text-center text-sm text-[var(--primary)]"></div>
+	</div>
+</div>
+
+<script>
+	import MarkdownIt from "markdown-it";
+	import {
+		decryptPayload,
+		loadEncryptedPayload,
+		recallPassword,
+		rememberPassword,
+	} from "../../utils/webcrypto";
+
+	const md = new MarkdownIt({ html: true, linkify: true, breaks: false });
+
+	function initOne(root: HTMLElement) {
+		if (root.dataset.encryptedReady === "1") return;
+		root.dataset.encryptedReady = "1";
+
+		const slug = root.dataset.encryptedPost;
+		if (!slug) return;
+
+		const uiText = JSON.parse(root.dataset.uiText ?? "{}") as Record<string, string>;
+
+		const form = root.querySelector<HTMLFormElement>(".encrypted-form");
+		const input = root.querySelector<HTMLInputElement>('input[name="password"]');
+		const errorEl = root.querySelector<HTMLElement>(".encrypted-error");
+		const hintEl = root.querySelector<HTMLElement>(".encrypted-hint");
+		if (!form || !input) return;
+
+		const showError = (msg: string) => {
+			if (!errorEl) return;
+			errorEl.textContent = msg;
+			errorEl.classList.remove("hidden");
+		};
+		const clearError = () => errorEl?.classList.add("hidden");
+
+		/** 解密成功后就地替换整个门禁区块 */
+		const reveal = (markdown: string) => {
+			const html = md.render(markdown);
+			const wrapper = document.createElement("div");
+			wrapper.className = "encrypted-content";
+			wrapper.innerHTML = html;
+
+			const mount = document.createElement("div");
+			mount.className = "card-base px-6 md:px-9 pt-6 pb-4 relative w-full";
+			const inner = document.createElement("div");
+			inner.className =
+				"prose dark:prose-invert prose-base !max-w-none custom-md mb-6";
+			inner.appendChild(wrapper);
+			mount.appendChild(inner);
+
+			root.replaceChildren(mount);
+			root.dataset.decrypted = "1";
+			if (hintEl) hintEl.classList.add("hidden");
+		};
+
+		let busy = false;
+		form.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			if (busy) return;
+			const password = input.value;
+			if (!password) {
+				showError(uiText.enterPassword);
+				return;
+			}
+			busy = true;
+			clearError();
+			if (hintEl) {
+				hintEl.textContent = uiText.decrypting;
+				hintEl.classList.remove("hidden");
+			}
+			try {
+				const payload = await loadEncryptedPayload(slug);
+				const markdown = await decryptPayload(payload, password);
+				rememberPassword(slug, password);
+				reveal(markdown);
+			} catch (err) {
+				console.error("[encrypted-post]", err);
+				showError(uiText.decryptFailed);
+				if (hintEl) hintEl.classList.add("hidden");
+			} finally {
+				busy = false;
+			}
+		});
+
+		// 同一会话内重新访问时自动解锁
+		const cached = recallPassword(slug);
+		if (cached) {
+			input.value = cached;
+			form.requestSubmit();
+		}
+	}
+
+	function initAll() {
+		document
+			.querySelectorAll<HTMLElement>("[data-encrypted-post]")
+			.forEach(initOne);
+	}
+
+	initAll();
+
+	const w = window as any;
+	if (w?.swup?.hooks) {
+		w.swup.hooks.on("page:view", initAll);
+	} else {
+		document.addEventListener("swup:enable", () => {
+			(w as any).swup.hooks.on("page:view", initAll);
+		});
+	}
+</script>

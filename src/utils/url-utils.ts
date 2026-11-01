@@ -1,0 +1,67 @@
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+
+export function pathsEqual(path1: string, path2: string): boolean {
+	const normalizedPath1 = path1.replace(/^\/|\/$/g, "").toLowerCase();
+	const normalizedPath2 = path2.replace(/^\/|\/$/g, "").toLowerCase();
+	return normalizedPath1 === normalizedPath2;
+}
+
+function joinUrl(...parts: string[]): string {
+	const joined = parts.join("/");
+	return joined.replace(/\/+/g, "/");
+}
+
+export function getPostUrlBySlug(slug: string): string {
+	return url(`/posts/${slug}/`);
+}
+
+// essay 集合的详情页在 /essays/：集合键与路由同名。
+export function getEssayUrlBySlug(slug: string): string {
+	return url(`/essays/${slug}/`);
+}
+
+// oc 集合的详情页在 /settings/：集合键按内容叫 oc，路由按站点文案叫「设定」。
+export function getSettingsUrlBySlug(slug: string): string {
+	return url(`/settings/${slug}/`);
+}
+
+export function getTagUrl(tag: string): string {
+	if (!tag) return url("/archive/");
+	// Per-name detail page (src/pages/tags/[tag].astro). The page also keeps
+	// the 18 legacy taxonomy URLs alive. Latin tags are lower-cased so URLs
+	// match the old site's canonical form byte-for-byte (CSS -> css); CJK
+	// labels are caseless and pass through unchanged. The visible label
+	// always keeps its stored casing.
+	return url(`/tags/${encodeURIComponent(tag.trim().toLowerCase())}/`);
+}
+
+export function getCategoryUrl(category: string | null): string {
+	if (
+		!category ||
+		category.trim() === "" ||
+		category.trim().toLowerCase() === i18n(I18nKey.uncategorized).toLowerCase()
+	)
+		return url("/archive/?uncategorized=true");
+	// Per-name detail page (src/pages/categories/[category].astro).
+	return url(`/categories/${encodeURIComponent(category.trim())}/`);
+}
+
+/**
+ * Resolve the `basePath` used to load a post's local assets (e.g. its cover).
+ *
+ * Content Layer ids drop the trailing `/index`, so an entry's id is no longer a
+ * usable directory. `filePath` (root-relative, POSIX) still carries the real
+ * location, e.g. `src/content/posts/<dir>/index.md` -> `content/posts/<dir>/`.
+ */
+export function getPostAssetBasePath(filePath: string | undefined): string {
+	if (!filePath) return "content/posts/";
+	const lastSlashIndex = filePath.lastIndexOf("/");
+	const dir =
+		lastSlashIndex < 0 ? "" : filePath.substring(0, lastSlashIndex + 1);
+	return dir.replace(/^src\//, "");
+}
+
+export function url(path: string): string {
+	return joinUrl("", import.meta.env.BASE_URL, path);
+}

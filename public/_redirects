@@ -1,0 +1,79 @@
+# Netlify redirect table for URLs from the pre-migration site.
+#
+# The old site served posts under `/blog/<slug>/` (see the legacy RSS) and had a
+# `/blog` index. Those URLs are live and indexed, so they must not 404 once this
+# build takes over the domain. Netlify serves this file from the publish root
+# and applies it at the edge as real 301s; `astro.config.mjs` declares the same
+# pair for hosts that ignore `_redirects` (and for `astro dev` / `astro preview`).
+
+# The trailing `!` is required. Astro's static build also emits an HTML
+# meta-refresh page for each configured redirect (build.redirects defaults to
+# true), and Netlify serves an existing static file in preference to a
+# `_redirects` rule — "shadowing". Forcing the rule makes the real 301 win at
+# the edge; the emitted HTML stays as the fallback for hosts that ignore
+# `_redirects`, and for `astro dev` / `astro preview`.
+#
+# Netlify's own pretty-URL 301 (`/x` -> `/x/`) runs first, so the no-slash
+# variants below only ever see already-normalized input.
+#
+# The legacy blog index has no counterpart here; the archive is its nearest
+# equivalent. Listed before the splat rules so `/blog` is not swallowed by them.
+/blog     /archive/   301!
+/blog/    /archive/   301!
+
+# Post permalinks: /blog/<slug>/ -> /posts/<slug>/ for the legacy post slugs.
+# story-1..4 are the exception: they live in the `essay` collection under
+# /essays/ now, so they get their own mapping further down instead of a 1:1 hop.
+# The trailing-slash form is listed first so a slashed legacy URL resolves in
+# a single hop.
+/blog/:slug/   /posts/:slug/   301!
+/blog/:slug    /posts/:slug    301!
+
+# Fallback for any remaining legacy path under /blog (e.g. the exported JSON
+# payloads that referenced /blog/<slug> without a trailing slash).
+/blog/*    /posts/:splat   301!
+
+# OC 设定区迁移：4 篇「设定」文章改由独立内容集合 `oc` 提供，公开路由从
+# /posts/<slug>/ 变为 /settings/<slug>/；旧分类页 /categories/设定/ 并入 /settings/。
+/posts/personoc/        /settings/personoc/        301!
+/posts/personoc         /settings/personoc/        301!
+/posts/luoshulv-bc/     /settings/luoshulv-bc/     301!
+/posts/luoshulv-bc      /settings/luoshulv-bc/     301!
+/posts/luoshulv-if/     /settings/luoshulv-if/     301!
+/posts/luoshulv-if      /settings/luoshulv-if/     301!
+/posts/yanchui/         /settings/yanchui/         301!
+/posts/yanchui          /settings/yanchui/         301!
+/categories/设定/        /settings/                301!
+/categories/设定         /settings/                301!
+
+# 子相册「三十天友谊挑战」已整册删除（页面 /gallery/sub-gallery/ 与加密载荷一并移除），
+# 旧地址并到画廊首页，避免书签、外链 404。
+/gallery/sub-gallery/   /gallery/   301!
+/gallery/sub-gallery    /gallery/   301!
+
+# 笔记区改名随笔区：集合键 notes -> essay，公开路由 /notes/<slug>/ -> /essays/<slug>/。
+# 旧笔记文章已下架，索引页与文章 URL 一律并到新的随笔区，避免书签与搜索结果 404。
+/notes     /essays/   301!
+/notes/    /essays/   301!
+/notes/:slug/   /essays/:slug/   301!
+/notes/:slug    /essays/:slug    301!
+/notes/*   /essays/:splat   301!
+
+# 原「随笔」分类的 4 篇文章从 /posts/<slug>/ 迁入随笔集合，公开路由改为
+# /essays/<slug>/（它们曾是 /posts/ 下的真实页面，所以必须逐条重定向）。
+/posts/story-1/   /essays/story-1/   301!
+/posts/story-1    /essays/story-1/   301!
+/posts/story-2/   /essays/story-2/   301!
+/posts/story-2    /essays/story-2/   301!
+/posts/story-3/   /essays/story-3/   301!
+/posts/story-3    /essays/story-3/   301!
+/posts/story-4/   /essays/story-4/   301!
+/posts/story-4    /essays/story-4/   301!
+
+# NOT redirected (deliberate, see the t9 report):
+#   /categories/<name>/ and /tags/<name>/ are live legacy URLs that will 404
+#   after cutover. Arbitrary percent-encoded CJK names and a case-folding tag
+#   space (the live site lowercases /tags/CSS/ -> /tags/css/) do not map onto a
+#   static redirect table; this site instead routes taxonomy to
+#   /archive/?category=... via getCategoryUrl() in src/utils/url-utils.ts.
+#   Carried to the 待定清单 instead.

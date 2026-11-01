@@ -1,0 +1,20 @@
+# Normalize all text files to LF in the repository, independent of any local
+# core.autocrlf setting. Without this, Windows checkouts turn every file into
+# CRLF while Biome's default lineEnding is "lf", so `pnpm lint` reported a
+# formatting diff on ~110 untouched files.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+
+# Keep the lockfile diff-stable and out of merge conflicts.
+pnpm-lock.yaml -diff linguist-generated

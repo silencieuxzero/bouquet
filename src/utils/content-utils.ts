@@ -1,0 +1,209 @@
+import { type CollectionEntry, getCollection } from "astro:content";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { getCategoryUrl } from "@utils/url-utils.ts";
+
+// // Retrieve posts and sort them by publication date
+async function getRawSortedPosts() {
+	const allBlogPosts = await getCollection("posts", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	const sorted = allBlogPosts.sort((a, b) => {
+		const dateA = new Date(a.data.published);
+		const dateB = new Date(b.data.published);
+		return dateA > dateB ? -1 : 1;
+	});
+	return sorted;
+}
+
+export async function getSortedPosts(): Promise<CollectionEntry<"posts">[]> {
+	const sorted = await getRawSortedPosts();
+
+	for (let i = 1; i < sorted.length; i++) {
+		sorted[i].data.nextSlug = sorted[i - 1].id;
+		sorted[i].data.nextTitle = sorted[i - 1].data.title;
+	}
+	for (let i = 0; i < sorted.length - 1; i++) {
+		sorted[i].data.prevSlug = sorted[i + 1].id;
+		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	}
+
+	return sorted;
+}
+export type PostForList = {
+	slug: string;
+	data: CollectionEntry<"posts">["data"];
+};
+export async function getSortedPostsList(): Promise<PostForList[]> {
+	const sortedFullPosts = await getRawSortedPosts();
+
+	// delete post.body
+	const sortedPostsList = sortedFullPosts.map((post) => ({
+		slug: post.id,
+		data: post.data,
+	}));
+
+	return sortedPostsList;
+}
+export type Tag = {
+	name: string;
+	count: number;
+};
+
+export async function getTagList(): Promise<Tag[]> {
+	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	const countMap: { [key: string]: number } = {};
+	allBlogPosts.forEach((post: { data: { tags: string[] } }) => {
+		post.data.tags.forEach((tag: string) => {
+			if (!countMap[tag]) countMap[tag] = 0;
+			countMap[tag]++;
+		});
+	});
+
+	// sort tags
+	const keys: string[] = Object.keys(countMap).sort((a, b) => {
+		return a.toLowerCase().localeCompare(b.toLowerCase());
+	});
+
+	return keys.map((key) => ({ name: key, count: countMap[key] }));
+}
+
+export type Category = {
+	name: string;
+	count: number;
+	url: string;
+};
+
+export async function getCategoryList(): Promise<Category[]> {
+	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+	const count: { [key: string]: number } = {};
+	allBlogPosts.forEach((post: { data: { category: string | null } }) => {
+		if (!post.data.category) {
+			const ucKey = i18n(I18nKey.uncategorized);
+			count[ucKey] = count[ucKey] ? count[ucKey] + 1 : 1;
+			return;
+		}
+
+		const categoryName =
+			typeof post.data.category === "string"
+				? post.data.category.trim()
+				: String(post.data.category).trim();
+
+		count[categoryName] = count[categoryName] ? count[categoryName] + 1 : 1;
+	});
+
+	const lst = Object.keys(count).sort((a, b) => {
+		return a.toLowerCase().localeCompare(b.toLowerCase());
+	});
+
+	const ret: Category[] = [];
+	for (const c of lst) {
+		ret.push({
+			name: c,
+			count: count[c],
+			url: getCategoryUrl(c),
+		});
+	}
+	return ret;
+}
+
+// ============================================================================
+// Essays collection (随笔)
+// ============================================================================
+// Essays mirror posts, but live in their own collection so the blog list and the
+// essay section stay separate.
+async function getRawSortedEssays() {
+	const allEssays = await getCollection("essay", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	return allEssays.sort((a, b) => {
+		const dateA = new Date(a.data.published);
+		const dateB = new Date(b.data.published);
+		return dateA > dateB ? -1 : 1;
+	});
+}
+
+export async function getSortedEssays(): Promise<CollectionEntry<"essay">[]> {
+	const sorted = await getRawSortedEssays();
+
+	for (let i = 1; i < sorted.length; i++) {
+		sorted[i].data.nextSlug = sorted[i - 1].id;
+		sorted[i].data.nextTitle = sorted[i - 1].data.title;
+	}
+	for (let i = 0; i < sorted.length - 1; i++) {
+		sorted[i].data.prevSlug = sorted[i + 1].id;
+		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	}
+
+	return sorted;
+}
+
+export type EssayForList = {
+	slug: string;
+	// 列表页要用封面，filePath 是 ImageWrapper 拼 basePath 的唯一来源。
+	filePath: CollectionEntry<"essay">["filePath"];
+	data: CollectionEntry<"essay">["data"];
+};
+
+export async function getSortedEssayList(): Promise<EssayForList[]> {
+	const sortedFullEssays = await getRawSortedEssays();
+	return sortedFullEssays.map((essay) => ({
+		slug: essay.id,
+		filePath: essay.filePath,
+		data: essay.data,
+	}));
+}
+
+// ============================================================================
+// OC 设定集合（集合键 oc，对外路由 /settings/）
+// ============================================================================
+// 与 essay 段同构：同样的 draft 过滤、同样的发布时间倒序，只是换了集合。
+async function getRawSortedOc() {
+	const allOc = await getCollection("oc", ({ data }) => {
+		return import.meta.env.PROD ? data.draft !== true : true;
+	});
+
+	return allOc.sort((a, b) => {
+		const dateA = new Date(a.data.published);
+		const dateB = new Date(b.data.published);
+		return dateA > dateB ? -1 : 1;
+	});
+}
+
+export async function getSortedOcs(): Promise<CollectionEntry<"oc">[]> {
+	const sorted = await getRawSortedOc();
+
+	for (let i = 1; i < sorted.length; i++) {
+		sorted[i].data.nextSlug = sorted[i - 1].id;
+		sorted[i].data.nextTitle = sorted[i - 1].data.title;
+	}
+	for (let i = 0; i < sorted.length - 1; i++) {
+		sorted[i].data.prevSlug = sorted[i + 1].id;
+		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	}
+
+	return sorted;
+}
+
+export type OcForList = {
+	slug: string;
+	// 同 NoteForList：封面缩略图的 basePath 依赖 filePath。
+	filePath: CollectionEntry<"oc">["filePath"];
+	data: CollectionEntry<"oc">["data"];
+};
+
+export async function getSortedOcList(): Promise<OcForList[]> {
+	const sortedFullOc = await getRawSortedOc();
+	return sortedFullOc.map((oc) => ({
+		slug: oc.id,
+		filePath: oc.filePath,
+		data: oc.data,
+	}));
+}
