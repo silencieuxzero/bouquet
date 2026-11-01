@@ -63,8 +63,13 @@ pnpm 的确切版本由 `packageManager` 字段锁定，会自动选用兼容版
 
 ```sh
 pnpm install     # 安装依赖
-pnpm dev         # 启动开发服务器 http://localhost:4321
+pnpm dev         # 启动开发服务器 http://localhost:4321（顺带启动启动器，见下）
 ```
+
+`pnpm dev` 会顺带把本地启动器一起拉起来：先看本仓库有无 `launcher/server.mjs`，
+再看环境变量 `LAUNCHER_HOME` 与同级目录 `../fuwari-launcher`，找到哪个就用哪个；
+一个都没有就只启动站点，不报错。想只起站点，用 `pnpm dev:astro` 或 `pnpm dev --no-launcher`
+（也可令 `LAUNCHER=0`）。
 
 随后：
 
@@ -139,7 +144,8 @@ src/content/posts/my-post/
 | 指令 | 作用 |
 |:--|:--|
 | `pnpm install` | 安装依赖 |
-| `pnpm dev` | 在 `localhost:4321` 启动开发服务器 |
+| `pnpm dev` | 在 `localhost:4321` 启动开发服务器；若找到启动器则同时启动 |
+| `pnpm dev:astro` | 只启动开发服务器，不启动启动器 |
 | `pnpm build` | 构建站点至 `./dist/`，随后用 Pagefind 建立索引 |
 | `pnpm preview` | 本地预览生产构建 |
 | `pnpm check` | 执行 `astro check`，检查类型与模板错误 |
