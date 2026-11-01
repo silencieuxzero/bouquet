@@ -12,6 +12,9 @@ pnpm launcher
 
 换端口：`LAUNCHER_PORT=5300 pnpm launcher`。
 
+`pnpm dev` 也会顺带把启动器拉起来（先找本仓库的 `launcher/server.mjs`，再找 `LAUNCHER_HOME`、同级 `../fuwari-launcher`，都没有就只起站点）：一条命令同时得到
+`localhost:4321` 的站点与 `127.0.0.1:5199` 的启动器，关掉站点时启动器一起退。只想起站点用 `pnpm dev:astro` 或 `pnpm dev --no-launcher`（或 `LAUNCHER=0`）。
+
 Windows 上还有 `start-launcher.cmd`（仓库根，双击即可）：它自动把「编辑哪个 checkout」指向同级的 `fuwari` 目录，也可以用第一个参数或 `LAUNCHER_ROOT` 覆盖：
 
 ```bat
