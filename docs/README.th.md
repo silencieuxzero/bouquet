@@ -67,6 +67,11 @@ pnpm install     # ติดตั้ง dependencies
 pnpm dev         # เริ่มเซิร์ฟเวอร์ที่ http://localhost:4321
 ```
 
+`pnpm dev` จะเริ่มตัวเรียกใช้งาน (launcher) ในเครื่องให้ด้วย: ดูในรีโปนี้ก่อนว่ามี
+`launcher/server.mjs` ไหม จากนั้นดูตัวแปรสภาพแวดล้อม `LAUNCHER_HOME` และไดเรกทอรีข้างเคียง
+`../fuwari-launcher` เจอที่ไหนก็ใช้ที่นั่น ถ้าไม่เจอเลยจะเริ่มเฉพาะเว็บโดยไม่แจ้งข้อผิดพลาด
+หากต้องการเริ่มเฉพาะเว็บ ให้ใช้ `pnpm dev:astro` หรือ `pnpm dev --no-launcher` (หรือกำหนด `LAUNCHER=0`)
+
 จากนั้น:
 
 1. แก้ไข [src/config.ts](../src/config.ts) —— ชื่อเว็บ คำโปรย ภาษา เฉดสีธีม แบนเนอร์
@@ -90,7 +95,82 @@ src/
 ├── types/          ไทป์ TypeScript ที่ใช้ร่วมกัน
 └── utils/          การดึงเนื้อหา ยูทิลิตี URL และธีม
 src/content.config.ts   นิยามคอลเลกชัน (Content Layer API)
+scripts/                สคริปต์สำหรับพัฒนา: dev.mjs (เริ่มเว็บ + ตัวเรียกใช้งาน), sync-branch.mjs (ซิงก์สแนปช็อตของสาขา)
+launcher/               ตัวเรียกใช้งานในเครื่อง (หน้าเว็บสำหรับแก้ค่าตั้งและเนื้อหา ดูตัวอย่าง และ deploy)
+start-launcher.cmd      ดับเบิลคลิกเพื่อเริ่มตัวเรียกใช้งานบน Windows
 ```
+
+## สาขา
+
+| สาขา | เนื้อหา | การใช้งาน |
+|:--|:--|:--|
+| `main` | ตัวเว็บ + ตัวเรียกใช้งาน (`launcher/`, `start-launcher.cmd`) | พัฒนาประจำวัน: `pnpm dev` เริ่มทั้งเว็บและตัวเรียกใช้งาน |
+| `site` | ตัวเว็บอย่างเดียว ไม่มีตัวเรียกใช้งาน | สำเนาที่บริสุทธิ์: ใช้เมื่อต้องการแค่บล็อก หรืออยากให้ `clone` สะอาด |
+| `launcher` | ตัวเรียกใช้งานอย่างเดียว ไม่มีตัวเว็บ | แก้ตัวเรียกใช้งานแยกต่างหาก ใช้ `LAUNCHER_ROOT` ชี้ไปที่ checkout ของเว็บ |
+
+ทั้งสามสาขา**ไม่มีบรรพบุรุษร่วมกัน** (แต่ละอันมีประวัติ orphan ของตัวเอง) ซึ่งตั้งใจให้เป็นเช่นนั้น: git จะ
+ปฏิเสธการ merge ข้ามทั้งสามสาขาโดยตรง (`fatal: refusing to merge unrelated histories`) แทนที่จะลบไฟล์
+ของอีกฝ่ายอย่างเงียบ ๆ เหมือนกรณีที่มีประวัติร่วมกัน ดังนั้น:
+
+- อย่าใช้ `git merge` ซิงก์สามสาขานี้ ถ้าต้องการซิงก์ให้เอาทั้งไดเรกทอรี หรือใช้สคริปต์ด้านล่าง
+- แหล่งความจริงของเนื้อหาคือ `main` เสมอ: `site` คือ “`main` ที่ตัด `launcher/`, `start-launcher.cmd` ออก”
+  ส่วน `launcher` คือ “`README.md`/`package.json`/`start-launcher.cmd` ของสาขานั้นเอง + `launcher/` ของ `main`”
+- ประวัติเก่าก่อนการแยกถูกเก็บไว้เป็นแท็ก: `site-pre-split` (= เดิม `fa47b3d`), `launcher-pre-split` (= เดิม `b157a80`)
+
+สคริปต์ซิงก์ (รันใน checkout ของ `main` สคริปต์ใช้คำสั่งระดับล่างของ git สร้างทรีใหม่ ไม่แตะ working tree):
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # ดูไฟล์ที่จะเปลี่ยนก่อน
+node scripts/sync-branch.mjs site --push         # อัปเดต site แล้ว push
+node scripts/sync-branch.mjs launcher --push     # อัปเดตไดเรกทอรี launcher/ ของสาขา launcher แล้ว push
+```
+
+เมื่อสาขา `launcher` ถูก checkout อยู่ที่ `E:\fuwari-launcher` สคริปต์จะบอกให้ไปรัน
+`git reset --hard <sha>` ในไดเรกทอรีนั้น
+
+### สามไดเรกทอรี (worktree)
+
+ทั้งสามสาขาถูก checkout แยกไว้ในแต่ละไดเรกทอรี **ใช้ `.git` ร่วมกัน** (ไม่ใช่สำเนารีโปสามชุด) ดังนั้น
+commit, push และรายการสาขาในทั้งสามที่จึงเป็นชุดเดียวกัน:
+
+```
+E:\fuwari\             → main      พัฒนาประจำวัน: เว็บ + ตัวเรียกใช้งาน
+E:\fuwari-site\        → site      เว็บล้วน (ไม่มี launcher/)
+E:\fuwari-launcher\    → launcher  ใช้เมื่อแก้ตัวเรียกใช้งานแยกต่างหาก
+```
+
+`git worktree list` ดู checkout ทั้งหมดได้ การสร้าง/สร้างใหม่ไดเรกทอรีหนึ่ง:
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# dependencies ใช้ร่วมกับไดเรกทอรีหลัก ใช้ junction link แทนการคัดลอก:
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+สาขาเดียวกัน checkout พร้อมกันสองไดเรกทอรีไม่ได้ (git จะปฏิเสธ) การแก้ด้วยมือในสามที่จึงไม่ทับกัน
+
+เมื่อลบไดเรกทอรี **ให้ถอด junction ก่อนแล้วค่อยลบ working tree** ไม่อย่างนั้นการลบจะตามเข้าไปในไดเรกทอรีเป้าหมาย:
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+ข้อควรระวังของแต่ละไดเรกทอรี:
+
+| ไดเรกทอรี | ข้อควรระวัง |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev` เริ่มทั้งเว็บ (localhost:4321) และตัวเรียกใช้งาน (127.0.0.1:5199) |
+| `E:\fuwari-site` | ถ้าอยากดูตัวอย่างในไดเรกทอรีที่มีแต่เว็บ ให้ใช้ `pnpm dev:astro`; `pnpm dev` จะไปหาเครื่องเรียกใช้งานที่ `..\fuwari-launcher` ด้วย |
+| `E:\fuwari-launcher` | **อย่ารัน `pnpm`** (`node_modules` เป็น junction pnpm จะปฏิเสธการติดตั้งและอาจพยายามลบมัน) ให้ใช้ `node launcher/server.mjs` หรือดับเบิลคลิก `start-launcher.cmd` และชี้ไปที่ไดเรกทอรีเว็บ (`LAUNCHER_ROOT` หรือ `fuwari` ข้างเคียงที่เป็นค่าเริ่มต้น) |
+
+การแก้ด้วยมือในไดเรกทอรี `site` / `launcher` เป็นของสาขานั้น และจะไม่ถูกซิงก์กลับเข้า `main` ในทาง
+กลับกัน การรัน `sync-branch.mjs` จะเขียนทับทั้งทรีของ `site` และไดเรกทอรี `launcher/` ของสาขา
+`launcher` ด้วยเนื้อหาจาก `main` หากต้องการเก็บการแก้ไขไว้ระยะยาว ให้แก้ที่ `main`
 
 ## Frontmatter ของบทความ
 

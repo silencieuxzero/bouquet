@@ -68,6 +68,12 @@ pnpm install     # 의존성 설치
 pnpm dev         # http://localhost:4321 에서 개발 서버 실행
 ```
 
+`pnpm dev`는 로컬 런처도 함께 띄웁니다. 먼저 이 저장소에 `launcher/server.mjs`가
+있는지 보고, 없으면 환경 변수 `LAUNCHER_HOME`, 그다음 형제 디렉터리
+`../fuwari-launcher`를 확인해 찾은 것을 사용합니다. 어디에도 없으면 오류 없이
+사이트만 시작합니다. 사이트만 띄우려면 `pnpm dev:astro` 또는
+`pnpm dev --no-launcher`(또는 `LAUNCHER=0`)를 사용하세요.
+
 그다음:
 
 1. [src/config.ts](../src/config.ts) 편집 —— 사이트 제목, 부제, 언어, 테마 색상,
@@ -91,7 +97,78 @@ src/
 ├── types/          공용 TypeScript 타입
 └── utils/          콘텐츠 조회, URL, 테마 헬퍼
 src/content.config.ts   컬렉션 정의 (Content Layer API)
+scripts/                개발 스크립트: dev.mjs (사이트 + 런처 실행), sync-branch.mjs (브랜치 스냅숏 동기화)
+launcher/               로컬 런처 (설정과 콘텐츠 편집, 미리보기, 배포용 Web UI)
+start-launcher.cmd      Windows에서 더블클릭으로 런처 실행
 ```
+
+## 브랜치
+
+| 브랜치 | 내용 | 용도 |
+|:--|:--|:--|
+| `main` | 사이트 본체 + 런처 (`launcher/`, `start-launcher.cmd`) | 일상 개발: `pnpm dev`가 사이트와 런처를 함께 띄움 |
+| `site` | 사이트 본체만, 런처 없음 | 깨끗한 사본: 블로그만 필요하거나 `clone`을 깔끔하게 유지하고 싶을 때 |
+| `launcher` | 런처만, 사이트 본체 없음 | 런처만 따로 수정; `LAUNCHER_ROOT`로 사이트 checkout을 가리킴 |
+
+세 브랜치는 **공통 조상이 없습니다**(각자 독립적인 orphan 히스토리). 이는 의도된 것으로,
+git은 세 브랜치의 병합을 곧바로 거부하며(`fatal: refusing to merge unrelated histories`),
+공유 히스토리처럼 상대편 파일을 조용히 지우지 않습니다. 따라서:
+
+- 이 세 브랜치를 `git merge`로 동기화하지 마세요. 동기화하려면 디렉터리를 가져오거나 아래 스크립트를 쓰세요.
+- 콘텐츠의 진원지는 항상 `main`입니다. `site`는 "`main`에서 `launcher/`, `start-launcher.cmd`를 뺀 것"이고,
+  `launcher`는 "브랜치 자체의 `README.md`/`package.json`/`start-launcher.cmd` + `main`의 `launcher/`"입니다.
+- 분리 이전의 옛 히스토리는 태그로 남아 있습니다: `site-pre-split`(= 기존 `fa47b3d`), `launcher-pre-split`(= 기존 `b157a80`).
+
+동기화 스크립트(`main`의 checkout에서 실행하며, git 저수준 명령으로 트리를 재구성하고 작업 영역은 건드리지 않습니다):
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # 어떤 파일이 바뀔지 먼저 확인
+node scripts/sync-branch.mjs site --push         # site 업데이트 후 푸시
+node scripts/sync-branch.mjs launcher --push     # launcher의 launcher/ 디렉터리 업데이트 후 푸시
+```
+
+`launcher` 브랜치가 `E:\fuwari-launcher`에 checkout되어 있으면 스크립트가 그 디렉터리에서 `git reset --hard <sha>`를 실행하라고 안내합니다.
+
+### 세 개의 디렉터리(worktree)
+
+세 브랜치가 각각 하나의 디렉터리에 checkout되고 **하나의 `.git`을 공유합니다**(저장소 사본 세 개가 아닙니다). 그래서 세 곳의 커밋, 푸시, 브랜치 목록은 모두 같은 것입니다:
+
+```
+E:\fuwari\             → main      일상 개발: 사이트 + 런처
+E:\fuwari-site\        → site      깨끗한 사이트 (launcher/ 없음)
+E:\fuwari-launcher\    → launcher  런처만 따로 수정할 때 사용
+```
+
+`git worktree list`로 모든 checkout을 볼 수 있습니다. 새 디렉터리를 만들거나 다시 만들 때:
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# 의존성은 메인 디렉터리를 공유하며, 복사 대신 junction 링크를 씁니다:
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+같은 브랜치를 두 디렉터리에 동시에 checkout할 수 없으므로(git이 거부), 세 곳의 수동 수정은 자연히 서로를 덮어쓰지 않습니다.
+
+디렉터리를 삭제할 때는 **junction을 먼저 떼고 나서 작업 영역을 삭제**하세요. 그렇지 않으면 삭제가 대상 디렉터리까지 따라갑니다:
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+디렉터리별 주의점:
+
+| 디렉터리 | 주의 |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev`가 사이트(localhost:4321)와 런처(127.0.0.1:5199)를 동시에 띄움 |
+| `E:\fuwari-site` | 사이트만 있는 이 디렉터리에서 미리보려면 `pnpm dev:astro`를 쓰세요. `pnpm dev`는 `..\fuwari-launcher`까지 가서 런처를 찾습니다 |
+| `E:\fuwari-launcher` | **`pnpm`을 실행하지 마세요** (`node_modules`가 junction이라 pnpm이 설치를 거부하고 삭제를 시도할 수 있습니다). `node launcher/server.mjs`를 쓰거나 `start-launcher.cmd`를 더블클릭하고, 사이트 디렉터리를 가리키게 하세요(`LAUNCHER_ROOT` 또는 기본값인 형제 `fuwari`) |
+
+`site` / `launcher` 디렉터리에서의 수동 수정은 그 브랜치에 속하며 동기화 스크립트가 `main`으로 합쳐 주지 않습니다. 반대로 `sync-branch.mjs`를 실행하면 `main`의 내용으로 `site`의 트리 전체와 `launcher`의 `launcher/` 디렉터리를 덮어씁니다. 오래 유지할 변경은 `main`에서 하세요.
 
 ## 글 Frontmatter
 

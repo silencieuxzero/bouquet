@@ -68,6 +68,12 @@ pnpm install     # 依存関係をインストール
 pnpm dev         # http://localhost:4321 で開発サーバーを起動
 ```
 
+`pnpm dev` はローカルのランチャーも一緒に起動します：まずこのリポジトリに
+`launcher/server.mjs` があるか、次に環境変数 `LAUNCHER_HOME`、そして隣接する
+`../fuwari-launcher` ディレクトリを探し、見つかったものを使います。どれもなければ
+サイトだけを起動し、エラーにはなりません。サイトだけを起動したい場合は
+`pnpm dev:astro` か `pnpm dev --no-launcher`（`LAUNCHER=0` でも可）を使います。
+
 その後:
 
 1. [`src/config.ts`](../src/config.ts) を編集 —— サイト名、サブタイトル、言語、テーマの
@@ -91,7 +97,91 @@ src/
 ├── types/          共有 TypeScript 型
 └── utils/          コンテンツ取得、URL、テーマのヘルパー
 src/content.config.ts   コレクション定義（Content Layer API）
+scripts/                開発スクリプト：dev.mjs（サイト + ランチャー起動）、sync-branch.mjs（ブランチのスナップショット同期）
+launcher/               ローカルランチャー（設定とコンテンツの編集、プレビュー、デプロイを行う Web UI）
+start-launcher.cmd      Windows でダブルクリックしてランチャーを起動
 ```
+
+## ブランチ
+
+| ブランチ | 内容 | 用途 |
+|:--|:--|:--|
+| `main` | サイト本体 + ランチャー（`launcher/`、`start-launcher.cmd`） | 日常の開発：`pnpm dev` でサイトとランチャーを同時に起動 |
+| `site` | サイト本体のみ。ランチャーなし | クリーンなコピー：ブログだけが必要な場合や `clone` をきれいにしたい場合 |
+| `launcher` | ランチャーのみ。サイト本体なし | ランチャーを単独で改修する場合。`LAUNCHER_ROOT` でサイトの作業ディレクトリを指定 |
+
+3 つのブランチは**共通の祖先を持ちません**（それぞれ独立した orphan 履歴）。これは
+意図的なもので、git は 3 つを相互にマージしようとすると、共有履歴のときのように相手の
+ファイルを黙って消すのではなく、単純に拒否します
+（`fatal: refusing to merge unrelated histories`）。したがって：
+
+- これら 3 つのブランチの同期に `git merge` を使わないでください。同期するならディレクトリ
+  ごと取るか、以下のスクリプトを使ってください。
+- 内容の正は常に `main` です：`site` は「`main` から `launcher/`、`start-launcher.cmd` を
+  除いたもの」、`launcher` は「そのブランチ自身の
+  `README.md`/`package.json`/`start-launcher.cmd` + `main` の `launcher/`」です。
+- 分割前の履歴はタグとして残しています：`site-pre-split`（= 元の `fa47b3d`）、
+  `launcher-pre-split`（= 元の `b157a80`）。
+
+同期スクリプト（`main` の作業ディレクトリで実行します。git の低レベルコマンドでツリーを
+作り直すもので、ワーキングツリーには触れません）：
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # まずどのファイルが変わるか確認
+node scripts/sync-branch.mjs site --push         # site を更新してプッシュ
+node scripts/sync-branch.mjs launcher --push     # launcher の launcher/ を更新してプッシュ
+```
+
+`launcher` ブランチが `E:\fuwari-launcher` に用意されている場合、スクリプトはそのディレクトリで
+`git reset --hard <sha>` を実行するよう案内します。
+
+### 3つのディレクトリ（worktree）
+
+3 つのブランチはそれぞれ別のディレクトリに用意され、**`.git` を 1 つ共有します**
+（リポジトリのコピーが 3 つあるわけではありません）。そのためコミット、プッシュ、
+ブランチ一覧は 3 か所で同じものになります：
+
+```
+E:\fuwari\             → main      日常の開発：サイト + ランチャー
+E:\fuwari-site\        → site      クリーンなサイト（launcher/ なし）
+E:\fuwari-launcher\    → launcher  ランチャーを単独で改修するときに使用
+```
+
+`git worktree list` で全ディレクトリを確認できます。ディレクトリを作成・再作成するには：
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# 依存関係はメインディレクトリと共有するため、コピーではなく junction でリンクします：
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+同じブランチを 2 つのディレクトリに同時に用意することはできません（git が拒否します）。
+そのため 3 か所での手作業の変更が互いを上書きすることはありません。
+
+ディレクトリを削除するときは**先に junction を外してからワーキングツリーを削除**して
+ください。そうしないと削除がリンク先のディレクトリまで追いかけます：
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+ディレクトリごとの注意点：
+
+| ディレクトリ | 注意 |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev` でサイト（localhost:4321）とランチャー（127.0.0.1:5199）を同時に起動 |
+| `E:\fuwari-site` | このサイトのみのディレクトリでプレビューするには `pnpm dev:astro` を使います。`pnpm dev` は `..\fuwari-launcher` にもランチャーを探しに行きます |
+| `E:\fuwari-launcher` | ここで **`pnpm` を実行しないでください**（`node_modules` は junction のため pnpm はインストールを拒否し、削除しようとすることがあります）。`node launcher/server.mjs` を実行するか `start-launcher.cmd` をダブルクリックし、サイトのディレクトリを指定してください（`LAUNCHER_ROOT`、または既定の隣接ディレクトリ `fuwari`） |
+
+`site` / `launcher` のディレクトリでの手作業の変更はそのブランチのものになり、同期
+スクリプトが `main` にマージし直すことはありません。逆に `sync-branch.mjs` を実行すると
+`site` のツリー全体と `launcher` の `launcher/` ディレクトリが `main` の内容で上書きされます。
+長く残したい変更は `main` 側で行ってください。
 
 ## 記事の Frontmatter
 
