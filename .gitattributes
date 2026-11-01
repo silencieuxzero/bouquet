@@ -5,6 +5,8 @@
 * text=auto eol=lf
 
 # Binary assets must never be line-ending normalized.
+*.cmd text eol=crlf
+
 *.png binary
 *.jpg binary
 *.jpeg binary

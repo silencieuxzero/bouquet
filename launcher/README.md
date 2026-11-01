@@ -12,6 +12,13 @@ pnpm launcher
 
 换端口：`LAUNCHER_PORT=5300 pnpm launcher`。
 
+Windows 上还有 `start-launcher.cmd`（仓库根，双击即可）：它自动把「编辑哪个 checkout」指向同级的 `fuwari` 目录，也可以用第一个参数或 `LAUNCHER_ROOT` 覆盖：
+
+```bat
+start-launcher.cmd              :: 自动挑同级 fuwari，没有就编辑自己所在目录
+start-launcher.cmd D:\some\repo  :: 显式指定被编辑的仓库
+```
+
 启动器默认操作**代码所在的那个 checkout**。要让一个启动器副本驱动别的 checkout（例如代码在 `E:\fuwari-launcher`、内容在 `E:\fuwari`）：
 
 ```bash
