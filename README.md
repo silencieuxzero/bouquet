@@ -94,7 +94,9 @@ src/
 ├── types/          共享 TypeScript 类型
 └── utils/          内容查询、URL 与主题辅助函数
 src/content.config.ts   集合定义（Content Layer API）
+scripts/                开发脚本：dev.mjs（起站点 + 启动器）、sync-branch.mjs（同步分支快照）
 launcher/               本地启动器（改配置与内容、预览、部署的 Web 界面）
+start-launcher.cmd      Windows 下双击启动启动器
 ```
 
 ## 分支
@@ -122,6 +124,47 @@ node scripts/sync-branch.mjs launcher --push     # 更新 launcher 的 launcher/
 ```
 
 `launcher` 分支被签出在 `E:\fuwari-launcher` 时，脚本会提示去那个目录执行 `git reset --hard <sha>`。
+
+### 三个目录（worktree）
+
+三条分支各自签出在一个目录里，**共用一个 `.git`**（不是三份仓库拷贝），所以三处提交、推送、分支列表都是同一套：
+
+```
+E:\fuwari\             → main      日常开发：站点 + 启动器
+E:\fuwari-site\        → site      纯净站点（无 launcher/）
+E:\fuwari-launcher\    → launcher  单独改启动器时用
+```
+
+`git worktree list` 可查看全部签出。新建/重建某个目录：
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# 依赖共用主目录，用 junction 链接而不是复制：
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+同一个分支不能同时签出到两个目录（git 会拒绝），所以三处的手改天然不会互相覆盖。
+
+删除目录时**先摘掉 junction 再删工作区**，否则删除会跟进目标目录：
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+各目录的注意点：
+
+| 目录 | 注意 |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev` 同时起站点（localhost:4321）与启动器（127.0.0.1:5199） |
+| `E:\fuwari-site` | 想在这个只有站点的目录里预览，用 `pnpm dev:astro`；`pnpm dev` 会顺带去 `..\fuwari-launcher` 找启动器 |
+| `E:\fuwari-launcher` | **不要跑 `pnpm`**（`node_modules` 是 junction，pnpm 会拒绝安装并可能试图删除它）；用 `node launcher/server.mjs` 或双击 `start-launcher.cmd`，并让它指向站点目录（`LAUNCHER_ROOT` 或默认的同级 `fuwari`） |
+
+在 `site` / `launcher` 目录里的手改属于那条分支，不会被同步脚本合回 `main`；反过来，跑 `sync-branch.mjs` 会用 `main` 的内容覆盖 `site` 的整棵树、`launcher` 的 `launcher/` 目录。想长期保留的改动请改在 `main`。
 
 ## 文章 Frontmatter
 
