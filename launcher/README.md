@@ -89,12 +89,15 @@ launcher/
 ## 测试
 
 ```bash
-# 测试会读真实站点文件（src/config.ts、src/content/…），所以必须指到站点 checkout；
-# 在 launcher 分支上（本分支只有启动器，没有站点本体）尤其如此。
-LAUNCHER_ROOT=E:\fuwari node --test launcher/test/*.test.mjs
+node --test launcher/test/ui-settings.test.mjs launcher/test/ui-models.test.mjs
+node --test launcher/test/core.test.mjs launcher/test/content.test.mjs
 ```
 
-不设 `LAUNCHER_ROOT` 时，测试按启动器自己所在的 checkout 找站点文件——在「站点 + 启动器」同仓的 checkout 里可以直接 `pnpm test`。
+测试会读真实站点文件（`src/config.ts`、`src/content/…`）。在站点所在的 checkout 里直接跑即可；若在**只有启动器的 checkout**（`launcher` 分支）里跑，测试按启动器自己的目录找不到站点文件，必须指过去：
+
+```bash
+LAUNCHER_ROOT=E:\fuwari node --test launcher/test/*.test.mjs
+```
 
 ## 环境变量
 
