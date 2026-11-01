@@ -93,6 +93,12 @@ node --test launcher/test/ui-settings.test.mjs launcher/test/ui-models.test.mjs
 node --test launcher/test/core.test.mjs launcher/test/content.test.mjs
 ```
 
+测试会读真实站点文件（`src/config.ts`、`src/content/…`）。在站点所在的 checkout 里直接跑即可；若在**只有启动器的 checkout**（`launcher` 分支）里跑，测试按启动器自己的目录找不到站点文件，必须指过去：
+
+```bash
+LAUNCHER_ROOT=E:\fuwari node --test launcher/test/*.test.mjs
+```
+
 ## 环境变量
 
 | 变量 | 默认 | 说明 |
