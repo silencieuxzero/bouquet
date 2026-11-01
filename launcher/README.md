@@ -12,6 +12,15 @@ pnpm launcher
 
 换端口：`LAUNCHER_PORT=5300 pnpm launcher`。
 
+启动器默认操作**代码所在的那个 checkout**。要让一个启动器副本驱动别的 checkout（例如代码在 `E:\fuwari-launcher`、内容在 `E:\fuwari`）：
+
+```bash
+cd E:\fuwari
+LAUNCHER_ROOT=E:\fuwari node E:\fuwari-launcher\launcher\server.mjs
+```
+
+此时 `ROOT`（改哪里）由 `LAUNCHER_ROOT` 决定，而界面文件与路由模块仍从这个副本自己的目录读（`CODE_DIR`）。启动日志第二行会打印 `target repository: ...`，先看这一行确认它指向正确的目录。
+
 ## 外观
 
 默认是**白底 Metro 风**（直角、细边框、强调色左边条、无阴影）。所有颜色与尺寸都是 CSS 变量，设置页只改这些变量，不动站点本身：
@@ -79,6 +88,7 @@ node --test launcher/test/core.test.mjs launcher/test/content.test.mjs
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
 | `LAUNCHER_PORT` | `5199` | 启动器端口 |
+| `LAUNCHER_ROOT` | 代码所在 checkout | 被操作的仓库根（读写的 config/内容/备份都在这里）；指向不存在的目录会直接退出 |
 | `LAUNCHER_PREVIEW_PORT` | `4321` | 预览用的 astro dev 端口 |
 | `LAUNCHER_PREVIEW_ARGS` | 空 | 追加给 astro dev 的参数（如 `--ignore-lock`，仅调试用） |
 

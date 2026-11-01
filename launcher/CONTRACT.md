@@ -168,6 +168,14 @@ read for listing but rewritten as flow arrays only when that key is edited. Unkn
 unsupported lines are preserved verbatim; if a key that must be edited cannot be
 parsed, fail with code frontmatter-unsupported instead of guessing.
 
+## Paths
+
+- `CODE_DIR` — the checkout that holds this launcher (launcher/ui, launcher/modules).
+- `ROOT` — the repository the launcher reads and writes; `CODE_DIR` unless
+  `LAUNCHER_ROOT` names another checkout. Every repo-relative path resolves against
+  `ROOT`; UI assets and route modules always come from `CODE_DIR`, so one copy of the
+  launcher can drive another checkout.
+
 ## UI conventions
 
 - Static files under launcher/ui/, native ES modules, fetch to /api/*, no framework, no

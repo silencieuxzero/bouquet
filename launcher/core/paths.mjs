@@ -2,14 +2,21 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { FailError } from "./http.mjs";
 
-/** Absolute path of the repository root (E:/fuwari). */
-export const ROOT = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
+/** Absolute path of the checkout that holds this launcher code (UI, route modules). */
+export const CODE_DIR = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
 
-/** Runtime state directory (backups, trash, logs). */
+/** Absolute path of the repository the launcher operates on: by default the checkout
+ * that holds the code, or LAUNCHER_ROOT when it points at another checkout. */
+export const ROOT = process.env.LAUNCHER_ROOT ? path.resolve(process.env.LAUNCHER_ROOT) : CODE_DIR;
+
+/** Runtime state directory (backups, trash, logs), relative to ROOT. */
 export const STATE_DIR_REL = ".launcher";
 
-/** Static UI directory, served for every non-/api GET. */
-export const UI_DIR = path.join(ROOT, "launcher", "ui");
+/** Static UI directory, served for every non-/api GET; always from the code checkout. */
+export const UI_DIR = path.join(CODE_DIR, "launcher", "ui");
+
+/** Route modules loaded at startup; always from the code checkout. */
+export const MODULES_DIR = path.join(CODE_DIR, "launcher", "modules");
 
 /** Directories the upload endpoint may write into, repo-relative. */
 export const UPLOAD_DIRS = ["public", "public/music", "public/favicon", "src/assets/images"];

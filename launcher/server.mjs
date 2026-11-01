@@ -4,13 +4,12 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { createApp } from "./core/router.mjs";
 import { failure, sendJson, sendText } from "./core/http.mjs";
-import { ROOT, UI_DIR } from "./core/paths.mjs";
+import { MODULES_DIR, ROOT, UI_DIR } from "./core/paths.mjs";
 import * as preview from "./core/preview.mjs";
 import * as deploy from "./core/deploy.mjs";
 
 const HOST = "127.0.0.1";
 const PORT = Number(process.env.LAUNCHER_PORT ?? 5199) || 5199;
-const MODULES_DIR = path.join(ROOT, "launcher", "modules");
 
 const MIME = {
 	".html": "text/html; charset=utf-8",
@@ -147,6 +146,12 @@ async function shutdown(signal, server) {
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1"));
 
 if (isMain) {
+	const rootIsDir = await fs.stat(ROOT).then((stat) => stat.isDirectory()).catch(() => false);
+	if (!rootIsDir) {
+		console.error("[launcher] target repository does not exist: " + ROOT);
+		process.exit(1);
+	}
+	console.log("[launcher] target repository: " + ROOT);
 	const { server } = await createServer();
 	server.on("error", (err) => {
 		if (err.code === "EADDRINUSE") {
