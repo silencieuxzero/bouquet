@@ -3,8 +3,9 @@
 	"type": "module",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "astro dev",
-		"start": "astro dev",
+		"dev": "node scripts/dev.mjs",
+		"start": "node scripts/dev.mjs",
+		"dev:astro": "astro dev",
 		"check": "astro check",
 		"build": "astro build && pagefind --site dist",
 		"preview": "astro preview",
