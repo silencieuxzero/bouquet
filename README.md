@@ -94,7 +94,19 @@ src/
 ├── types/          共享 TypeScript 类型
 └── utils/          内容查询、URL 与主题辅助函数
 src/content.config.ts   集合定义（Content Layer API）
+launcher/               本地启动器（改配置与内容、预览、部署的 Web 界面）
 ```
+
+## 分支
+
+| 分支 | 内容 | 用途 |
+|:--|:--|:--|
+| `main` | 站点本体 + 启动器（`launcher/`、`start-launcher.cmd`） | 日常开发：`pnpm dev` 同时拉起站点与启动器 |
+| `site` | 只有站点本体，没有启动器 | 纯净副本：只需要博客、或想让 `clone` 干净时用 |
+| `launcher` | 只有启动器，没有站点本体 | 单独改启动器；用 `LAUNCHER_ROOT` 指向站点 checkout |
+
+三个分支共享同一份历史，但**不要互相整枝合并**：`site` 与 `launcher` 都是 `main` 的子集快照，
+合并回去会删文件。要更新它们，从 `main` 取对应目录即可（例如 `git checkout main -- launcher/`）。
 
 ## 文章 Frontmatter
 
