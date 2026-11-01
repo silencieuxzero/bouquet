@@ -94,7 +94,34 @@ src/
 ├── types/          共享 TypeScript 类型
 └── utils/          内容查询、URL 与主题辅助函数
 src/content.config.ts   集合定义（Content Layer API）
+launcher/               本地启动器（改配置与内容、预览、部署的 Web 界面）
 ```
+
+## 分支
+
+| 分支 | 内容 | 用途 |
+|:--|:--|:--|
+| `main` | 站点本体 + 启动器（`launcher/`、`start-launcher.cmd`） | 日常开发：`pnpm dev` 同时拉起站点与启动器 |
+| `site` | 只有站点本体，没有启动器 | 纯净副本：只需要博客、或想让 `clone` 干净时用 |
+| `launcher` | 只有启动器，没有站点本体 | 单独改启动器；用 `LAUNCHER_ROOT` 指向站点 checkout |
+
+三条分支**没有共同祖先**（各自独立的 orphan 历史），这是刻意的：git 会直接拒绝三方互整枝合并
+（`fatal: refusing to merge unrelated histories`），而不会像共享历史那样静默删掉对方的文件。所以：
+
+- 不要用 `git merge` 同步这三个分支；要同步就取目录，或者用下面的脚本。
+- 内容真源永远是 `main`：`site` 是「`main` 去掉 `launcher/`、`start-launcher.cmd`」，`launcher` 是「分支自己的
+  `README.md`/`package.json`/`start-launcher.cmd` + `main` 的 `launcher/`」。
+- 拆分前的旧历史保留了标签：`site-pre-split`（= 原 `fa47b3d`）、`launcher-pre-split`（= 原 `b157a80`）。
+
+同步脚本（在 `main` 的 checkout 里跑，脚本用 git 底层命令重建树，不动工作区）：
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # 先看会改哪些文件
+node scripts/sync-branch.mjs site --push         # 更新 site 并推送
+node scripts/sync-branch.mjs launcher --push     # 更新 launcher 的 launcher/ 目录并推送
+```
+
+`launcher` 分支被签出在 `E:\fuwari-launcher` 时，脚本会提示去那个目录执行 `git reset --hard <sha>`。
 
 ## 文章 Frontmatter
 
