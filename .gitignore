@@ -33,6 +33,9 @@ yarn.lock
 # Plaintext sources for encrypted posts - never commit these
 private/source/
 
+# Launcher runtime state (backups, logs, pids)
+.launcher/
+
 # Agent / scratch working directories - never commit these
 .agent-teams/
 .tmp-*/
