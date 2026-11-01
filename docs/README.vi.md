@@ -67,6 +67,12 @@ pnpm install     # cài đặt phụ thuộc
 pnpm dev         # chạy dev server tại http://localhost:4321
 ```
 
+`pnpm dev` cũng khởi động trình khởi chạy (launcher) cục bộ: trước tiên xem kho lưu trữ này có
+`launcher/server.mjs` hay không, rồi xem biến môi trường `LAUNCHER_HOME` và thư mục cùng cấp
+`../fuwari-launcher`, tìm thấy cái nào thì dùng cái đó; không có cái nào thì chỉ khởi động site và
+không báo lỗi. Muốn chỉ khởi động site, dùng `pnpm dev:astro` hoặc `pnpm dev --no-launcher`
+(cũng có thể đặt `LAUNCHER=0`).
+
 Sau đó:
 
 1. Sửa [src/config.ts](../src/config.ts) —— tiêu đề, phụ đề, ngôn ngữ, màu chủ đề,
@@ -90,7 +96,86 @@ src/
 ├── types/          kiểu TypeScript dùng chung
 └── utils/          truy vấn nội dung, tiện ích URL và chủ đề
 src/content.config.ts   định nghĩa bộ sưu tập (Content Layer API)
+scripts/                script phát triển: dev.mjs (khởi động site + launcher), sync-branch.mjs (đồng bộ ảnh chụp nhánh)
+launcher/               trình khởi chạy cục bộ (giao diện web để sửa cấu hình và nội dung, xem trước, triển khai)
+start-launcher.cmd      nhấp đúp để khởi động launcher trên Windows
 ```
+
+## Nhánh
+
+| Nhánh | Nội dung | Mục đích |
+|:--|:--|:--|
+| `main` | bản thân site + launcher (`launcher/`, `start-launcher.cmd`) | phát triển hằng ngày: `pnpm dev` khởi động cả site và launcher |
+| `site` | chỉ bản thân site, không có launcher | bản sao thuần: dùng khi chỉ cần blog, hoặc muốn `clone` được gọn |
+| `launcher` | chỉ launcher, không có site | sửa launcher riêng; dùng `LAUNCHER_ROOT` để trỏ tới checkout của site |
+
+Ba nhánh **không có tổ tiên chung** (mỗi nhánh có lịch sử orphan riêng), đây là chủ ý: git sẽ từ chối
+thẳng việc merge chéo cả ba nhánh (`fatal: refusing to merge unrelated histories`), thay vì âm thầm
+xóa tệp của nhánh kia như khi có lịch sử chung. Vì vậy:
+
+- Đừng dùng `git merge` để đồng bộ ba nhánh này; cần đồng bộ thì lấy thư mục, hoặc dùng script bên dưới.
+- Nguồn chân lý của nội dung luôn là `main`: `site` là “`main` bỏ `launcher/`, `start-launcher.cmd`”,
+  `launcher` là “`README.md`/`package.json`/`start-launcher.cmd` của chính nhánh đó + `launcher/` của `main`”.
+- Lịch sử cũ trước khi tách được giữ bằng tag: `site-pre-split` (= `fa47b3d` gốc),
+  `launcher-pre-split` (= `b157a80` gốc).
+
+Script đồng bộ (chạy trong checkout của `main`, script dùng lệnh cấp thấp của git để dựng lại cây,
+không đụng vào working tree):
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # xem trước những tệp sẽ thay đổi
+node scripts/sync-branch.mjs site --push         # cập nhật site rồi push
+node scripts/sync-branch.mjs launcher --push     # cập nhật thư mục launcher/ của nhánh launcher rồi push
+```
+
+Khi nhánh `launcher` được checkout tại `E:\fuwari-launcher`, script sẽ nhắc bạn vào thư mục đó chạy
+`git reset --hard <sha>`.
+
+### Ba thư mục (worktree)
+
+Ba nhánh mỗi nhánh được checkout trong một thư mục, **dùng chung một `.git`** (không phải ba bản sao kho),
+nên commit, push và danh sách nhánh ở cả ba nơi là một bộ:
+
+```
+E:\fuwari\             → main      phát triển hằng ngày: site + launcher
+E:\fuwari-site\        → site      site thuần (không có launcher/)
+E:\fuwari-launcher\    → launcher  dùng khi sửa launcher riêng
+```
+
+`git worktree list` xem được toàn bộ checkout. Tạo/dựng lại một thư mục:
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# phụ thuộc dùng chung với thư mục chính, dùng junction link thay vì sao chép:
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+Một nhánh không thể checkout đồng thời ở hai thư mục (git sẽ từ chối), nên các sửa tay ở ba nơi vốn
+không thể ghi đè lên nhau.
+
+Khi xóa thư mục, **hãy tháo junction trước rồi mới xóa working tree**, nếu không việc xóa sẽ đi theo
+vào thư mục đích:
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+Lưu ý cho từng thư mục:
+
+| Thư mục | Lưu ý |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev` khởi động cả site (localhost:4321) và launcher (127.0.0.1:5199) |
+| `E:\fuwari-site` | Muốn xem trước ngay trong thư mục chỉ có site, dùng `pnpm dev:astro`; `pnpm dev` sẽ tìm launcher ở `..\fuwari-launcher` |
+| `E:\fuwari-launcher` | **Đừng chạy `pnpm`** (`node_modules` là junction, pnpm sẽ từ chối cài đặt và có thể cố xóa nó); hãy dùng `node launcher/server.mjs` hoặc nhấp đúp `start-launcher.cmd`, và trỏ nó tới thư mục site (`LAUNCHER_ROOT` hoặc `fuwari` cùng cấp mặc định) |
+
+Các sửa tay trong thư mục `site` / `launcher` thuộc về nhánh đó và sẽ không được script đồng bộ hợp
+nhất trở lại `main`; ngược lại, chạy `sync-branch.mjs` sẽ dùng nội dung của `main` ghi đè toàn bộ cây
+của `site` và thư mục `launcher/` của nhánh `launcher`. Muốn giữ thay đổi lâu dài, hãy sửa trên `main`.
 
 ## Frontmatter của bài viết
 

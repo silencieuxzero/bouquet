@@ -68,6 +68,12 @@ pnpm install     # pasang dependensi
 pnpm dev         # jalankan server pengembangan di http://localhost:4321
 ```
 
+`pnpm dev` juga ikut menjalankan launcher lokal: pertama periksa apakah repositori ini punya
+`launcher/server.mjs`, lalu variabel lingkungan `LAUNCHER_HOME` dan direktori sejajar
+`../fuwari-launcher`, mana yang ditemukan dipakai; bila tidak ada sama sekali hanya situs yang
+dijalankan, tanpa galat. Ingin menjalankan situs saja, gunakan `pnpm dev:astro` atau
+`pnpm dev --no-launcher` (bisa juga dengan `LAUNCHER=0`).
+
 Selanjutnya:
 
 1. Sunting [src/config.ts](../src/config.ts) —— judul situs, subjudul, bahasa, hue tema,
@@ -91,7 +97,89 @@ src/
 ├── types/          tipe TypeScript bersama
 └── utils/          kueri konten, utilitas URL dan tema
 src/content.config.ts   definisi koleksi (Content Layer API)
+scripts/                skrip pengembangan: dev.mjs (menjalankan situs + launcher), sync-branch.mjs (menyinkronkan cuplikan cabang)
+launcher/               launcher lokal (antarmuka web untuk mengubah konfigurasi dan konten, pratinjau, deploy)
+start-launcher.cmd      klik dua kali untuk menjalankan launcher di Windows
 ```
+
+## Cabang
+
+| Cabang | Isi | Kegunaan |
+|:--|:--|:--|
+| `main` | situs + launcher (`launcher/`, `start-launcher.cmd`) | pengembangan harian: `pnpm dev` menjalankan situs dan launcher sekaligus |
+| `site` | hanya situs, tanpa launcher | salinan murni: dipakai bila hanya butuh blog, atau ingin `clone` tetap bersih |
+| `launcher` | hanya launcher, tanpa situs | mengubah launcher tersendiri; arahkan `LAUNCHER_ROOT` ke checkout situs |
+
+Ketiga cabang **tidak memiliki leluhur bersama** (masing-masing berisi riwayat orphan sendiri), dan itu
+memang disengaja: git akan langsung menolak merge silang ketiga cabang
+(`fatal: refusing to merge unrelated histories`), alih-alih diam-diam menghapus berkas cabang lain
+seperti pada riwayat bersama. Karena itu:
+
+- Jangan memakai `git merge` untuk menyinkronkan ketiga cabang ini; bila perlu sinkron, ambil direktorinya, atau pakai skrip di bawah.
+- Sumber kebenaran konten selalu `main`: `site` adalah “`main` tanpa `launcher/`, `start-launcher.cmd`”,
+  sedangkan `launcher` adalah “`README.md`/`package.json`/`start-launcher.cmd` milik cabang itu sendiri
+  + `launcher/` dari `main`”.
+- Riwayat lama sebelum pemisahan disimpan sebagai tag: `site-pre-split` (= `fa47b3d` lama),
+  `launcher-pre-split` (= `b157a80` lama).
+
+Skrip sinkron (jalankan di checkout `main`; skrip memakai perintah tingkat rendah git untuk menyusun
+ulang tree tanpa menyentuh working tree):
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # lihat dulu berkas yang akan berubah
+node scripts/sync-branch.mjs site --push         # perbarui site lalu push
+node scripts/sync-branch.mjs launcher --push     # perbarui direktori launcher/ cabang launcher lalu push
+```
+
+Bila cabang `launcher` di-checkout di `E:\fuwari-launcher`, skrip akan menyarankan menjalankan
+`git reset --hard <sha>` di direktori itu.
+
+### Tiga direktori (worktree)
+
+Ketiga cabang masing-masing di-checkout dalam satu direktori dan **berbagi satu `.git`** (bukan tiga
+salinan repositori), jadi commit, push, dan daftar cabang di ketiga tempat itu sama:
+
+```
+E:\fuwari\             → main      pengembangan harian: situs + launcher
+E:\fuwari-site\        → site      situs murni (tanpa launcher/)
+E:\fuwari-launcher\    → launcher  dipakai saat mengubah launcher tersendiri
+```
+
+`git worktree list` menampilkan semua checkout. Membuat/menyusun ulang sebuah direktori:
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# dependensi dipakai bersama direktori utama, pakai junction link alih-alih menyalin:
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+Satu cabang tidak dapat di-checkout di dua direktori sekaligus (git akan menolak), jadi perubahan
+manual di ketiga tempat secara alami tidak saling menimpa.
+
+Saat menghapus direktori, **lepas junction lebih dulu baru hapus working tree**, kalau tidak
+penghapusan akan ikut masuk ke direktori target:
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+Catatan per direktori:
+
+| Direktori | Catatan |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev` menjalankan situs (localhost:4321) dan launcher (127.0.0.1:5199) sekaligus |
+| `E:\fuwari-site` | Ingin pratinjau di direktori yang hanya berisi situs, pakai `pnpm dev:astro`; `pnpm dev` akan ikut mencari launcher di `..\fuwari-launcher` |
+| `E:\fuwari-launcher` | **Jangan menjalankan `pnpm`** (`node_modules` adalah junction, pnpm akan menolak pemasangan dan mungkin mencoba menghapusnya); pakai `node launcher/server.mjs` atau klik dua kali `start-launcher.cmd`, dan arahkan ke direktori situs (`LAUNCHER_ROOT` atau `fuwari` sejajar sebagai bawaan) |
+
+Perubahan manual di direktori `site` / `launcher` milik cabang itu dan tidak akan disatukan kembali ke
+`main` oleh skrip sinkron; sebaliknya, menjalankan `sync-branch.mjs` akan menimpa seluruh tree `site`
+dan direktori `launcher/` dengan isi dari `main`. Perubahan yang ingin dipertahankan lama sebaiknya
+dibuat di `main`.
 
 ## Frontmatter Artikel
 

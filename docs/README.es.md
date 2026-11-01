@@ -70,6 +70,12 @@ pnpm install     # instalar dependencias
 pnpm dev         # iniciar el servidor de desarrollo en http://localhost:4321
 ```
 
+`pnpm dev` también levanta el lanzador local: primero busca `launcher/server.mjs`
+en este repositorio, luego la variable de entorno `LAUNCHER_HOME` y después el
+directorio hermano `../fuwari-launcher`, y usa el que encuentre. Si no encuentra
+ninguno, arranca solo el sitio sin dar error. Para levantar únicamente el sitio,
+usa `pnpm dev:astro` o `pnpm dev --no-launcher` (o bien `LAUNCHER=0`).
+
 Después:
 
 1. Edita [src/config.ts](../src/config.ts) —— título, subtítulo, idioma, tono del tema,
@@ -93,7 +99,75 @@ src/
 ├── types/          tipos TypeScript compartidos
 └── utils/          consultas de contenido y utilidades de URL y tema
 src/content.config.ts   definición de colecciones (Content Layer API)
+scripts/                scripts de desarrollo: dev.mjs (sitio + lanzador), sync-branch.mjs (sincronizar instantáneas de rama)
+launcher/               lanzador local (interfaz web para editar configuración y contenido, previsualizar y desplegar)
+start-launcher.cmd      iniciar el lanzador con doble clic en Windows
 ```
+
+## Ramas
+
+| Rama | Contenido | Uso |
+|:--|:--|:--|
+| `main` | el sitio en sí + el lanzador (`launcher/`, `start-launcher.cmd`) | desarrollo diario: `pnpm dev` levanta el sitio y el lanzador a la vez |
+| `site` | solo el sitio, sin el lanzador | copia limpia: para cuando solo necesitas el blog o quieres que `clone` quede limpio |
+| `launcher` | solo el lanzador, sin el sitio | modificar el lanzador por separado; apunta al checkout del sitio con `LAUNCHER_ROOT` |
+
+Las tres ramas **no tienen ancestro común** (cada una tiene su propia historia orphan independiente), y es intencionado: git rechaza directamente la fusión de las tres (`fatal: refusing to merge unrelated histories`) en lugar de borrar en silencio los archivos de la otra parte como haría con una historia compartida. Por eso:
+
+- No sincronices estas tres ramas con `git merge`; para sincronizar, toma los directorios o usa el script de abajo.
+- La fuente de verdad del contenido es siempre `main`: `site` es «`main` sin `launcher/` ni `start-launcher.cmd`», y `launcher` es «el `README.md`/`package.json`/`start-launcher.cmd` de la propia rama + el `launcher/` de `main`».
+- La historia antigua anterior a la separación se conserva en etiquetas: `site-pre-split` (= el antiguo `fa47b3d`) y `launcher-pre-split` (= el antiguo `b157a80`).
+
+Script de sincronización (se ejecuta en el checkout de `main`; usa comandos de bajo nivel de git para reconstruir el árbol y no toca el directorio de trabajo):
+
+```bash
+node scripts/sync-branch.mjs site --dry-run      # ver primero qué archivos cambiarían
+node scripts/sync-branch.mjs site --push         # actualizar site y subirlo
+node scripts/sync-branch.mjs launcher --push     # actualizar el directorio launcher/ de la rama launcher y subirlo
+```
+
+Cuando la rama `launcher` está con checkout en `E:\fuwari-launcher`, el script avisa de que ejecutes `git reset --hard <sha>` en ese directorio.
+
+### Tres directorios (worktrees)
+
+Las tres ramas se sacan con checkout en un directorio cada una y **comparten un único `.git`** (no son tres copias del repositorio), así que los commits, los push y la lista de ramas son los mismos en las tres:
+
+```
+E:\fuwari\             → main      desarrollo diario: sitio + lanzador
+E:\fuwari-site\        → site      sitio limpio (sin launcher/)
+E:\fuwari-launcher\    → launcher  para modificar el lanzador por separado
+```
+
+`git worktree list` muestra todos los checkouts. Para crear o recrear un directorio:
+
+```bash
+git worktree add ../fuwari-site site
+git worktree add ../fuwari-launcher launcher
+
+# las dependencias se comparten con el directorio principal; usa un enlace junction en vez de copiar:
+cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
+cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
+```
+
+Una misma rama no puede tener checkout en dos directorios a la vez (git lo rechaza), así que las ediciones manuales de los tres lugares no se pisan entre sí.
+
+Al borrar un directorio, **quita primero el junction y luego elimina el árbol de trabajo**; de lo contrario el borrado seguirá hasta el directorio de destino:
+
+```bash
+cmd //c rmdir ..\fuwari-site\node_modules
+git worktree remove ../fuwari-site
+```
+
+Aspectos a tener en cuenta en cada directorio:
+
+| Directorio | Atención |
+|:--|:--|
+| `E:\fuwari` | `pnpm dev` levanta a la vez el sitio (localhost:4321) y el lanzador (127.0.0.1:5199) |
+| `E:\fuwari-site` | Para previsualizar en este directorio que solo tiene el sitio, usa `pnpm dev:astro`; `pnpm dev` irá además a `..\fuwari-launcher` a buscar el lanzador |
+| `E:\fuwari-launcher` | **No ejecutes `pnpm`** (`node_modules` es un junction, pnpm rechazará la instalación y puede intentar borrarlo); usa `node launcher/server.mjs` o haz doble clic en `start-launcher.cmd`, y haz que apunte al directorio del sitio (`LAUNCHER_ROOT` o el `fuwari` hermano por defecto) |
+
+Las ediciones manuales hechas en los directorios `site` / `launcher` pertenecen a esa rama y el script de sincronización no las devuelve a `main`; a la inversa, ejecutar `sync-branch.mjs` sobrescribe todo el árbol de `site` y el directorio `launcher/` de la rama con el contenido de `main`. Haz en `main` los cambios que quieras conservar a largo plazo.
 
 ## Frontmatter de las entradas
 
