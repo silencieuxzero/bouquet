@@ -102,8 +102,6 @@ El repositorio tiene una sola rama, `main`.
 
 - Hubo un lanzador web local (rama `launcher`, con su propio checkout en `E:\fuwari-launcher`) para cambiar la configuración, gestionar las entradas y ejecutar los despliegues.
   Ya no existe: `pnpm dev` vuelve a ser `astro dev` puro y el repositorio ya no contiene su código, sus scripts ni sus reglas de ignorado.
-- Las instantáneas históricas quedan en las etiquetas: `site-pre-split` (el sitio antes de la separación) y `site-final` (la última forma, solo con los archivos del sitio).
-  Para recuperar archivos antiguos usa solo lectura, por ejemplo `git show site-final:README.md`, y no fusiones las etiquetas de vuelta en `main`.
 
 ## Frontmatter de las entradas
 

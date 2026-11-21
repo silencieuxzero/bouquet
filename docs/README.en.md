@@ -103,9 +103,6 @@ This repository has a single branch `main`.
   used to edit configuration, manage posts and run deployments. It has been removed: `pnpm dev`
   is a plain `astro dev` again, and the repository no longer carries its code, scripts or
   ignore rules.
-- Historical snapshots remain as tags: `site-pre-split` (the site before the split) and
-  `site-final` (the final form using site files only). Read old files with a read-only
-  command such as `git show site-final:README.md`; do not merge the tags back into `main`.
 
 ## Post Frontmatter
 

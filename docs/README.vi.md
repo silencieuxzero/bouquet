@@ -99,8 +99,6 @@ Kho lưu trữ này chỉ có một nhánh là `main`.
 
 - Từng có một trình khởi chạy web (launcher) cục bộ nằm ở nhánh `launcher`, được checkout riêng tại `E:\fuwari-launcher`, dùng để sửa cấu hình, quản lý bài viết và chạy triển khai.
   Nó đã bị gỡ bỏ: `pnpm dev` quay lại là `astro dev` thuần túy, và kho lưu trữ không còn mã, script hay quy tắc ignore của nó.
-- Ảnh chụp lịch sử vẫn nằm trong các tag: `site-pre-split` (site trước khi tách), `site-final` (hình thái cuối cùng chỉ gồm các tệp của site).
-  Lấy tệp cũ theo cách chỉ đọc như `git show site-final:README.md`, đừng merge các tag trở lại `main`.
 
 ## Frontmatter của bài viết
 

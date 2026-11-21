@@ -101,10 +101,6 @@ scripts/                開発スクリプト：new-post.js、encrypt-post.mjs�
 - 以前はローカルの Web ランチャーがあり、設定変更、記事管理、デプロイ実行に使われていました
   （`launcher` ブランチとして `E:\fuwari-launcher` に別途チェックアウト）。現在は削除済みです：
   `pnpm dev` は純粋な `astro dev` に戻り、そのコード、スクリプト、無視設定はもうありません。
-- 過去のスナップショットはタグとして残っています：`site-pre-split`（分割前のサイト）と
-  `site-final`（サイトのファイルのみを使った最終形）。古いファイルは
-  `git show site-final:README.md` のような読み取り専用の方法で取得し、タグは `main` に
-  マージしないでください。
 
 ## 記事の Frontmatter
 

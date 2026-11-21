@@ -100,8 +100,6 @@ Repositori ini hanya punya satu cabang, yaitu `main`.
 
 - Dulu ada launcher web lokal yang berada di cabang `launcher` dan di-checkout terpisah di `E:\fuwari-launcher`, dipakai untuk mengubah konfigurasi, mengelola artikel, dan menjalankan deploy.
   Alat itu sudah dihapus: `pnpm dev` kembali menjadi `astro dev` murni, dan repositori ini tidak lagi memuat kode, skrip, maupun aturan ignore-nya.
-- Cuplikan historis tetap tersimpan sebagai tag: `site-pre-split` (situs sebelum pemisahan), `site-final` (bentuk terakhir yang hanya berisi berkas situs).
-  Ambil berkas lama dengan cara baca-saja seperti `git show site-final:README.md`, jangan merge tag itu kembali ke `main`.
 
 ## Frontmatter Artikel
 

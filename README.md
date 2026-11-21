@@ -98,8 +98,6 @@ scripts/                开发脚本：new-post.js、encrypt-post.mjs、encrypt-
 
 - 曾有过一个本地 Web 启动器（`launcher` 分支，单独签出在 `E:\fuwari-launcher`），用来改配置、管文章、跑部署。
   它已被移除：`pnpm dev` 恢复为纯粹的 `astro dev`，仓库里不再有它的代码、脚本与忽略规则。
-- 历史上的快照留在标签里：`site-pre-split`（拆分前的站点）、`site-final`（只用站点文件的最后形态）。
-  取旧文件用 `git show site-final:README.md` 这类只读方式，不要把标签合并回 `main`。
 
 ## 文章 Frontmatter
 

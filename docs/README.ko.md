@@ -100,8 +100,6 @@ scripts/                개발 스크립트: new-post.js, encrypt-post.mjs, encr
 
 - 한때 설정을 고치고 글을 관리하고 배포를 실행하는 로컬 웹 런처(`launcher` 브랜치, `E:\fuwari-launcher`에 따로 체크아웃)가 있었습니다.
   지금은 제거되었습니다: `pnpm dev`는 순수한 `astro dev`로 돌아갔고, 저장소에는 그 코드와 스크립트, 무시 규칙이 더 이상 없습니다.
-- 과거 스냅숏은 태그로 남아 있습니다: `site-pre-split`(분리 이전의 사이트), `site-final`(사이트 파일만 남긴 마지막 형태).
-  옛 파일은 `git show site-final:README.md` 같은 읽기 전용 방식으로 꺼내고, 태그를 `main`에 다시 병합하지 마세요.
 
 ## 글 Frontmatter
 
