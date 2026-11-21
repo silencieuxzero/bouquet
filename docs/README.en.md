@@ -68,11 +68,11 @@ pnpm install     # install dependencies
 pnpm dev         # start the dev server at http://localhost:4321
 ```
 
-`pnpm dev` also brings up the local launcher: it first looks for `launcher/server.mjs` in
-this repository, then at the `LAUNCHER_HOME` environment variable, then at a sibling
-`../fuwari-launcher` directory, and uses whichever it finds; if none exists it starts the
-site alone and does not fail. To start the site only, use `pnpm dev:astro` or
-`pnpm dev --no-launcher` (or set `LAUNCHER=0`).
+`pnpm dev` also brings up the local launcher: it first checks the `LAUNCHER_HOME` environment
+variable, then looks for `server.mjs` in the sibling `../fuwari-launcher` directory, and uses
+whichever it finds; if neither exists it starts the site alone and reports no error. The
+launcher code is not in this repository (`main` carries the site only, see "Branches"). To
+start the site only, use `pnpm dev:astro` or `pnpm dev --no-launcher` (or set `LAUNCHER=0`).
 
 Then:
 
@@ -98,91 +98,66 @@ src/
 ├── types/          shared TypeScript types
 └── utils/          content queries, URL and theme helpers
 src/content.config.ts   collection definitions (Content Layer API)
-scripts/                dev scripts: dev.mjs (site + launcher), sync-branch.mjs (branch snapshot sync)
-launcher/               local launcher (web UI to edit config and content, preview, deploy)
-start-launcher.cmd      double-click to start the launcher on Windows
+scripts/                dev script: dev.mjs (starts the site; also starts the sibling launcher when found)
 ```
 
 ## Branches
 
-| Branch | Contents | Purpose |
+The launcher and the site live on two separate branches, each checked out in its own
+directory:
+
+| Branch | Contents | Directory |
 |:--|:--|:--|
-| `main` | the site itself + the launcher (`launcher/`, `start-launcher.cmd`) | daily development: `pnpm dev` starts the site and the launcher together |
-| `site` | the site itself only, no launcher | clean copy: for when you only need the blog, or want a clean `clone` |
-| `launcher` | the launcher only, no site | editing the launcher on its own; point `LAUNCHER_ROOT` at the site checkout |
+| `main` | the site itself only (`src/`, `public/`, `scripts/`, posts) | `E:\fuwari` |
+| `launcher` | the launcher only (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
 
-The three branches **share no common ancestor** (each has its own independent orphan
-history), and that is deliberate: git simply refuses to merge the three into one another
-(`fatal: refusing to merge unrelated histories`) instead of silently deleting the other
-side's files the way a shared history would. Therefore:
+- The two branches **share no common ancestor** (each has its own independent orphan
+  history). git refuses to merge them into one another
+  (`fatal: refusing to merge unrelated histories`), and that is deliberate: unlike a shared
+  history, it cannot silently delete the other side's files.
+- Do not use `git merge` to synchronise the two. The launcher reads the site's files through
+  `LAUNCHER_ROOT`, so no code ever needs copying.
+- The launcher's full documentation (endpoints, sections, safety nets, tests, environment
+  variables) lives in `E:\fuwari-launcher\README.md`.
+- The pre-split snapshots are preserved as the tags `site-pre-split` (from the former
+  `site` branch) and `launcher-pre-split`.
 
-- Do not use `git merge` to synchronise these three branches; synchronise by taking
-  directories, or with the script below.
-- The source of truth for content is always `main`: `site` is "`main` minus `launcher/`,
-  `start-launcher.cmd`", and `launcher` is "the branch's own
-  `README.md`/`package.json`/`start-launcher.cmd` + `main`'s `launcher/`".
-- The pre-split history is preserved as tags: `site-pre-split` (= the original `fa47b3d`)
-  and `launcher-pre-split` (= the original `b157a80`).
+### Two directories (worktrees)
 
-The sync script (run it in the `main` checkout; it rebuilds the tree with git plumbing
-commands and does not touch the working tree):
+Each of the two branches is checked out in its own directory, and **they share a single
+`.git`** (not two copies of the repository), so commits, pushes and the branch list are the
+same set in both places:
+
+```
+E:\fuwari\             → main      site (astro dev on localhost:4321)
+E:\fuwari-launcher\    → launcher  launcher (127.0.0.1:5199)
+```
+
+`git worktree list` shows every checkout. To create or recreate the launcher directory:
 
 ```bash
-node scripts/sync-branch.mjs site --dry-run      # see which files would change first
-node scripts/sync-branch.mjs site --push         # update site and push
-node scripts/sync-branch.mjs launcher --push     # update launcher's launcher/ directory and push
-```
-
-When the `launcher` branch is checked out at `E:\fuwari-launcher`, the script tells you to
-run `git reset --hard <sha>` in that directory.
-
-### Three directories (worktrees)
-
-Each of the three branches is checked out in its own directory, and **they share a single
-`.git`** (not three copies of the repository), so commits, pushes and the branch list are
-the same set in all three places:
-
-```
-E:\fuwari\             → main      daily development: site + launcher
-E:\fuwari-site\        → site      clean site (no launcher/)
-E:\fuwari-launcher\    → launcher  for editing the launcher on its own
-```
-
-`git worktree list` shows every checkout. To create or recreate one of the directories:
-
-```bash
-git worktree add ../fuwari-site site
 git worktree add ../fuwari-launcher launcher
 
-# dependencies are shared with the main directory — link them with junctions instead of copying:
-cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+# dependencies and plaintext are shared with the main directory — link them with junctions instead of copying:
 cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
 cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
 ```
 
-The same branch cannot be checked out in two directories at once (git refuses), so hand
-edits made in the three places can never overwrite each other.
-
-When deleting a directory, **unlink the junction first, then remove the worktree**,
-otherwise the delete follows the link into the target directory:
+When deleting a directory, **unlink the junctions first, then remove the worktree**,
+otherwise the delete follows the links into the target directory:
 
 ```bash
-cmd //c rmdir ..\fuwari-site\node_modules
-git worktree remove ../fuwari-site
+cmd //c rmdir ..\fuwari-launcher\node_modules
+cmd //c rmdir ..\fuwari-launcher\private
+git worktree remove ../fuwari-launcher
 ```
 
 Caveats per directory:
 
 | Directory | Caveat |
 |:--|:--|
-| `E:\fuwari` | `pnpm dev` starts both the site (localhost:4321) and the launcher (127.0.0.1:5199) |
-| `E:\fuwari-site` | to preview inside this site-only directory, use `pnpm dev:astro`; `pnpm dev` will also go looking for a launcher in `..\fuwari-launcher` |
-| `E:\fuwari-launcher` | **do not run `pnpm`** here (`node_modules` is a junction, pnpm refuses to install and may try to delete it); use `node launcher/server.mjs` or double-click `start-launcher.cmd`, and point it at the site directory (`LAUNCHER_ROOT`, or the default sibling `fuwari`) |
-
-Hand edits made in the `site` / `launcher` directories belong to that branch and are not
-merged back into `main` by the sync script; conversely, running `sync-branch.mjs`
-overwrites the whole `site` tree and `launcher`'s `launcher/` directory with the contents of
-`main`. Make any change you want to keep in the long run in `main`.
+| `E:\fuwari` | `pnpm dev` starts the site and automatically goes looking for the launcher in `..\fuwari-launcher` to start it too |
+| `E:\fuwari-launcher` | **do not run `pnpm`** here (`node_modules` is a junction, pnpm refuses); use `node server.mjs` or double-click `start-launcher.cmd`, which points at the sibling `..\fuwari` by default |
 
 ## Post Frontmatter
 
