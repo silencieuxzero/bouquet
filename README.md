@@ -66,10 +66,10 @@ pnpm install     # 安装依赖
 pnpm dev         # 启动开发服务器 http://localhost:4321（顺带启动启动器，见下）
 ```
 
-`pnpm dev` 会顺带把本地启动器一起拉起来：先看本仓库有无 `launcher/server.mjs`，
-再看环境变量 `LAUNCHER_HOME` 与同级目录 `../fuwari-launcher`，找到哪个就用哪个；
-一个都没有就只启动站点，不报错。想只起站点，用 `pnpm dev:astro` 或 `pnpm dev --no-launcher`
-（也可令 `LAUNCHER=0`）。
+`pnpm dev` 会顺带把本地启动器一起拉起来：先看环境变量 `LAUNCHER_HOME`，再看同级目录
+`../fuwari-launcher` 里有没有 `server.mjs`，找到哪个就用哪个；一个都没有就只启动站点，不报错。
+启动器代码不在本仓库（`main` 只有站点，见「分支」）。想只起站点，用 `pnpm dev:astro` 或
+`pnpm dev --no-launcher`（也可令 `LAUNCHER=0`）。
 
 随后：
 
@@ -94,77 +94,55 @@ src/
 ├── types/          共享 TypeScript 类型
 └── utils/          内容查询、URL 与主题辅助函数
 src/content.config.ts   集合定义（Content Layer API）
-scripts/                开发脚本：dev.mjs（起站点 + 启动器）、sync-branch.mjs（同步分支快照）
-launcher/               本地启动器（改配置与内容、预览、部署的 Web 界面）
-start-launcher.cmd      Windows 下双击启动启动器
+scripts/                开发脚本：dev.mjs（起站点，发现同级启动器时一并拉起）
 ```
 
 ## 分支
 
-| 分支 | 内容 | 用途 |
+启动器与站点分居两条分支、两个目录，各自独立签出：
+
+| 分支 | 内容 | 目录 |
 |:--|:--|:--|
-| `main` | 站点本体 + 启动器（`launcher/`、`start-launcher.cmd`） | 日常开发：`pnpm dev` 同时拉起站点与启动器 |
-| `site` | 只有站点本体，没有启动器 | 纯净副本：只需要博客、或想让 `clone` 干净时用 |
-| `launcher` | 只有启动器，没有站点本体 | 单独改启动器；用 `LAUNCHER_ROOT` 指向站点 checkout |
+| `main` | 只有站点本体（`src/`、`public/`、`scripts/`、文章） | `E:\fuwari` |
+| `launcher` | 只有启动器（`server.mjs`、`core/`、`modules/`、`content/`、`ui/`、`test/`） | `E:\fuwari-launcher` |
 
-三条分支**没有共同祖先**（各自独立的 orphan 历史），这是刻意的：git 会直接拒绝三方互整枝合并
-（`fatal: refusing to merge unrelated histories`），而不会像共享历史那样静默删掉对方的文件。所以：
+- 两条分支**没有共同祖先**（各自独立的 orphan 历史）。git 会拒绝互整枝合并
+  （`fatal: refusing to merge unrelated histories`），这正是目的：不会像共享历史那样静默删掉对方的文件。
+- 不要用 `git merge` 在两者间同步。启动器通过 `LAUNCHER_ROOT` 读站点文件，不需要复制代码。
+- 启动器的完整说明（端点、分区、安全网、测试、环境变量）见 `E:\fuwari-launcher\README.md`。
+- 拆分前的快照仍在：`site` 分支与标签 `site-pre-split`、`launcher-pre-split`。
 
-- 不要用 `git merge` 同步这三个分支；要同步就取目录，或者用下面的脚本。
-- 内容真源永远是 `main`：`site` 是「`main` 去掉 `launcher/`、`start-launcher.cmd`」，`launcher` 是「分支自己的
-  `README.md`/`package.json`/`start-launcher.cmd` + `main` 的 `launcher/`」。
-- 拆分前的旧历史保留了标签：`site-pre-split`（= 原 `fa47b3d`）、`launcher-pre-split`（= 原 `b157a80`）。
+### 两个目录（worktree）
 
-同步脚本（在 `main` 的 checkout 里跑，脚本用 git 底层命令重建树，不动工作区）：
+两条分支各自签出在一个目录里，**共用一个 `.git`**（不是两份仓库拷贝），所以提交、推送、分支列表都是同一套：
+
+```
+E:\fuwari\             → main      站点（astro dev 在 localhost:4321）
+E:\fuwari-launcher\    → launcher  启动器（127.0.0.1:5199）
+```
+
+`git worktree list` 可查看全部签出。重建启动器目录：
 
 ```bash
-node scripts/sync-branch.mjs site --dry-run      # 先看会改哪些文件
-node scripts/sync-branch.mjs site --push         # 更新 site 并推送
-node scripts/sync-branch.mjs launcher --push     # 更新 launcher 的 launcher/ 目录并推送
-```
-
-`launcher` 分支被签出在 `E:\fuwari-launcher` 时，脚本会提示去那个目录执行 `git reset --hard <sha>`。
-
-### 三个目录（worktree）
-
-三条分支各自签出在一个目录里，**共用一个 `.git`**（不是三份仓库拷贝），所以三处提交、推送、分支列表都是同一套：
-
-```
-E:\fuwari\             → main      日常开发：站点 + 启动器
-E:\fuwari-site\        → site      纯净站点（无 launcher/）
-E:\fuwari-launcher\    → launcher  单独改启动器时用
-```
-
-`git worktree list` 可查看全部签出。新建/重建某个目录：
-
-```bash
-git worktree add ../fuwari-site site
 git worktree add ../fuwari-launcher launcher
 
-# 依赖共用主目录，用 junction 链接而不是复制：
-cmd //c mklink /J ..\fuwari-site\node_modules ..\fuwari\node_modules
+# 依赖与明文共用主目录，用 junction 链接而不是复制：
 cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
 cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
 ```
 
-同一个分支不能同时签出到两个目录（git 会拒绝），所以三处的手改天然不会互相覆盖。
-
 删除目录时**先摘掉 junction 再删工作区**，否则删除会跟进目标目录：
 
 ```bash
-cmd //c rmdir ..\fuwari-site\node_modules
-git worktree remove ../fuwari-site
+cmd //c rmdir ..\fuwari-launcher\node_modules
+cmd //c rmdir ..\fuwari-launcher\private
+git worktree remove ../fuwari-launcher
 ```
-
-各目录的注意点：
 
 | 目录 | 注意 |
 |:--|:--|
-| `E:\fuwari` | `pnpm dev` 同时起站点（localhost:4321）与启动器（127.0.0.1:5199） |
-| `E:\fuwari-site` | 想在这个只有站点的目录里预览，用 `pnpm dev:astro`；`pnpm dev` 会顺带去 `..\fuwari-launcher` 找启动器 |
-| `E:\fuwari-launcher` | **不要跑 `pnpm`**（`node_modules` 是 junction，pnpm 会拒绝安装并可能试图删除它）；用 `node launcher/server.mjs` 或双击 `start-launcher.cmd`，并让它指向站点目录（`LAUNCHER_ROOT` 或默认的同级 `fuwari`） |
-
-在 `site` / `launcher` 目录里的手改属于那条分支，不会被同步脚本合回 `main`；反过来，跑 `sync-branch.mjs` 会用 `main` 的内容覆盖 `site` 的整棵树、`launcher` 的 `launcher/` 目录。想长期保留的改动请改在 `main`。
+| `E:\fuwari` | `pnpm dev` 起站点，并自动去 `..\fuwari-launcher` 找启动器一起拉起 |
+| `E:\fuwari-launcher` | **不要跑 `pnpm`**（`node_modules` 是 junction，pnpm 会拒绝）；用 `node server.mjs` 或双击 `start-launcher.cmd`，默认指向同级 `..\fuwari` |
 
 ## 文章 Frontmatter
 

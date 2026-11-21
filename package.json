@@ -16,8 +16,7 @@
 		"lint": "biome check --write ./src",
 		"preinstall": "npx only-allow pnpm",
 		"encrypt": "node scripts/encrypt-post.mjs",
-		"encrypt-file": "node scripts/encrypt-file.mjs",
-		"launcher": "node launcher/server.mjs"
+		"encrypt-file": "node scripts/encrypt-file.mjs"
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.10",
