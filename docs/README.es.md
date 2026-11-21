@@ -67,15 +67,8 @@ y Yarn.
 
 ```sh
 pnpm install     # instalar dependencias
-pnpm dev         # iniciar el servidor de desarrollo en http://localhost:4321 (levanta también el lanzador, ver abajo)
+pnpm dev         # iniciar el servidor de desarrollo en http://localhost:4321
 ```
-
-`pnpm dev` también levanta el lanzador local: primero mira la variable de entorno
-`LAUNCHER_HOME` y después comprueba si el directorio hermano `../fuwari-launcher`
-contiene `server.mjs`, y usa el que encuentre. Si no encuentra ninguno, arranca solo el sitio
-sin dar error. El código del lanzador no está en este repositorio (`main` solo tiene el
-sitio, ver «Ramas»). Para levantar únicamente el sitio, usa `pnpm dev:astro` o
-`pnpm dev --no-launcher` (o bien `LAUNCHER=0`).
 
 Después:
 
@@ -100,55 +93,17 @@ src/
 ├── types/          tipos TypeScript compartidos
 └── utils/          consultas de contenido y utilidades de URL y tema
 src/content.config.ts   definición de colecciones (Content Layer API)
-scripts/                scripts de desarrollo: dev.mjs (arranca el sitio y, si encuentra el lanzador hermano, lo levanta también)
+scripts/                scripts de desarrollo: new-post.js, encrypt-post.mjs, encrypt-file.mjs
 ```
 
 ## Ramas
 
-El lanzador y el sitio se reparten en dos ramas y dos directorios, cada uno con su propio checkout:
+El repositorio tiene una sola rama, `main`.
 
-| Rama | Contenido | Directorio |
-|:--|:--|:--|
-| `main` | solo el sitio (`src/`, `public/`, `scripts/`, las entradas) | `E:\fuwari` |
-| `launcher` | solo el lanzador (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
-
-- Las dos ramas **no tienen ancestro común** (cada una tiene su propia historia orphan independiente). git rechaza la fusión de historias no relacionadas
-  (`fatal: refusing to merge unrelated histories`), y es intencionado: no borra en silencio los archivos de la otra parte como haría con una historia compartida.
-- No sincronices las dos ramas con `git merge`. El lanzador lee los archivos del sitio mediante `LAUNCHER_ROOT`, así que no necesita copiar código.
-- La documentación completa del lanzador (endpoints, secciones, red de seguridad, pruebas, variables de entorno) está en `E:\fuwari-launcher\README.md`.
-- Las instantáneas anteriores a la separación se conservan como etiquetas: `site-pre-split` (de la antigua rama `site`) y `launcher-pre-split`.
-
-### Dos directorios (worktrees)
-
-Las dos ramas se sacan con checkout en un directorio cada una y **comparten un único `.git`** (no son dos copias del repositorio), así que los commits, los push y la lista de ramas son los mismos en los dos:
-
-```
-E:\fuwari\             → main      sitio (astro dev en localhost:4321)
-E:\fuwari-launcher\    → launcher  lanzador (127.0.0.1:5199)
-```
-
-`git worktree list` muestra todos los checkouts. Para recrear el directorio del lanzador:
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# las dependencias y los archivos en claro se comparten con el directorio principal; usa un enlace junction en vez de copiar:
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-Al borrar un directorio, **quita primero el junction y luego elimina el árbol de trabajo**; de lo contrario el borrado seguirá hasta el directorio de destino:
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-| Directorio | Atención |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` levanta el sitio y busca automáticamente el lanzador en `..\fuwari-launcher` para levantarlo también |
-| `E:\fuwari-launcher` | **No ejecutes `pnpm`** (`node_modules` es un junction y pnpm lo rechaza); usa `node server.mjs` o haz doble clic en `start-launcher.cmd`; por defecto apunta al `..\fuwari` hermano |
+- Hubo un lanzador web local (rama `launcher`, con su propio checkout en `E:\fuwari-launcher`) para cambiar la configuración, gestionar las entradas y ejecutar los despliegues.
+  Ya no existe: `pnpm dev` vuelve a ser `astro dev` puro y el repositorio ya no contiene su código, sus scripts ni sus reglas de ignorado.
+- Las instantáneas históricas quedan en las etiquetas: `site-pre-split` (el sitio antes de la separación) y `site-final` (la última forma, solo con los archivos del sitio).
+  Para recuperar archivos antiguos usa solo lectura, por ejemplo `git show site-final:README.md`, y no fusiones las etiquetas de vuelta en `main`.
 
 ## Frontmatter de las entradas
 
@@ -201,6 +156,7 @@ Ejecuta todos los comandos desde la raíz del repositorio:
 |:--|:--|
 | `pnpm install` | Instala las dependencias |
 | `pnpm dev` | Inicia el servidor de desarrollo en `localhost:4321` |
+| `pnpm start` | Igual que arriba |
 | `pnpm build` | Compila el sitio en `./dist/` y lo indexa con Pagefind |
 | `pnpm preview` | Sirve el build de producción en local |
 | `pnpm check` | Ejecuta `astro check` para errores de tipos y plantillas |

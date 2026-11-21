@@ -68,12 +68,6 @@ pnpm install     # install dependencies
 pnpm dev         # start the dev server at http://localhost:4321
 ```
 
-`pnpm dev` also brings up the local launcher: it first checks the `LAUNCHER_HOME` environment
-variable, then looks for `server.mjs` in the sibling `../fuwari-launcher` directory, and uses
-whichever it finds; if neither exists it starts the site alone and reports no error. The
-launcher code is not in this repository (`main` carries the site only, see "Branches"). To
-start the site only, use `pnpm dev:astro` or `pnpm dev --no-launcher` (or set `LAUNCHER=0`).
-
 Then:
 
 1. Edit [`src/config.ts`](../src/config.ts) — site title, subtitle, language, theme hue,
@@ -98,66 +92,20 @@ src/
 ├── types/          shared TypeScript types
 └── utils/          content queries, URL and theme helpers
 src/content.config.ts   collection definitions (Content Layer API)
-scripts/                dev script: dev.mjs (starts the site; also starts the sibling launcher when found)
+scripts/                dev scripts: new-post.js, encrypt-post.mjs, encrypt-file.mjs
 ```
 
 ## Branches
 
-The launcher and the site live on two separate branches, each checked out in its own
-directory:
+This repository has a single branch `main`.
 
-| Branch | Contents | Directory |
-|:--|:--|:--|
-| `main` | the site itself only (`src/`, `public/`, `scripts/`, posts) | `E:\fuwari` |
-| `launcher` | the launcher only (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
-
-- The two branches **share no common ancestor** (each has its own independent orphan
-  history). git refuses to merge them into one another
-  (`fatal: refusing to merge unrelated histories`), and that is deliberate: unlike a shared
-  history, it cannot silently delete the other side's files.
-- Do not use `git merge` to synchronise the two. The launcher reads the site's files through
-  `LAUNCHER_ROOT`, so no code ever needs copying.
-- The launcher's full documentation (endpoints, sections, safety nets, tests, environment
-  variables) lives in `E:\fuwari-launcher\README.md`.
-- The pre-split snapshots are preserved as the tags `site-pre-split` (from the former
-  `site` branch) and `launcher-pre-split`.
-
-### Two directories (worktrees)
-
-Each of the two branches is checked out in its own directory, and **they share a single
-`.git`** (not two copies of the repository), so commits, pushes and the branch list are the
-same set in both places:
-
-```
-E:\fuwari\             → main      site (astro dev on localhost:4321)
-E:\fuwari-launcher\    → launcher  launcher (127.0.0.1:5199)
-```
-
-`git worktree list` shows every checkout. To create or recreate the launcher directory:
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# dependencies and plaintext are shared with the main directory — link them with junctions instead of copying:
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-When deleting a directory, **unlink the junctions first, then remove the worktree**,
-otherwise the delete follows the links into the target directory:
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-Caveats per directory:
-
-| Directory | Caveat |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` starts the site and automatically goes looking for the launcher in `..\fuwari-launcher` to start it too |
-| `E:\fuwari-launcher` | **do not run `pnpm`** here (`node_modules` is a junction, pnpm refuses); use `node server.mjs` or double-click `start-launcher.cmd`, which points at the sibling `..\fuwari` by default |
+- A local web launcher (the `launcher` branch, checked out separately at `E:\fuwari-launcher`)
+  used to edit configuration, manage posts and run deployments. It has been removed: `pnpm dev`
+  is a plain `astro dev` again, and the repository no longer carries its code, scripts or
+  ignore rules.
+- Historical snapshots remain as tags: `site-pre-split` (the site before the split) and
+  `site-final` (the final form using site files only). Read old files with a read-only
+  command such as `git show site-final:README.md`; do not merge the tags back into `main`.
 
 ## Post Frontmatter
 
@@ -209,6 +157,7 @@ Run all commands from the repository root:
 |:--|:--|
 | `pnpm install` | Install dependencies |
 | `pnpm dev` | Start the dev server at `localhost:4321` |
+| `pnpm start` | Same as above |
 | `pnpm build` | Build the site to `./dist/`, then index it with Pagefind |
 | `pnpm preview` | Serve the production build locally |
 | `pnpm check` | Run `astro check` for type and template errors |

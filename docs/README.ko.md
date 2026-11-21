@@ -65,14 +65,8 @@ pnpm의 정확한 버전은 `packageManager` 필드로 고정되어 있어 호�
 
 ```sh
 pnpm install     # 의존성 설치
-pnpm dev         # http://localhost:4321 에서 개발 서버 실행 (로컬 런처도 함께 시작, 아래 참고)
+pnpm dev         # http://localhost:4321 에서 개발 서버 실행
 ```
-
-`pnpm dev`는 로컬 런처도 함께 띄웁니다. 먼저 환경 변수 `LAUNCHER_HOME`을 보고, 그다음
-형제 디렉터리 `../fuwari-launcher`에 `server.mjs`가 있는지 확인해 찾은 것을 사용합니다.
-어디에도 없으면 오류 없이 사이트만 시작합니다. 런처 코드는 이 저장소에 없습니다
-(`main`에는 사이트만 있습니다. 아래 "브랜치" 참고). 사이트만 띄우려면 `pnpm dev:astro` 또는
-`pnpm dev --no-launcher`(또는 `LAUNCHER=0`)를 사용하세요.
 
 그다음:
 
@@ -97,55 +91,17 @@ src/
 ├── types/          공용 TypeScript 타입
 └── utils/          콘텐츠 조회, URL, 테마 헬퍼
 src/content.config.ts   컬렉션 정의 (Content Layer API)
-scripts/                개발 스크립트: dev.mjs (사이트 실행, 형제 런처를 발견하면 함께 띄움)
+scripts/                개발 스크립트: new-post.js, encrypt-post.mjs, encrypt-file.mjs
 ```
 
 ## 브랜치
 
-런처와 사이트는 두 개의 브랜치, 두 개의 디렉터리에 나뉘어 각각 독립적으로 checkout됩니다:
+저장소에는 `main` 브랜치 하나만 있습니다.
 
-| 브랜치 | 내용 | 디렉터리 |
-|:--|:--|:--|
-| `main` | 사이트 본체만 (`src/`, `public/`, `scripts/`, 글) | `E:\fuwari` |
-| `launcher` | 런처만 (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
-
-- 두 브랜치는 **공통 조상이 없습니다**(각자 독립적인 orphan 히스토리). git은 서로 다른 히스토리의 병합을 거부하며
-  (`fatal: refusing to merge unrelated histories`), 이는 의도된 것입니다: 공유 히스토리처럼 상대편 파일을 조용히 지우지 않습니다.
-- 두 브랜치를 `git merge`로 동기화하지 마세요. 런처는 `LAUNCHER_ROOT`로 사이트 파일을 읽으므로 코드를 복사할 필요가 없습니다.
-- 런처의 전체 설명(엔드포인트, 구획, 안전망, 테스트, 환경 변수)은 `E:\fuwari-launcher\README.md`를 참고하세요.
-- 분리 이전의 스냅숏은 태그로 남아 있습니다: 옛 `site` 브랜치의 `site-pre-split`과 `launcher-pre-split`.
-
-### 두 개의 디렉터리(worktree)
-
-두 브랜치는 각각 하나의 디렉터리에 checkout되고 **하나의 `.git`을 공유합니다**(저장소 사본 두 개가 아닙니다). 그래서 두 곳의 커밋, 푸시, 브랜치 목록은 모두 같은 것입니다:
-
-```
-E:\fuwari\             → main      사이트 (astro dev는 localhost:4321)
-E:\fuwari-launcher\    → launcher  런처 (127.0.0.1:5199)
-```
-
-`git worktree list`로 모든 checkout을 볼 수 있습니다. 런처 디렉터리를 다시 만들 때:
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# 의존성과 평문 파일은 메인 디렉터리를 공유하며, 복사 대신 junction 링크를 씁니다:
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-디렉터리를 삭제할 때는 **junction을 먼저 떼고 나서 작업 영역을 삭제**하세요. 그렇지 않으면 삭제가 대상 디렉터리까지 따라갑니다:
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-| 디렉터리 | 주의 |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev`가 사이트를 띄우고, 자동으로 `..\fuwari-launcher`에서 런처를 찾아 함께 시작합니다 |
-| `E:\fuwari-launcher` | **`pnpm`을 실행하지 마세요**(`node_modules`가 junction이라 pnpm이 거부합니다). `node server.mjs`를 쓰거나 `start-launcher.cmd`를 더블클릭하세요. 기본값은 형제 디렉터리 `..\fuwari`입니다 |
+- 한때 설정을 고치고 글을 관리하고 배포를 실행하는 로컬 웹 런처(`launcher` 브랜치, `E:\fuwari-launcher`에 따로 체크아웃)가 있었습니다.
+  지금은 제거되었습니다: `pnpm dev`는 순수한 `astro dev`로 돌아갔고, 저장소에는 그 코드와 스크립트, 무시 규칙이 더 이상 없습니다.
+- 과거 스냅숏은 태그로 남아 있습니다: `site-pre-split`(분리 이전의 사이트), `site-final`(사이트 파일만 남긴 마지막 형태).
+  옛 파일은 `git show site-final:README.md` 같은 읽기 전용 방식으로 꺼내고, 태그를 `main`에 다시 병합하지 마세요.
 
 ## 글 Frontmatter
 
@@ -195,6 +151,7 @@ src/content/posts/my-post/
 |:--|:--|
 | `pnpm install` | 의존성 설치 |
 | `pnpm dev` | `localhost:4321`에서 개발 서버 실행 |
+| `pnpm start` | 위와 같음 |
 | `pnpm build` | `./dist/`로 빌드한 뒤 Pagefind로 인덱스 생성 |
 | `pnpm preview` | 프로덕션 빌드를 로컬에서 미리보기 |
 | `pnpm check` | `astro check`로 타입 및 템플릿 오류 검사 |

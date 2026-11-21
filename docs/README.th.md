@@ -67,12 +67,6 @@ pnpm install     # ติดตั้ง dependencies
 pnpm dev         # เริ่มเซิร์ฟเวอร์ที่ http://localhost:4321
 ```
 
-`pnpm dev` จะเริ่มตัวเรียกใช้งาน (launcher) ในเครื่องให้ด้วย: ดูตัวแปรสภาพแวดล้อม `LAUNCHER_HOME`
-ก่อน แล้วจึงดูว่ามี `server.mjs` ในไดเรกทอรีข้างเคียง `../fuwari-launcher` ไหม เจอที่ไหนก็ใช้ที่นั่น
-ถ้าไม่เจอเลยจะเริ่มเฉพาะเว็บโดยไม่แจ้งข้อผิดพลาด โค้ดของตัวเรียกใช้งานไม่ได้อยู่ในรีโปนี้
-(`main` มีแต่เว็บ ดูหัวข้อ “สาขา”) หากต้องการเริ่มเฉพาะเว็บ ให้ใช้ `pnpm dev:astro` หรือ
-`pnpm dev --no-launcher` (หรือกำหนด `LAUNCHER=0`)
-
 จากนั้น:
 
 1. แก้ไข [src/config.ts](../src/config.ts) —— ชื่อเว็บ คำโปรย ภาษา เฉดสีธีม แบนเนอร์
@@ -96,62 +90,17 @@ src/
 ├── types/          ไทป์ TypeScript ที่ใช้ร่วมกัน
 └── utils/          การดึงเนื้อหา ยูทิลิตี URL และธีม
 src/content.config.ts   นิยามคอลเลกชัน (Content Layer API)
-scripts/                สคริปต์สำหรับพัฒนา: dev.mjs (เริ่มเว็บ และเริ่มตัวเรียกใช้งานด้วยถ้าเจอในไดเรกทอรีข้างเคียง)
+scripts/                สคริปต์สำหรับพัฒนา: new-post.js, encrypt-post.mjs, encrypt-file.mjs
 ```
 
 ## สาขา
 
-ตัวเรียกใช้งานกับเว็บอยู่คนละสาขาและคนละไดเรกทอรี โดย checkout แยกกัน:
+รีโปนี้มีสาขาเดียวคือ `main`
 
-| สาขา | เนื้อหา | ไดเรกทอรี |
-|:--|:--|:--|
-| `main` | ตัวเว็บเท่านั้น (`src/`, `public/`, `scripts/`, บทความ) | `E:\fuwari` |
-| `launcher` | ตัวเรียกใช้งานเท่านั้น (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
-
-- ทั้งสองสาขา**ไม่มีบรรพบุรุษร่วมกัน** (ต่างมีประวัติ orphan ของตัวเอง) git จะปฏิเสธการ merge
-  ข้ามสาขา (`fatal: refusing to merge unrelated histories`) ซึ่งเป็นเจตนา: มันจะไม่ลบไฟล์ของอีกฝ่าย
-  อย่างเงียบ ๆ เหมือนกรณีที่มีประวัติร่วมกัน
-- อย่าใช้ `git merge` ซิงก์ทั้งสองสาขา ตัวเรียกใช้งานอ่านไฟล์ของเว็บผ่าน `LAUNCHER_ROOT` จึงไม่ต้อง
-  คัดลอกโค้ดกัน
-- คำอธิบายตัวเรียกใช้งานฉบับเต็ม (เอนด์พอยต์ พาร์ทิชัน ตาข่ายนิรภัย การทดสอบ ตัวแปรสภาพแวดล้อม)
-  ดูที่ `E:\fuwari-launcher\README.md`
-- สแนปช็อตก่อนการแยกยังอยู่เป็นแท็ก: `site-pre-split` (จากสาขา `site` เดิม) และ `launcher-pre-split`
-
-### สองไดเรกทอรี (worktree)
-
-ทั้งสองสาขาถูก checkout แยกไว้ในแต่ละไดเรกทอรี **ใช้ `.git` ร่วมกัน** (ไม่ใช่สำเนารีโปสองชุด) ดังนั้น
-commit, push และรายการสาขาจึงเป็นชุดเดียวกัน:
-
-```
-E:\fuwari\             → main      เว็บ (astro dev ที่ localhost:4321)
-E:\fuwari-launcher\    → launcher  ตัวเรียกใช้งาน (127.0.0.1:5199)
-```
-
-`git worktree list` ดู checkout ทั้งหมดได้ การสร้าง/สร้างใหม่ไดเรกทอรีของตัวเรียกใช้งาน:
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# dependencies ใช้ร่วมกับไดเรกทอรีหลัก ใช้ junction link แทนการคัดลอก:
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-เมื่อลบไดเรกทอรี **ให้ถอด junction ก่อนแล้วค่อยลบ working tree** ไม่อย่างนั้นการลบจะตามเข้าไปใน
-ไดเรกทอรีเป้าหมาย:
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-ข้อควรระวังของแต่ละไดเรกทอรี:
-
-| ไดเรกทอรี | ข้อควรระวัง |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` เริ่มเว็บ และไปหาเครื่องเรียกใช้งานที่ `..\fuwari-launcher` เพื่อเริ่มให้ด้วยโดยอัตโนมัติ |
-| `E:\fuwari-launcher` | **อย่ารัน `pnpm`** (`node_modules` เป็น junction pnpm จะปฏิเสธ) ให้ใช้ `node server.mjs` หรือดับเบิลคลิก `start-launcher.cmd` ซึ่งชี้ไปที่ `..\fuwari` ข้างเคียงเป็นค่าเริ่มต้น |
+- เคยมีตัวเรียกใช้งานเว็บ (launcher) แบบโลคอลที่แยกไว้ในสาขา `launcher` และ checkout ที่ `E:\fuwari-launcher` สำหรับแก้ไขการตั้งค่า จัดการบทความ และรันการ deploy
+  ตอนนี้ถูกถอดออกแล้ว: `pnpm dev` กลับมาเป็น `astro dev` ล้วน ๆ และรีโปนี้ไม่มีโค้ด สคริปต์ หรือกฎ ignore ของมันอีก
+- สแนปช็อตในอดีตยังอยู่ในแท็ก: `site-pre-split` (เว็บก่อนการแยก) และ `site-final` (รูปแบบสุดท้ายที่มีเฉพาะไฟล์ของเว็บ)
+  ดูไฟล์เก่าด้วยวิธีอ่านอย่างเดียว เช่น `git show site-final:README.md` อย่า merge แท็กกลับเข้า `main`
 
 ## Frontmatter ของบทความ
 
@@ -203,6 +152,7 @@ src/content/posts/my-post/
 |:--|:--|
 | `pnpm install` | ติดตั้ง dependencies |
 | `pnpm dev` | เริ่มเซิร์ฟเวอร์พัฒนาที่ `localhost:4321` |
+| `pnpm start` | เหมือนด้านบน |
 | `pnpm build` | บิลด์เว็บไปที่ `./dist/` แล้วสร้างดัชนีด้วย Pagefind |
 | `pnpm preview` | ดูตัวอย่างบิลด์โปรดักชันในเครื่อง |
 | `pnpm check` | รัน `astro check` ตรวจไทป์และเทมเพลต |

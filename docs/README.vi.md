@@ -67,12 +67,6 @@ pnpm install     # cài đặt phụ thuộc
 pnpm dev         # chạy dev server tại http://localhost:4321
 ```
 
-`pnpm dev` cũng khởi động trình khởi chạy (launcher) cục bộ: trước tiên xem biến môi trường
-`LAUNCHER_HOME`, rồi xem thư mục cùng cấp `../fuwari-launcher` có `server.mjs` hay không, tìm thấy
-cái nào thì dùng cái đó; không có cái nào thì chỉ khởi động site và không báo lỗi. Mã của launcher
-không nằm trong kho lưu trữ này (`main` chỉ có site, xem “Nhánh”). Muốn chỉ khởi động site, dùng
-`pnpm dev:astro` hoặc `pnpm dev --no-launcher` (cũng có thể đặt `LAUNCHER=0`).
-
 Sau đó:
 
 1. Sửa [src/config.ts](../src/config.ts) —— tiêu đề, phụ đề, ngôn ngữ, màu chủ đề,
@@ -96,63 +90,17 @@ src/
 ├── types/          kiểu TypeScript dùng chung
 └── utils/          truy vấn nội dung, tiện ích URL và chủ đề
 src/content.config.ts   định nghĩa bộ sưu tập (Content Layer API)
-scripts/                script phát triển: dev.mjs (khởi động site, và khởi động cả launcher nếu tìm thấy trong thư mục cùng cấp)
+scripts/                script phát triển: new-post.js, encrypt-post.mjs, encrypt-file.mjs
 ```
 
 ## Nhánh
 
-Trình khởi chạy và site nằm ở hai nhánh, hai thư mục riêng và được checkout độc lập:
+Kho lưu trữ này chỉ có một nhánh là `main`.
 
-| Nhánh | Nội dung | Thư mục |
-|:--|:--|:--|
-| `main` | chỉ bản thân site (`src/`, `public/`, `scripts/`, bài viết) | `E:\fuwari` |
-| `launcher` | chỉ launcher (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
-
-- Hai nhánh **không có tổ tiên chung** (mỗi nhánh có lịch sử orphan riêng). git sẽ từ chối merge
-  chéo hai nhánh (`fatal: refusing to merge unrelated histories`), và đó chính là chủ ý: nó sẽ không
-  âm thầm xóa tệp của nhánh kia như khi có lịch sử chung.
-- Đừng dùng `git merge` để đồng bộ hai nhánh. Trình khởi chạy đọc tệp của site qua `LAUNCHER_ROOT`,
-  không cần sao chép mã nguồn.
-- Hướng dẫn đầy đủ về trình khởi chạy (endpoint, phân vùng, lưới an toàn, kiểm thử, biến môi trường)
-  xem tại `E:\fuwari-launcher\README.md`.
-- Ảnh chụp trước khi tách vẫn còn dưới dạng tag: `site-pre-split` (từ nhánh `site` cũ) và
-  `launcher-pre-split`.
-
-### Hai thư mục (worktree)
-
-Hai nhánh mỗi nhánh được checkout trong một thư mục, **dùng chung một `.git`** (không phải hai bản sao
-kho), nên commit, push và danh sách nhánh là một bộ:
-
-```
-E:\fuwari\             → main      site (astro dev tại localhost:4321)
-E:\fuwari-launcher\    → launcher  launcher (127.0.0.1:5199)
-```
-
-`git worktree list` xem được toàn bộ checkout. Dựng lại thư mục của launcher:
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# phụ thuộc dùng chung với thư mục chính, dùng junction link thay vì sao chép:
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-Khi xóa thư mục, **hãy tháo junction trước rồi mới xóa working tree**, nếu không việc xóa sẽ đi theo
-vào thư mục đích:
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-Lưu ý cho từng thư mục:
-
-| Thư mục | Lưu ý |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` khởi động site, và tự tìm launcher ở `..\fuwari-launcher` để khởi động cùng |
-| `E:\fuwari-launcher` | **Đừng chạy `pnpm`** (`node_modules` là junction, pnpm sẽ từ chối); hãy dùng `node server.mjs` hoặc nhấp đúp `start-launcher.cmd`, mặc định trỏ tới `..\fuwari` cùng cấp |
+- Từng có một trình khởi chạy web (launcher) cục bộ nằm ở nhánh `launcher`, được checkout riêng tại `E:\fuwari-launcher`, dùng để sửa cấu hình, quản lý bài viết và chạy triển khai.
+  Nó đã bị gỡ bỏ: `pnpm dev` quay lại là `astro dev` thuần túy, và kho lưu trữ không còn mã, script hay quy tắc ignore của nó.
+- Ảnh chụp lịch sử vẫn nằm trong các tag: `site-pre-split` (site trước khi tách), `site-final` (hình thái cuối cùng chỉ gồm các tệp của site).
+  Lấy tệp cũ theo cách chỉ đọc như `git show site-final:README.md`, đừng merge các tag trở lại `main`.
 
 ## Frontmatter của bài viết
 
@@ -204,6 +152,7 @@ Chạy mọi lệnh từ thư mục gốc của kho lưu trữ:
 |:--|:--|
 | `pnpm install` | Cài đặt phụ thuộc |
 | `pnpm dev` | Chạy dev server tại `localhost:4321` |
+| `pnpm start` | Như trên |
 | `pnpm build` | Build site vào `./dist/` rồi lập chỉ mục bằng Pagefind |
 | `pnpm preview` | Xem trước bản build production tại máy |
 | `pnpm check` | Chạy `astro check` để tìm lỗi kiểu và template |

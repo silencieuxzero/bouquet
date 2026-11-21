@@ -68,12 +68,6 @@ pnpm install     # pasang dependensi
 pnpm dev         # jalankan server pengembangan di http://localhost:4321
 ```
 
-`pnpm dev` juga ikut menjalankan launcher lokal: pertama periksa variabel lingkungan `LAUNCHER_HOME`,
-lalu apakah direktori sejajar `../fuwari-launcher` punya `server.mjs`, mana yang ditemukan dipakai; bila
-tidak ada sama sekali hanya situs yang dijalankan, tanpa galat. Kode launcher tidak ada di repositori ini
-(`main` hanya berisi situs, lihat “Cabang”). Ingin menjalankan situs saja, gunakan `pnpm dev:astro` atau
-`pnpm dev --no-launcher` (bisa juga dengan `LAUNCHER=0`).
-
 Selanjutnya:
 
 1. Sunting [src/config.ts](../src/config.ts) —— judul situs, subjudul, bahasa, hue tema,
@@ -97,63 +91,17 @@ src/
 ├── types/          tipe TypeScript bersama
 └── utils/          kueri konten, utilitas URL dan tema
 src/content.config.ts   definisi koleksi (Content Layer API)
-scripts/                skrip pengembangan: dev.mjs (menjalankan situs, dan menjalankan launcher juga bila ditemukan di direktori sejajar)
+scripts/                skrip pengembangan: new-post.js, encrypt-post.mjs, encrypt-file.mjs
 ```
 
 ## Cabang
 
-Launcher dan situs berada di dua cabang, dua direktori, dan di-checkout terpisah:
+Repositori ini hanya punya satu cabang, yaitu `main`.
 
-| Cabang | Isi | Direktori |
-|:--|:--|:--|
-| `main` | hanya situs (`src/`, `public/`, `scripts/`, artikel) | `E:\fuwari` |
-| `launcher` | hanya launcher (`server.mjs`, `core/`, `modules/`, `content/`, `ui/`, `test/`) | `E:\fuwari-launcher` |
-
-- Kedua cabang **tidak memiliki leluhur bersama** (masing-masing berisi riwayat orphan sendiri). git
-  akan menolak merge silang (`fatal: refusing to merge unrelated histories`), dan itu memang disengaja:
-  git tidak akan diam-diam menghapus berkas cabang lain seperti pada riwayat bersama.
-- Jangan memakai `git merge` untuk menyinkronkan kedua cabang. Launcher membaca berkas situs melalui
-  `LAUNCHER_ROOT`, jadi tidak perlu menyalin kode.
-- Penjelasan lengkap launcher (endpoint, partisi, jaring pengaman, pengujian, variabel lingkungan) ada di
-  `E:\fuwari-launcher\README.md`.
-- Cuplikan sebelum pemisahan masih tersimpan sebagai tag: `site-pre-split` (dari cabang `site` lama) dan
-  `launcher-pre-split`.
-
-### Dua direktori (worktree)
-
-Kedua cabang masing-masing di-checkout dalam satu direktori dan **berbagi satu `.git`** (bukan dua
-salinan repositori), jadi commit, push, dan daftar cabang di kedua tempat itu sama:
-
-```
-E:\fuwari\             → main      situs (astro dev di localhost:4321)
-E:\fuwari-launcher\    → launcher  launcher (127.0.0.1:5199)
-```
-
-`git worktree list` menampilkan semua checkout. Menyusun ulang direktori launcher:
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# dependensi dipakai bersama direktori utama, pakai junction link alih-alih menyalin:
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-Saat menghapus direktori, **lepas junction lebih dulu baru hapus working tree**, kalau tidak
-penghapusan akan ikut masuk ke direktori target:
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-Catatan per direktori:
-
-| Direktori | Catatan |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` menjalankan situs, dan otomatis mencari launcher di `..\fuwari-launcher` untuk dijalankan sekaligus |
-| `E:\fuwari-launcher` | **Jangan menjalankan `pnpm`** (`node_modules` adalah junction, pnpm akan menolak); pakai `node server.mjs` atau klik dua kali `start-launcher.cmd`, bawaannya mengarah ke `..\fuwari` sejajar |
+- Dulu ada launcher web lokal yang berada di cabang `launcher` dan di-checkout terpisah di `E:\fuwari-launcher`, dipakai untuk mengubah konfigurasi, mengelola artikel, dan menjalankan deploy.
+  Alat itu sudah dihapus: `pnpm dev` kembali menjadi `astro dev` murni, dan repositori ini tidak lagi memuat kode, skrip, maupun aturan ignore-nya.
+- Cuplikan historis tetap tersimpan sebagai tag: `site-pre-split` (situs sebelum pemisahan), `site-final` (bentuk terakhir yang hanya berisi berkas situs).
+  Ambil berkas lama dengan cara baca-saja seperti `git show site-final:README.md`, jangan merge tag itu kembali ke `main`.
 
 ## Frontmatter Artikel
 
@@ -206,6 +154,7 @@ Jalankan semua perintah dari akar repositori:
 |:--|:--|
 | `pnpm install` | Memasang dependensi |
 | `pnpm dev` | Menjalankan server pengembangan di `localhost:4321` |
+| `pnpm start` | Sama seperti di atas |
 | `pnpm build` | Build situs ke `./dist/`, lalu mengindeksnya dengan Pagefind |
 | `pnpm preview` | Melayani hasil build produksi secara lokal |
 | `pnpm check` | Menjalankan `astro check` untuk galat tipe dan template |

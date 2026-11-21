@@ -68,13 +68,6 @@ pnpm install     # 依存関係をインストール
 pnpm dev         # http://localhost:4321 で開発サーバーを起動
 ```
 
-`pnpm dev` はローカルのランチャーも一緒に起動します：まず環境変数 `LAUNCHER_HOME` を見て、
-次に隣接する `../fuwari-launcher` ディレクトリに `server.mjs` があるかどうかを探し、
-見つかったほうを使います。どちらもなければサイトだけを起動し、エラーにはなりません。
-ランチャーのコードは本リポジトリにはありません（`main` はサイトのみ。詳しくは「ブランチ」を
-参照）。サイトだけを起動したい場合は `pnpm dev:astro` か `pnpm dev --no-launcher`
-（`LAUNCHER=0` でも可）を使います。
-
 その後:
 
 1. [`src/config.ts`](../src/config.ts) を編集 —— サイト名、サブタイトル、言語、テーマの
@@ -98,66 +91,20 @@ src/
 ├── types/          共有 TypeScript 型
 └── utils/          コンテンツ取得、URL、テーマのヘルパー
 src/content.config.ts   コレクション定義（Content Layer API）
-scripts/                開発スクリプト：dev.mjs（サイトを起動し、隣接するランチャーがあれば一緒に起動）
+scripts/                開発スクリプト：new-post.js、encrypt-post.mjs、encrypt-file.mjs
 ```
 
 ## ブランチ
 
-ランチャーとサイトは 2 つのブランチに分かれ、それぞれ独立したディレクトリに
-チェックアウトされています：
+リポジトリには `main` ブランチが 1 つだけあります。
 
-| ブランチ | 内容 | ディレクトリ |
-|:--|:--|:--|
-| `main` | サイト本体のみ（`src/`、`public/`、`scripts/`、記事） | `E:\fuwari` |
-| `launcher` | ランチャーのみ（`server.mjs`、`core/`、`modules/`、`content/`、`ui/`、`test/`） | `E:\fuwari-launcher` |
-
-- 2 つのブランチは**共通の祖先を持ちません**（それぞれ独立した orphan 履歴）。git は
-  相互のマージを拒否します（`fatal: refusing to merge unrelated histories`）。これは
-  意図的なもので、共有履歴のときのように相手のファイルを黙って消すことはありません。
-- 両者の同期に `git merge` を使わないでください。ランチャーは `LAUNCHER_ROOT` 経由で
-  サイトのファイルを読むため、コードをコピーする必要はありません。
-- ランチャーの詳細（エンドポイント、セクション、セーフティネット、テスト、環境変数）は
-  `E:\fuwari-launcher\README.md` を参照してください。
-- 分割前のスナップショットはタグとして残っています：`site-pre-split`（旧 `site` ブランチ）と
-  `launcher-pre-split`。
-
-### 2つのディレクトリ（worktree）
-
-2 つのブランチはそれぞれ別のディレクトリに用意され、**`.git` を 1 つ共有します**
-（リポジトリのコピーが 2 つあるわけではありません）。そのためコミット、プッシュ、
-ブランチ一覧は 2 か所で同じものになります：
-
-```
-E:\fuwari\             → main      サイト（astro dev は localhost:4321）
-E:\fuwari-launcher\    → launcher  ランチャー（127.0.0.1:5199）
-```
-
-`git worktree list` で全ディレクトリを確認できます。ランチャーのディレクトリを
-作成・再作成するには：
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# 依存関係と平文はメインディレクトリと共有するため、コピーではなく junction でリンクします：
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-ディレクトリを削除するときは**先に junction を外してからワーキングツリーを削除**して
-ください。そうしないと削除がリンク先のディレクトリまで追いかけます：
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-ディレクトリごとの注意点：
-
-| ディレクトリ | 注意 |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` でサイトを起動し、`..\fuwari-launcher` のランチャーも自動で探して一緒に起動 |
-| `E:\fuwari-launcher` | ここで **`pnpm` を実行しないでください**（`node_modules` は junction のため pnpm が拒否します）。`node server.mjs` を実行するか `start-launcher.cmd` をダブルクリックしてください。既定では隣接する `..\fuwari` を指します |
+- 以前はローカルの Web ランチャーがあり、設定変更、記事管理、デプロイ実行に使われていました
+  （`launcher` ブランチとして `E:\fuwari-launcher` に別途チェックアウト）。現在は削除済みです：
+  `pnpm dev` は純粋な `astro dev` に戻り、そのコード、スクリプト、無視設定はもうありません。
+- 過去のスナップショットはタグとして残っています：`site-pre-split`（分割前のサイト）と
+  `site-final`（サイトのファイルのみを使った最終形）。古いファイルは
+  `git show site-final:README.md` のような読み取り専用の方法で取得し、タグは `main` に
+  マージしないでください。
 
 ## 記事の Frontmatter
 
@@ -207,6 +154,7 @@ src/content/posts/my-post/
 |:--|:--|
 | `pnpm install` | 依存関係をインストール |
 | `pnpm dev` | `localhost:4321` で開発サーバーを起動 |
+| `pnpm start` | 同上 |
 | `pnpm build` | `./dist/` にビルドし、Pagefind でインデックスを作成 |
 | `pnpm preview` | 本番ビルドをローカルで表示 |
 | `pnpm check` | `astro check` で型とテンプレートのエラーを検査 |
