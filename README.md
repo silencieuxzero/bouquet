@@ -63,13 +63,8 @@ pnpm 的确切版本由 `packageManager` 字段锁定，会自动选用兼容版
 
 ```sh
 pnpm install     # 安装依赖
-pnpm dev         # 启动开发服务器 http://localhost:4321（顺带启动启动器，见下）
+pnpm dev         # 启动开发服务器 http://localhost:4321
 ```
-
-`pnpm dev` 会顺带把本地启动器一起拉起来：先看环境变量 `LAUNCHER_HOME`，再看同级目录
-`../fuwari-launcher` 里有没有 `server.mjs`，找到哪个就用哪个；一个都没有就只启动站点，不报错。
-启动器代码不在本仓库（`main` 只有站点，见「分支」）。想只起站点，用 `pnpm dev:astro` 或
-`pnpm dev --no-launcher`（也可令 `LAUNCHER=0`）。
 
 随后：
 
@@ -94,55 +89,17 @@ src/
 ├── types/          共享 TypeScript 类型
 └── utils/          内容查询、URL 与主题辅助函数
 src/content.config.ts   集合定义（Content Layer API）
-scripts/                开发脚本：dev.mjs（起站点，发现同级启动器时一并拉起）
+scripts/                开发脚本：new-post.js、encrypt-post.mjs、encrypt-file.mjs
 ```
 
 ## 分支
 
-启动器与站点分居两条分支、两个目录，各自独立签出：
+仓库只有一条分支 `main`。
 
-| 分支 | 内容 | 目录 |
-|:--|:--|:--|
-| `main` | 只有站点本体（`src/`、`public/`、`scripts/`、文章） | `E:\fuwari` |
-| `launcher` | 只有启动器（`server.mjs`、`core/`、`modules/`、`content/`、`ui/`、`test/`） | `E:\fuwari-launcher` |
-
-- 两条分支**没有共同祖先**（各自独立的 orphan 历史）。git 会拒绝互整枝合并
-  （`fatal: refusing to merge unrelated histories`），这正是目的：不会像共享历史那样静默删掉对方的文件。
-- 不要用 `git merge` 在两者间同步。启动器通过 `LAUNCHER_ROOT` 读站点文件，不需要复制代码。
-- 启动器的完整说明（端点、分区、安全网、测试、环境变量）见 `E:\fuwari-launcher\README.md`。
-- 拆分前的快照仍在：`site` 分支与标签 `site-pre-split`、`launcher-pre-split`。
-
-### 两个目录（worktree）
-
-两条分支各自签出在一个目录里，**共用一个 `.git`**（不是两份仓库拷贝），所以提交、推送、分支列表都是同一套：
-
-```
-E:\fuwari\             → main      站点（astro dev 在 localhost:4321）
-E:\fuwari-launcher\    → launcher  启动器（127.0.0.1:5199）
-```
-
-`git worktree list` 可查看全部签出。重建启动器目录：
-
-```bash
-git worktree add ../fuwari-launcher launcher
-
-# 依赖与明文共用主目录，用 junction 链接而不是复制：
-cmd //c mklink /J ..\fuwari-launcher\node_modules ..\fuwari\node_modules
-cmd //c mklink /J ..\fuwari-launcher\private ..\fuwari\private
-```
-
-删除目录时**先摘掉 junction 再删工作区**，否则删除会跟进目标目录：
-
-```bash
-cmd //c rmdir ..\fuwari-launcher\node_modules
-cmd //c rmdir ..\fuwari-launcher\private
-git worktree remove ../fuwari-launcher
-```
-
-| 目录 | 注意 |
-|:--|:--|
-| `E:\fuwari` | `pnpm dev` 起站点，并自动去 `..\fuwari-launcher` 找启动器一起拉起 |
-| `E:\fuwari-launcher` | **不要跑 `pnpm`**（`node_modules` 是 junction，pnpm 会拒绝）；用 `node server.mjs` 或双击 `start-launcher.cmd`，默认指向同级 `..\fuwari` |
+- 曾有过一个本地 Web 启动器（`launcher` 分支，单独签出在 `E:\fuwari-launcher`），用来改配置、管文章、跑部署。
+  它已被移除：`pnpm dev` 恢复为纯粹的 `astro dev`，仓库里不再有它的代码、脚本与忽略规则。
+- 历史上的快照留在标签里：`site-pre-split`（拆分前的站点）、`site-final`（只用站点文件的最后形态）。
+  取旧文件用 `git show site-final:README.md` 这类只读方式，不要把标签合并回 `main`。
 
 ## 文章 Frontmatter
 
@@ -192,8 +149,8 @@ src/content/posts/my-post/
 | 指令 | 作用 |
 |:--|:--|
 | `pnpm install` | 安装依赖 |
-| `pnpm dev` | 在 `localhost:4321` 启动开发服务器；若找到启动器则同时启动 |
-| `pnpm dev:astro` | 只启动开发服务器，不启动启动器 |
+| `pnpm dev` | 在 `localhost:4321` 启动开发服务器 |
+| `pnpm start` | 同上 |
 | `pnpm build` | 构建站点至 `./dist/`，随后用 Pagefind 建立索引 |
 | `pnpm preview` | 本地预览生产构建 |
 | `pnpm check` | 执行 `astro check`，检查类型与模板错误 |
