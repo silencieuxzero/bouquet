@@ -21,7 +21,8 @@ export default async function handler(req) {
 		upstream = await fetchUpstream(track, req.headers.get("range"));
 	} catch (error) {
 		console.error("[bili-stream]", error);
-		return new Response("upstream unavailable", { status: 502 });
+		const reason = error instanceof Error ? error.message : String(error);
+		return new Response(`upstream unavailable: ${reason}`, { status: 502 });
 	}
 
 	const headers = new Headers();

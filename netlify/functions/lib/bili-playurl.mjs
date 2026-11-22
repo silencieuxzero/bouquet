@@ -126,17 +126,29 @@ export async function resolveCached(bvid) {
 	return fresh;
 }
 
+/** 上游只给了响应头就返回；超时只卡"等到响应头"这一段，之后的身体照常流式读。 */
+const UPSTREAM_HEADER_TIMEOUT = 10_000;
+const UPSTREAM_TOTAL_BUDGET = 18_000;
+
 /** 依次尝试主直链和备用直链，返回第一个能取到字节的上游响应。 */
 export async function fetchUpstream(track, range) {
 	const headers = { "User-Agent": BILI_UA, Referer: BILI_REFERER };
 	if (range) headers.Range = range;
 	let lastError;
+	// 备用链依次试，但总时间要有上限：每首最多等 18 秒，不能让浏览器干等到自己超时。
+	const deadline = Date.now() + UPSTREAM_TOTAL_BUDGET;
 	for (const url of [track.url, ...track.backups]) {
+		if (Date.now() > deadline) break;
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), UPSTREAM_HEADER_TIMEOUT);
 		try {
-			const res = await fetch(url, { headers });
+			// 定时器在拿到响应头后就清掉，否则它会在中途掐断还在传输的身体。
+			const res = await fetch(url, { headers, signal: controller.signal });
+			clearTimeout(timer);
 			if (res.status === 200 || res.status === 206) return res;
 			lastError = new Error(`HTTP ${res.status}`);
 		} catch (error) {
+			clearTimeout(timer);
 			lastError = error;
 		}
 	}
