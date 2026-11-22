@@ -137,8 +137,10 @@ export type MusicConfig = {
 	/** 0.0 ~ 1.0 */
 	volume: number;
 	songs: {
-		/** Path under /public, e.g. '/music/song.mp3' */
-		url: string;
+		/** Path under /public, e.g. '/music/song.mp3'. Optional when `bvid` is set. */
+		url?: string;
+		/** Bilibili video id (BV...). Resolved to a signed audio URL at play time. */
+		bvid?: string;
 		title: string;
 	}[];
 };
@@ -155,4 +157,3 @@ export type GalleryConfig = {
 	subtitle?: string;
 	images: GalleryImage[];
 };
-

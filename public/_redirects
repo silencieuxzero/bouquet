@@ -77,3 +77,7 @@
 #   static redirect table; this site instead routes taxonomy to
 #   /archive/?category=... via getCategoryUrl() in src/utils/url-utils.ts.
 #   Carried to the 待定清单 instead.
+
+# 音乐播放器的 B 站音频转发（netlify/functions/bili-stream.mjs）。
+# 静态构建里没有这个路径，200 是 rewrite 而不是重定向，浏览器地址栏保持 /api/bili-stream。
+/api/bili-stream   /.netlify/functions/bili-stream   200

@@ -184,9 +184,11 @@ export const musicConfig: MusicConfig = {
 	loopMode: "all", // 'none' | 'one' | 'all'
 	autoplay: false,
 	volume: 0.3,
+	// 每条要么给 bvid（B 站源，播放时现取签名直链），要么给本地 url（public 下的文件）。
+	// B 站源优先：两者都写时用 bvid。
 	songs: [
 		{
-			url: "/music/《说谎的马卡龙》中文填词，但是伴奏重制🧊🧊🧊【重音テト】-风巡妄想 [VBR 高质量].mp3",
+			bvid: "BV18MfSBTEHd",
 			title: "说谎的马卡龙 - 风巡妄想",
 		},
 		{
@@ -194,23 +196,23 @@ export const musicConfig: MusicConfig = {
 			title: "不可淹没的三峡游记 - 山城Mors",
 		},
 		{
-			url: "/music/Ciyo-拼接乌托邦 (反乌托邦拼接版).m4a",
+			bvid: "BV1UJ5j6eEse",
 			title: "反乌托邦·拼接版 - Ciyo / 见过夏天P / 乌托邦P",
 		},
 		{
-			url: "/music/【本家投稿】サイエンス(科学) _ MIMI feat. 重音テトSV【Official Video】-MIMI_music.mp3",
+			bvid: "BV1rmc6ziEHN",
 			title: "サイエンス(科学) - MIMI feat. 重音テトSV",
 		},
 		{
-			url: "/music/【本家投稿】ハナタバ _ MIMI feat. 可不 【official video】-MIMI_music.mp3",
+			bvid: "BV1VPcrzREby",
 			title: "ハナタバ - MIMI feat. 可不",
 		},
 		{
-			url: "/music/【本家投稿】ミュージック (音乐) _ MIMI feat. 可不-MIMI_music.mp3",
+			bvid: "BV1EEL969EHT",
 			title: "ミュージック(音乐) - MIMI feat. 可不",
 		},
 		{
-			url: "/music/【星尘原创】少年幻想总是诗  “一直被困在夏天自从你离开之后，直到发现我所拥有的自由”【新世代音乐人】-Utopia_乌托邦P.mp3",
+			bvid: "BV1Ve7P67Eqa",
 			title: "少年幻想总是诗 - Utopia_乌托邦P",
 		},
 	],

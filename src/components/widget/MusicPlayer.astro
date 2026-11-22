@@ -12,9 +12,16 @@ import I18nKey from "../../i18n/i18nKey";
 import { i18n } from "../../i18n/translation";
 
 const songs = musicConfig.songs.map((s) => ({
-	src: s.url,
+	src: s.url ?? "",
+	bvid: s.bvid ?? "",
 	title: s.title,
 }));
+
+// B 站音频必须经同源接口转发（直连 CDN 会 403，见 netlify/functions/bili-stream.mjs）。
+// dev 没有 Netlify Functions，走集成起的本机小服务（src/integrations/bili-stream-dev.mjs）。
+const biliStreamBase = import.meta.env.DEV
+	? "http://127.0.0.1:4399/api/bili-stream"
+	: "/api/bili-stream";
 
 const loopLabels: Record<string, string> = {
 	none: i18n(I18nKey.loopNone),
@@ -120,12 +127,12 @@ const uiText = {
 			<input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value={musicConfig.volume} aria-label={i18n(I18nKey.volumeLabel)} />
 		</div>
 
-		<audio id="audio-player" preload="none"></audio>
+		<audio id="audio-player" preload="none" referrerpolicy="no-referrer"></audio>
 		<div class="music-status" id="music-status"></div>
 	</div>
 </div>
 
-<script define:vars={{ songs, loopMode: musicConfig.loopMode, autoplay: musicConfig.autoplay, volume: musicConfig.volume, loopLabels, uiText }}>
+<script define:vars={{ songs, biliStreamBase, loopMode: musicConfig.loopMode, autoplay: musicConfig.autoplay, volume: musicConfig.volume, loopLabels, uiText }}>
 	const defaultLoopMode = loopMode;
 	const defaultAutoplay = autoplay;
 	const defaultVolume = volume;
@@ -193,25 +200,39 @@ const uiText = {
 			if (isError) console.error('[MusicPlayer]', msg);
 		}
 
-		function loadTrack(index) {
-			if (!songs.length) return;
+		// 每次切歌自增，用于丢弃“加载得太慢、用户已经点了别的歌”的结果
+		let loadToken = 0;
+
+		/** 切换曲目并开始加载；返回 false 表示这一首没加载起来，调用方不要接着 play。 */
+		async function loadTrack(index) {
+			if (!songs.length) return false;
 			const track = songs[index];
-			audio.src = track.src;
-			audio.load();
+			const token = ++loadToken;
 			if (musicTitle) musicTitle.textContent = track.title;
 			if (musicIndex) musicIndex.textContent = `${index + 1} / ${songs.length}`;
 			setStatus(uiText.loading);
+
+			// B 站源直接指向同源转发口，解析与补 Referer 都在服务端完成。
+			const src = track.src || (track.bvid ? `${biliStreamBase}?bvid=${encodeURIComponent(track.bvid)}` : "");
+			if (token !== loadToken) return false;
+			if (!src) {
+				setStatus(uiText.loadFailed, true);
+				return false;
+			}
+			audio.src = src;
+			audio.load();
+			return true;
 		}
 
 		function updatePlaylistActive(index) {
 			playlistItems.forEach((el, i) => el.classList.toggle('active', i === index));
 		}
 
-		function playTrack(index) {
+		async function playTrack(index) {
 			if (!songs.length) return;
 			currentIndex = index;
-			loadTrack(index);
 			updatePlaylistActive(index);
+			if (!(await loadTrack(index))) return;
 
 			function tryPlay() {
 				audio.play()
@@ -229,12 +250,25 @@ const uiText = {
 				tryPlay();
 			} else {
 				audio.addEventListener('canplay', tryPlay, { once: true });
-				const timeoutId = setTimeout(() => {
-					if (audio.readyState < 2) {
+				let retried = false;
+				let timeoutId;
+				const armTimeout = () => {
+					clearTimeout(timeoutId);
+					timeoutId = setTimeout(() => {
+						if (audio.readyState >= 2) return;
+						if (!retried) {
+							// 跨洋 CDN 偶发断流：静默重连一次，而不是立刻判失败
+							retried = true;
+							console.warn('[MusicPlayer] load slow, retrying:', audio.src);
+							audio.load();
+							armTimeout();
+							return;
+						}
 						setStatus(uiText.musicLoadTimeout, true);
 						console.error('[MusicPlayer] load timeout:', audio.src);
-					}
-				}, 10000);
+					}, 15000);
+				};
+				armTimeout();
 				audio.addEventListener('canplay', () => clearTimeout(timeoutId), { once: true });
 				audio.addEventListener('error', () => clearTimeout(timeoutId), { once: true });
 			}
