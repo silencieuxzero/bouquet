@@ -15,23 +15,28 @@ export default async function handler(req) {
 	const bvid = (new URL(req.url).searchParams.get("bvid") ?? "").trim();
 	if (!BVID.test(bvid)) return new Response("invalid bvid", { status: 400 });
 
+	// 部分 B 站 CDN 对不带 Range 的请求回 567（防盗链），所以没 Range 时自己补一条全网段的。
+	const range = req.headers.get("range") ?? "bytes=0-";
 	let upstream;
 	try {
 		const track = await resolveCached(bvid);
-		upstream = await fetchUpstream(track, req.headers.get("range"));
+		upstream = await fetchUpstream(track, range);
 	} catch (error) {
 		console.error("[bili-stream]", error);
 		const reason = error instanceof Error ? error.message : String(error);
 		return new Response(`upstream unavailable: ${reason}`, { status: 502 });
 	}
 
+	// 客户端没要 Range 时上游那 206 是补出来的，对客户端要还原成 200。
+	const answeredRange = Boolean(req.headers.get("range"));
 	const headers = new Headers();
 	for (const name of FORWARDED) {
+		if (!answeredRange && (name === "content-range" || name === "content-length")) continue;
 		const value = upstream.headers.get(name);
 		if (value) headers.set(name, value);
 	}
 	// 直链两小时就换，浏览器缓存太久会拿着过期链接反复失败。
 	headers.set("cache-control", "private, max-age=600");
 
-	return new Response(upstream.body, { status: upstream.status, headers });
+	return new Response(upstream.body, { status: answeredRange ? upstream.status : 200, headers });
 }
