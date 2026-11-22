@@ -64,6 +64,13 @@ function md5(text) {
 	return createHash("md5").update(text).digest("hex");
 }
 
+const COMFORTABLE_BPS = 132_000;
+
+/** 排序键：低于舒适码率的取"越小越靠后"，高于的按超出量从小到大。 */
+function preference(bandwidth) {
+	return bandwidth <= COMFORTABLE_BPS ? -bandwidth : bandwidth - COMFORTABLE_BPS + 1_000_000;
+}
+
 export async function resolveAudioUrl(bvid) {
 	const { imgKey, subKey } = await loadWbiKeys();
 
@@ -75,7 +82,11 @@ export async function resolveAudioUrl(bvid) {
 	const playurl = await getJson(`https://api.bilibili.com/x/player/wbi/playurl?${query}`);
 	if (playurl?.code !== 0) throw new Error(`playurl ${playurl?.code}: ${playurl?.message ?? "unknown"}`);
 
-	const tracks = [...(playurl?.data?.dash?.audio ?? [])].sort((a, b) => b.bandwidth - a.bandwidth);
+	// 音频字节要穿过 Netlify 一次再交给浏览器，实测这条往返只有 ~26 KB/s；224k 的档位
+	// 会追不上播放进度而卡顿。所以优先 132k 及以下里最高的那一档，实在没有才用更高档。
+	const tracks = [...(playurl?.data?.dash?.audio ?? [])].sort(
+		(a, b) => preference(a.bandwidth) - preference(b.bandwidth),
+	);
 	if (!tracks.length) throw new Error("playurl 没有返回音频轨");
 
 	// 候选按码率降序，转发时优先用第一条能拿到字节的。探活带上转发用的同一套头
